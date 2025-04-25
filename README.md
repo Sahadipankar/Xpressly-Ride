@@ -1,0 +1,1 @@
+Uber Clone – MERN Stack Project... A sleek and modern ride-booking platform built with the power of the MERN stack. Designed to reflect real-world applications, this project blends intuitive design with scalable architecture—perfect for showcasing full-stack development skills in a real-life scenario.
