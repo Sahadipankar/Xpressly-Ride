@@ -4,14 +4,15 @@
 # Backend API Documentation
 
 ## Table of Contents
-- [Description](#description)
-- [HTTP Method](#http-method)
-- [Required Packages](#required-packages)
-- [Controller File: `user.controller.js`](#controller-file-usercontrollerjs)
-- [Service File: `user.service.js`](#service-file-userservicejs)
-- [Model File: `user.model.js`](#model-file-usermodeljs)
-- [Request Body](#request-body)
-- [Status Codes & Responses](#status-codes--responses)
+- [Backend API Documentation (Register)](#backend-api-documentation-register)
+  - [Description](#description)
+  - [HTTP Method](#http-method)
+  - [Required Packages](#required-packages)
+  - [Controller File: `user.controller.js`](#controller-file-usercontrollerjs)
+  - [Service File: `user.service.js`](#service-file-userservicejs)
+  - [Model File: `user.model.js`](#model-file-usermodeljs)
+  - [Request Body](#request-body)
+  - [Status Codes & Responses](#status-codes--responses)
 
 - [Backend API Documentation (Login)](#backend-api-documentation-login)
   - [Description](#description-1)
@@ -32,6 +33,8 @@
   - [Status Codes & Responses](#status-codes--responses-3)
 
 ---
+
+# Backend API Documentation (Register)
 
 ## Description
 Creates a new user account and returns a JWT token along with user data.
