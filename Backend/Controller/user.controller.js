@@ -1,6 +1,7 @@
 const userModel = require('../Models/user.model');  // Import the user model
 const userService = require('../Services/user.service');  // Import the user service
 const { validationResult } = require('express-validator');  // Import express-validator for validation
+const blackListTokenModel = require('../Models/blacklistToken.model');  // Import the blacklist token model
 
 
 module.exports.registerUser = async (req, res, next) => {  // Function to handle user registration
@@ -23,6 +24,8 @@ module.exports.registerUser = async (req, res, next) => {  // Function to handle
 
     res.status(201).json({token, user});  // Return a 201 status with the token and user data
 }
+
+
 
 module.exports.loginUser = async (req, res, next) => {  // Function to handle user login
     
@@ -47,5 +50,28 @@ module.exports.loginUser = async (req, res, next) => {  // Function to handle us
 
     const token = user.generateAuthToken();  // Generate a JWT token for the user
 
-    res.status(200).json({token, user});  // Return a 200 status with the token and user data
+    res.cookie('token', token);  // Set the token as a cookie in the response
+
+    res.status(200).json({ message: 'Logged in successfully', token, user });  // Return a 200 status with a success message, token, and user data
 }
+
+
+
+module.exports.getUserProfile = async (req, res, next) => {  // Function to get user profile
+    res.status(200).json(req.user);  // Return a 200 status with the user data from the request object
+}
+
+
+
+module.exports.logoutUser = async (req, res, next) => {  // Function to handle user logout
+    res.clearCookie('token');  // Clear the token cookie from the response
+    
+    const token = req.cookies.token || req.headers.authorization.split(' ')[1];  // Get the token from cookies or headers
+
+    await blackListTokenModel.create({ token });  // Add the token to the blacklist
+    // This will prevent the token from being used again
+
+    res.status(200).json({ message: 'Logged out successfully' });  // Return a 200 status with a success message
+}
+
+

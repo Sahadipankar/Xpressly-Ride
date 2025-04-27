@@ -1,10 +1,42 @@
-# Backend Api Documentation
+
+---
+
+# Backend API Documentation
+
+## Table of Contents
+- [Description](#description)
+- [HTTP Method](#http-method)
+- [Required Packages](#required-packages)
+- [Controller File: `user.controller.js`](#controller-file-usercontrollerjs)
+- [Service File: `user.service.js`](#service-file-userservicejs)
+- [Model File: `user.model.js`](#model-file-usermodeljs)
+- [Request Body](#request-body)
+- [Status Codes & Responses](#status-codes--responses)
+
+- [Backend API Documentation (Login)](#backend-api-documentation-login)
+  - [Description](#description-1)
+  - [HTTP Method](#http-method-1)
+  - [Request Body](#request-body-1)
+  - [Status Codes & Responses](#status-codes--responses-1)
+
+- [Backend API Documentation (Profile)](#backend-api-documentation-profile)
+  - [Description](#description-2)
+  - [HTTP Method](#http-method-2)
+  - [Request Body](#request-body-2)
+  - [Status Codes & Responses](#status-codes--responses-2)
+
+- [Backend API Documentation (Logout)](#backend-api-documentation-logout)
+  - [Description](#description-3)
+  - [HTTP Method](#http-method-3)
+  - [Request Body](#request-body-3)
+  - [Status Codes & Responses](#status-codes--responses-3)
+
+---
 
 ## Description
 Creates a new user account and returns a JWT token along with user data.
 
 ---
-
 
 ## HTTP Method
 **POST** `/user/register`
@@ -86,6 +118,7 @@ Below are the main packages involved in this endpoint:
      }
    }
    ```
+
 2. **400 Bad Request**  
    Returned if validation fails or required fields are missing. Example Error Response:
    ```json
@@ -102,13 +135,15 @@ Below are the main packages involved in this endpoint:
 
 ---
 
-## HTTP Method
-**POST** `/user/login`
+# Backend API Documentation (Login)
+
+## Description
+Authenticates an existing user by verifying the provided email and password. On success, returns a JWT token plus the user data.
 
 ---
 
-### Description
-Authenticates an existing user by verifying the provided email and password. On success, returns a JWT token plus the user data.
+## HTTP Method
+**POST** `/user/login`
 
 ---
 
@@ -163,3 +198,69 @@ Authenticates an existing user by verifying the provided email and password. On 
      "message": "Invalid email or password"
    }
    ```
+
+---
+
+# Backend API Documentation (Profile)
+
+## Description
+Retrieves the profile of the currently authenticated user.
+
+---
+
+## HTTP Method
+**GET** `/user/profile`
+
+---
+
+## Request Body
+*None.*
+
+---
+
+## Status Codes & Responses
+
+1. **200 OK**  
+   Example Successful Response:
+   ```json
+   {
+     "_id": "user-id-string",
+     "fullname": {
+       "firstname": "John",
+       "lastname": "Doe"
+     },
+     "email": "johndoe@example.com",
+     "socketId": null
+   }
+   ```
+
+---
+
+# Backend API Documentation (Logout)
+
+## Description
+Logs out the currently authenticated user by clearing the token cookie and blacklisting the token.
+
+---
+
+## HTTP Method
+**GET** `/user/logout`
+
+---
+
+## Request Body
+*None.*
+
+---
+
+## Status Codes & Responses
+
+1. **200 OK**  
+   Example Successful Response:
+   ```json
+   {
+     "message": "Logged out successfully"
+   }
+   ```
+
+---

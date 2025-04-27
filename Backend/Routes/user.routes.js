@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();  // Create a new router instance
 const {body} = require('express-validator');  // Import express-validator for validation
 const userController = require('../Controller/user.controller');  // Import the user controller
+const authMiddleware = require('../Middlewares/auth.middleware');  // Import the authentication middleware
 
 
 
@@ -21,6 +22,12 @@ router.post('/login', [
 userController.loginUser);  // Route for user login
 
 
+
+router.get('/profile', authMiddleware.authUser, userController.getUserProfile);  // Route for getting user profile
+
+
+
+router.get('/logout', authMiddleware.authUser, userController.logoutUser);  // Route for user logout
 
 module.exports = router;  // Export the router for use in other files
 // This router can be used to define routes related to user operations, such as registration, login, etc.

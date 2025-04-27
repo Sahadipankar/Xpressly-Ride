@@ -3,16 +3,20 @@ dotenv.config(); // Load environment variables from .env file
 const express = require('express'); // Import Express framework
 const cors = require('cors'); // Import CORS middleware
 const app = express(); // Create an Express application
+const cookieParser = require('cookie-parser'); // Import cookie-parser middleware
 const connectToDB = require('./DB/db'); // Import the database connection function
 const userRoutes = require('./Routes/user.routes'); // Import user routes
-
-app.use(express.json()); // Middleware to parse JSON request bodies
-app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded request bodies
 
 
 connectToDB(); // Call the function to connect to the database
 
+
 app.use(cors()); // Use CORS middleware to enable Cross-Origin Resource Sharing
+app.use(express.json()); // Middleware to parse JSON request bodies
+app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded request bodies
+app.use(cookieParser()); // Middleware to parse cookies from request headers
+
+
 
 app.get('/', (req, res) => {
     res.send('Hello World!');

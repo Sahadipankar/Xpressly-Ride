@@ -33,9 +33,9 @@ const userSchema = new mongoose.Schema({    // Define the user schema
 });
 
 
-userSchema.methods.generateAuthToken = function () {   // Method to generate JWT token
-    const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET);  // Sign the token with user ID and secret
-    return token;  // Return the generated token
+userSchema.methods.generateAuthToken = function () {
+    const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    return token;
 }
 
 userSchema.methods.comparePassword = async function (password) {  // Method to compare password with hashed password
