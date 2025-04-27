@@ -5,6 +5,7 @@ Creates a new user account and returns a JWT token along with user data.
 
 ---
 
+
 ## HTTP Method
 **POST** `/user/register`
 
@@ -65,6 +66,7 @@ Below are the main packages involved in this endpoint:
 ```
 
 ---
+
 ## Status Codes & Responses
 
 1. **201 Created**  
@@ -99,3 +101,65 @@ Below are the main packages involved in this endpoint:
    ```
 
 ---
+
+## HTTP Method
+**POST** `/user/login`
+
+---
+
+### Description
+Authenticates an existing user by verifying the provided email and password. On success, returns a JWT token plus the user data.
+
+---
+
+## Request Body
+```json
+{
+  "email": "string (valid email, required)",
+  "password": "string (≥6 chars, required)"
+}
+```
+
+---
+
+## Status Codes & Responses
+
+1. **200 OK**  
+   Example Successful Response:
+   ```json
+   {
+     "token": "generated-jwt-token",
+     "user": {
+       "_id": "user-id-string",
+       "fullname": {
+         "firstname": "John",
+         "lastname": "Doe"
+       },
+       "email": "johndoe@example.com",
+       "password": "hashed-password",
+       "socketId": null
+     }
+   }
+   ```
+
+2. **400 Bad Request**  
+   Returned if validation fails. Example Error Response:
+   ```json
+   {
+     "errors": [
+       {
+         "msg": "Invalid Email",
+         "param": "email",
+         "location": "body"
+       }
+     ]
+   }
+   ```
+
+3. **401 Unauthorized**  
+   Returned if the credentials are invalid. Example Error Response:
+   ```json
+   {
+     "message": "Invalid email or password"
+   }
+   ```

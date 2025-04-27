@@ -11,6 +11,11 @@ npm install express-validator
 
 
 
-create a readme.md file to docs the /user/register endpoint with description and status code. Also write how the data is required in the endpoint. Create md file in the Backend folder. Give detailed description of the entire file with proper documentation including all the packages required for this project and the entire functioning of all the functions. Include description, http methods, request body, example for response that user gets from the endpoint
+create a readme.md file to docs the /user/register endpoint with description and status code. 
+Also write how the data is required in the endpoint. Create md file in the Backend folder. 
+Give detailed description of the entire file with proper documentation including all the 
+packages required for this project and the entire functioning of all the functions. 
+Include description, http methods, request body, example for response that user gets from the endpoint
 
 
+Modify the Readme.md file and add { /user/login } endpoint with description and status code. Add detailed description of the new added portion and Include description, http methods, request body, example for response that user gets from the endpoint. Combine the already written information in Readme.md file and add this new portion while keeping the previous information intact

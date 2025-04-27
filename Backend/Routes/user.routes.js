@@ -4,14 +4,21 @@ const {body} = require('express-validator');  // Import express-validator for va
 const userController = require('../Controller/user.controller');  // Import the user controller
 
 
+
 router.post('/register', [
     body('email').isEmail().withMessage('Invalid Email'),  // Validate email format
     body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be at least 3 characters long'),  // Validate first name length
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),  // Validate password length
 ], 
-userController.userRegister);  // Route for user registration   
+userController.registerUser);  // Route for user registration   
 
 
+
+router.post('/login', [
+    body('email').isEmail().withMessage('Invalid Email'),  // Validate email format
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),  // Validate password length
+],
+userController.loginUser);  // Route for user login
 
 
 
