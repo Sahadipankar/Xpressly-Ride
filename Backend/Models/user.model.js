@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');   // Import Mongoose for MongoDB object modeling
-const bcrypt = require('bcryptjs');     // Import bcrypt for password hashing   
+const bcrypt = require('bcrypt');     // Import bcrypt for password hashing   
 const jwt = require('jsonwebtoken');    // Import jsonwebtoken for creating JWTs
 
 
