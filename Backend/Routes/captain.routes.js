@@ -2,6 +2,7 @@ const express = require('express');             // Import Express framework
 const router = express.Router();                // Create a new router instance
 const { body } = require('express-validator');  // Import express-validator for request validation
 const captainController = require('../Controller/captain.controller'); // Import the captain controller
+const authMiddleware = require('../Middlewares/auth.middleware'); // Import authentication middleware
 
 
 
@@ -20,7 +21,23 @@ router.post('/register', [ // Define a POST route for user registration
    
     body('vehicle.vehicleType').isIn(['Car', 'Bike', 'Auto']).withMessage('Vehicle type must be either Car, Bike, or Auto') // Validate vehicle type
 ], 
-captainController.registerCatain); // Call the registerCaptain function from the controller
+captainController.registerCaptain); // Call the registerCaptain function from the controller
+
+
+
+router.post('/login', [ // Define a POST route for user login
+    body('email').isEmail().withMessage('Please fill a valid email address'), // Validate email format
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long') // Validate password length
+],
+captainController.loginCaptain); // Call the loginCaptain function from the controller
+
+
+
+router.get('/profile', authMiddleware.authCaptain, captainController.getCaptainProfile); // Define a GET route to fetch the captain's profile
+
+
+
+router.get('/logout', authMiddleware.authCaptain, captainController.logoutCaptain); // Define a GET route for user logout
 
 
 

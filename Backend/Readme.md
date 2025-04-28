@@ -4,7 +4,10 @@
 # Backend API Documentation
 
 ## Table of Contents
-- [Backend API Documentation (Register)](#backend-api-documentation-user-register)
+
+### User 
+
+- [Backend API Documentation (User Register)](#backend-api-documentation-user-register)
   - [Description](#description)
   - [HTTP Method](#http-method)
   - [Required Packages](#required-packages)
@@ -14,23 +17,25 @@
   - [Request Body](#request-body)
   - [Status Codes & Responses](#status-codes--responses)
 
-- [Backend API Documentation (Login)](#backend-api-documentation-user-login)
+- [Backend API Documentation (User Login)](#backend-api-documentation-user-login)
   - [Description](#description-1)
   - [HTTP Method](#http-method-1)
   - [Request Body](#request-body-1)
   - [Status Codes & Responses](#status-codes--responses-1)
 
-- [Backend API Documentation (Profile)](#backend-api-documentation-user-profile)
+- [Backend API Documentation (User Profile)](#backend-api-documentation-user-profile)
   - [Description](#description-2)
   - [HTTP Method](#http-method-2)
   - [Request Body](#request-body-2)
   - [Status Codes & Responses](#status-codes--responses-2)
 
-- [Backend API Documentation (Logout)](#backend-api-documentation-user-logout)
+- [Backend API Documentation (User Logout)](#backend-api-documentation-user-logout)
   - [Description](#description-3)
   - [HTTP Method](#http-method-3)
   - [Request Body](#request-body-3)
   - [Status Codes & Responses](#status-codes--responses-3)
+
+### Captain
 
 - [Backend API Documentation (Captain Register)](#backend-api-documentation-captain-register)
   - [Description](#description-4)
@@ -41,6 +46,24 @@
   - [Model File: `captain.model.js`](#model-file-captainmodeljs)
   - [Request Body](#request-body-4)
   - [Status Codes & Responses](#status-codes--responses-4)
+
+- [Backend API Documentation (Captain Login)](#backend-api-documentation-captain-login)
+  - [Description](#description-5)
+  - [HTTP Method](#http-method-5)
+  - [Request Body](#request-body-5)
+  - [Status Codes & Responses](#status-codes--responses-5)
+
+- [Backend API Documentation (Captain Profile)](#backend-api-documentation-captain-profile)
+  - [Description](#description-6)
+  - [HTTP Method](#http-method-6)
+  - [Request Body](#request-body-6)
+  - [Status Codes & Responses](#status-codes--responses-6)
+
+- [Backend API Documentation (Captain Logout)](#backend-api-documentation-captain-logout)
+  - [Description](#description-7)
+  - [HTTP Method](#http-method-7)
+  - [Request Body](#request-body-7)
+  - [Status Codes & Responses](#status-codes--responses-7)
 
 ---
 
@@ -148,6 +171,10 @@ Below are the main packages involved in this endpoint:
 
 ---
 
+[⬅️ Back to Table of Contents](#table-of-contents)
+
+---
+
 # Backend API Documentation (User Login)
 
 ## Description
@@ -214,6 +241,10 @@ Authenticates an existing user by verifying the provided email and password. On 
 
 ---
 
+[⬅️ Back to Table of Contents](#table-of-contents)
+
+---
+
 # Backend API Documentation (User Profile)
 
 ## Description
@@ -230,6 +261,11 @@ Retrieves the profile of the currently authenticated user.
 *None.*
 
 ---
+
+[⬅️ Back to Table of Contents](#table-of-contents)
+
+---
+
 
 ## Status Codes & Responses
 
@@ -248,6 +284,11 @@ Retrieves the profile of the currently authenticated user.
    ```
 
 ---
+
+[⬅️ Back to Table of Contents](#table-of-contents)
+
+---
+
 
 # Backend API Documentation (User Logout)
 
@@ -275,6 +316,10 @@ Logs out the currently authenticated user by clearing the token cookie and black
      "message": "Logged out successfully"
    }
    ```
+
+---
+
+[⬅️ Back to Table of Contents](#table-of-contents)
 
 ---
 
@@ -399,6 +444,167 @@ Below are the main packages involved in this endpoint:
    ```json
    {
      "message": "Captain already exists"
+   }
+   ```
+
+[⬅️ Back to Table of Contents](#table-of-contents)
+
+---
+
+# Backend API Documentation (Captain Login)
+
+## Description
+Authenticates an existing captain by verifying the provided email and password. On success, returns a JWT token plus the captain data.
+
+---
+
+## HTTP Method
+**POST** `/captains/login`
+
+---
+
+## Request Body
+```json
+{
+  "email": "string (valid email, required)",
+  "password": "string (≥6 chars, required)"
+}
+```
+
+---
+
+## Status Codes & Responses
+
+1. **200 OK**  
+   Example Successful Response:
+   ```json
+   {
+     "token": "generated-jwt-token",
+     "captain": {
+       "_id": "captain-id-string",
+       "fullname": {
+         "firstname": "Jane",
+         "lastname": "Smith"
+       },
+       "email": "janesmith@example.com",
+       "socketId": null,
+       "status": "inactive",
+       "vehicle": {
+         "color": "Red",
+         "plate": "ABC123",
+         "capacity": 4,
+         "vehicleType": "Car"
+       },
+       "location": {
+         "lat": null,
+         "lng": null
+       }
+     }
+   }
+   ```
+
+2. **400 Bad Request**  
+   Returned if validation fails or credentials are incorrect. Example Error Response:
+   ```json
+   {
+     "errors": [
+       {
+         "msg": "Please fill a valid email address",
+         "param": "email",
+         "location": "body"
+       }
+     ]
+   }
+   ```
+   Or:
+   ```json
+   {
+     "message": "Invalid email or password"
+   }
+   ```
+
+---
+
+[⬅️ Back to Table of Contents](#table-of-contents)
+
+---
+
+# Backend API Documentation (Captain Profile)
+
+## Description
+Retrieves the profile of the currently authenticated captain.
+
+---
+
+## HTTP Method
+**GET** `/captains/profile`
+
+---
+
+## Request Body
+*None.*
+
+---
+
+## Status Codes & Responses
+
+1. **200 OK**  
+   Example Successful Response:
+   ```json
+   {
+     "captain": {
+       "_id": "captain-id-string",
+       "fullname": {
+         "firstname": "Jane",
+         "lastname": "Smith"
+       },
+       "email": "janesmith@example.com",
+       "socketId": null,
+       "status": "inactive",
+       "vehicle": {
+         "color": "Red",
+         "plate": "ABC123",
+         "capacity": 4,
+         "vehicleType": "Car"
+       },
+       "location": {
+         "lat": null,
+         "lng": null
+       }
+     }
+   }
+   ```
+
+---
+
+[⬅️ Back to Table of Contents](#table-of-contents)
+
+---
+
+# Backend API Documentation (Captain Logout)
+
+## Description
+Logs out the currently authenticated captain by clearing the token cookie and blacklisting the token.
+
+---
+
+## HTTP Method
+**GET** `/captains/logout`
+
+---
+
+## Request Body
+*None.*
+
+---
+
+## Status Codes & Responses
+
+1. **200 OK**  
+   Example Successful Response:
+   ```json
+   {
+     "message": "Logged out successfully"
    }
    ```
 

@@ -12,4 +12,5 @@ const blacklistTokenSchema = new mongoose.Schema({  // Define the schema for the
         expires: 86400 }    // 86400 seconds = 24 hours
 });
 
-module.exports = mongoose.model('BlacklistToken', blacklistTokenSchema);    // Create a Mongoose model for the blacklist token schema and export it
+module.exports = mongoose.model('blacklistToken', blacklistTokenSchema); // Export the model for use in other parts of the application
+// This model is used to store blacklisted tokens in the database, with a TTL (time-to-live) of 24 hours.

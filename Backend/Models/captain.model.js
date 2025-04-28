@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');    // Import jsonwebtoken for creating JWTs
 
 
 const captainSchema = new mongoose.Schema({     // Define the captain schema
-    
+
     fullname: {     // Nested schema for full name
         firstname: {
             type: String,
