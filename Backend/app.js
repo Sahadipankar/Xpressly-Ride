@@ -6,6 +6,7 @@ const app = express(); // Create an Express application
 const cookieParser = require('cookie-parser'); // Import cookie-parser middleware
 const connectToDB = require('./DB/db'); // Import the database connection function
 const userRoutes = require('./Routes/user.routes'); // Import user routes
+const captainRoutes = require('./Routes/captain.routes'); // Import captain routes
 
 
 connectToDB(); // Call the function to connect to the database
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/users', userRoutes); // Use user routes for API requests
+app.use('/captains', captainRoutes); // Use captain routes for API requests
 
 module.exports = app;
 // This is a simple Express application that responds with "Hello World!" when the root URL is accessed.
