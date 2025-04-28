@@ -1,9 +1,10 @@
+
 ---
 
 # Backend API Documentation
 
 ## Table of Contents
-- [Backend API Documentation (User Register)](#backend-api-documentation-register)
+- [Backend API Documentation (Register)](#backend-api-documentation-user-register)
   - [Description](#description)
   - [HTTP Method](#http-method)
   - [Required Packages](#required-packages)
@@ -13,19 +14,19 @@
   - [Request Body](#request-body)
   - [Status Codes & Responses](#status-codes--responses)
 
-- [Backend API Documentation (User Login)](#backend-api-documentation-login)
+- [Backend API Documentation (Login)](#backend-api-documentation-user-login)
   - [Description](#description-1)
   - [HTTP Method](#http-method-1)
   - [Request Body](#request-body-1)
   - [Status Codes & Responses](#status-codes--responses-1)
 
-- [Backend API Documentation (User Profile)](#backend-api-documentation-profile)
+- [Backend API Documentation (Profile)](#backend-api-documentation-user-profile)
   - [Description](#description-2)
   - [HTTP Method](#http-method-2)
   - [Request Body](#request-body-2)
   - [Status Codes & Responses](#status-codes--responses-2)
 
-- [Backend API Documentation (User Logout)](#backend-api-documentation-logout)
+- [Backend API Documentation (Logout)](#backend-api-documentation-user-logout)
   - [Description](#description-3)
   - [HTTP Method](#http-method-3)
   - [Request Body](#request-body-3)
