@@ -1,5 +1,6 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
+import Start from './Pages/Start'
 import Home from './Pages/Home'
 import UserLogin from './Pages/UserLogin'
 import CaptainLogin from './Pages/CaptainLogin'
@@ -10,7 +11,8 @@ const App = () => { // This is the main App component that sets up the routes fo
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Start />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/login" element={<UserLogin />} />
         <Route path="/signup" element={<UserSignUp />} />
         <Route path="/captain-login" element={<CaptainLogin />} />
