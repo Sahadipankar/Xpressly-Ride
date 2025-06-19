@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { useState, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 import axios from 'axios' // Importing axios for making HTTP requests.
 import { UserDataContext } from '../Context/UserContext' // Importing the UserDataContext to manage user data.
 
@@ -14,7 +13,7 @@ const UserSignUp = () => {
 
     const navigate = useNavigate() // Hook to programmatically navigate to different routes.
 
-    const {user, setUser} = React.useContext(UserDataContext) // Using the UserDataContext to get and set user data.
+    const { user, setUser } = useContext(UserDataContext) // Using the UserDataContext to get and set user data.
 
     const submitHandler = async (e) => { // This function handles the form submission.
         e.preventDefault() // Prevents the default form submission behavior.
@@ -33,6 +32,7 @@ const UserSignUp = () => {
         if (response.status === 201) { // If the response is successful
             const data = response.data // Extracting user data from the response.
             setUser(data.user) // Updating the user context with the new user data.
+            localStorage.setItem('token', data.token) // Storing the token in local storage for authentication.
             navigate('/home') // Navigating to the home page after successful registration.
         }
 

@@ -41,7 +41,6 @@ module.exports.registerCaptain = async (req, res, next) => { // Function to regi
     const token = captain.generateAuthToken(); // Generate a JWT token for the newly created captain
 
     res.status(201).json({ token, captain }); // Return a 201 Created response with the token and captain details
-
 }
 
 

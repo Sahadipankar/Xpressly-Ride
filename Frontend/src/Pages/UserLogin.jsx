@@ -1,5 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
+import { UserDataContext } from '../Context/UserContext'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios' // Importing axios for making HTTP requests.
 
 
 const UserLogin = () => {
@@ -7,20 +10,31 @@ const UserLogin = () => {
 
     const [email, setEmail] = useState('')
     // useState hook is used to manage the email state of the input field.
-
     const [password, setPassword] = useState('')
     // useState hook is used to manage the password state of the input field.
-
     const [userData, setUserData] = useState({})
 
-    const submitHandler = (e) => { // This function handles the form submission.
+
+    const { user, setUser } = useContext(UserDataContext) // Using the UserDataContext to get and set user data.
+    const navigate = useNavigate() // Hook to programmatically navigate to different routes.
+
+
+    const submitHandler = async (e) => { // This function handles the form submission.
         e.preventDefault() // Prevents the default form submission behavior.
 
-        // Collecting user data from the input fields
-        setUserData({
-            Email: email,
-            Password: password
-        })
+        const userData = {
+            email: email,
+            password: password
+        }
+
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData) // Sending a POST request to the server to log in the user.
+
+        if (response.status === 200) { // If the response is successful
+            const data = response.data // Extracting user data from the response.
+            setUser(data.user) // Updating the user context with the new user data.
+            localStorage.setItem('token', data.token) // Storing the token in local storage for authentication.
+            navigate('/home') // Navigating to the home page after successful login.
+        }
 
         // Resetting the input fields after submission
         setEmail('')
