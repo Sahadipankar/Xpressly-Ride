@@ -6,9 +6,11 @@ import UserLogin from './Pages/UserLogin'
 import CaptainLogin from './Pages/CaptainLogin'
 import UserSignUp from './Pages/UserSignUp'
 import CaptainSignUp from './Pages/CaptainSignUp'
-import UserProtectedWrapper from './Pages/UserProtectedWrapper'
+import UserProtectWrapper from './Pages/UserProtectWrapper'
 import UserLogout from './Pages/UserLogout'
 import CaptainDashboard from './Pages/CaptainDashboard'
+import CaptainProtectWrapper from './Pages/CaptainProtectWrapper'
+import CaptainLogout from './Pages/CaptainLogout'
 
 const App = () => { // This is the main App component that sets up the routes for the application
   return (
@@ -23,19 +25,29 @@ const App = () => { // This is the main App component that sets up the routes fo
 
         <Route path="/home"
           element={
-            <UserProtectedWrapper>
+            <UserProtectWrapper>
               <Home />
-            </UserProtectedWrapper>} />
+            </UserProtectWrapper>} />
 
         <Route path="/user/logout"
           element={
-            <UserProtectedWrapper>
+            <UserProtectWrapper>
               <UserLogout />
-            </UserProtectedWrapper>} />
+            </UserProtectWrapper>
+          } />
 
         <Route path="/captain-dashboard"
           element={
-            <CaptainDashboard />
+            <CaptainProtectWrapper>
+              <CaptainDashboard />
+            </CaptainProtectWrapper>
+          } />
+
+          <Route path="/captain/logout"
+          element={
+            <CaptainProtectWrapper>
+              <CaptainLogout />
+            </CaptainProtectWrapper>
           } />
       </Routes>
     </div>

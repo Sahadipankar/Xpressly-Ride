@@ -141,7 +141,7 @@ const CaptainSignUp = () => {
                             className='bg-[#eeeeee] w-1/2 rounded-lg px-4 py-2 border text-lg placeholder:text-base'
                             type="number"
                             min="1" // Only allows positive numbers
-                            placeholder='Vehicle Capacity in cc'
+                            placeholder='Vehicle Capacity'
                             value={vehicleCapacity}
                             onChange={(e) => {
                                 const value = e.target.value;

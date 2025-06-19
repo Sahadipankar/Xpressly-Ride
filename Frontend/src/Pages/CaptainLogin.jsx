@@ -1,22 +1,35 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { CaptainDataContext } from '../Context/CaptainContext'
 
 const CaptainLogin = () => { // This component renders a login form for captains to log in to their accounts.
 
     const [email, setEmail] = useState('') // useState hook is used to manage the email state of the input field.
-
     const [password, setPassword] = useState('') // useState hook is used to manage the password state of the input field.
 
-    const [CaptainData, setCaptainData] = useState({})
+    const { captain, setCaptain } = React.useContext(CaptainDataContext) // Using the CaptainDataContext to access and set captain data.
+    const navigate = useNavigate() // Using useNavigate hook to programmatically navigate after form submission.
 
-    const submitHandler = (e) => { // This function handles the form submission.
+    const submitHandler = async (e) => { // This function handles the form submission.
         e.preventDefault() // Prevents the default form submission behavior.
 
         // Collecting captain data from the input fields
-        setCaptainData({
-            Email: email,
-            Password: password
-        })
+        const captain = {
+            email: email,
+            password: password
+        }
+
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, captain)
+
+        if (response.status === 200) {
+            const data = response.data
+
+            setCaptain(data.captain)
+            localStorage.setItem('token', data.token)
+            navigate('/captain-dashboard') // Navigating to the captain dashboard after successful login.
+        }
 
         // Resetting the input fields after submission
         setEmail('')
@@ -49,7 +62,7 @@ const CaptainLogin = () => { // This component renders a login form for captains
                         type="password"
                         placeholder='password'
                     />
-                    <button className='bg-[#111] text-white font-semibold mb-3 rounded-sm px-4 py-2 w-full text-lg placeholder:text-base'>Login</button>
+                    <button className='bg-[#111] text-white font-semibold mb-3 rounded-sm px-4 py-2 w-full text-lg placeholder:text-base'>Login as Captain</button>
 
                 </form>
 
