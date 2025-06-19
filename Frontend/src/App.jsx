@@ -43,7 +43,7 @@ const App = () => { // This is the main App component that sets up the routes fo
             </CaptainProtectWrapper>
           } />
 
-          <Route path="/captain/logout"
+        <Route path="/captain/logout"
           element={
             <CaptainProtectWrapper>
               <CaptainLogout />
