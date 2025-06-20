@@ -10,8 +10,10 @@ const Home = () => {
     const [pickup, setPickup] = useState("");
     const [destination, setDestination] = useState("");
     const [panelOpen, setPanelOpen] = useState(false);
+    const vehilcePanelRef = useRef(null)
     const panelRef = useRef(null);
     const panelCloseRef = useRef(null);
+    const [vehiclePanelOpen, setVehiclePanelOpen] = useState(false)
 
     const submitHandler = (e) => {
         e.preventDefault();
@@ -36,6 +38,21 @@ const Home = () => {
             })
         }
     }, [panelOpen]);
+
+
+    useGSAP(() => {
+        if (vehiclePanelOpen) {
+            gsap.to(vehilcePanelRef.current, {
+                transform: 'translateY(0)',
+            })
+        }
+        else {
+            gsap.to(vehilcePanelRef.current, {
+                transform: 'translateY(100%)'
+            })
+        }
+    }, [vehiclePanelOpen]);
+
 
     return (
         <div className='h-screen relative overflow-hidden'>
@@ -77,15 +94,27 @@ const Home = () => {
                         />
                     </form>
                 </div>
+
                 <div ref={panelRef} className='bg-white h-0'>
-                    <LocationSearchPanel />
+                    <LocationSearchPanel
+                        setPanelOpen={setPanelOpen}
+                        setVehiclePanelOpen={setVehiclePanelOpen}
+                    />
                 </div>
 
             </div>
 
-            <div className='fixed w-full z-10 bottom-0 bg-white px-3 py-6'>
+            <div ref={vehilcePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-10'>
+
+                <h5 className='p-1 text-center w-[93%] absolute top-0'
+                    onClick={() => {
+                        setVehiclePanelOpen(false);
+                    }}><i className="text-2xl text-gray-500 ri-arrow-down-wide-line"></i></h5>
+
                 <h3 className='text-2xl font-semibold mb-5'>Choose a Vehicle</h3>
-                <div className='flex border-2 border-black mb-2 rounded-xl w-full p-3 items-center justify-between'>
+
+
+                <div className='flex border-2 border-gray-100 active:border-black mb-2 rounded-xl w-full p-3 items-center justify-between'>
                     <img className='h-16' src="https://www.svgrepo.com/show/408292/car-white.svg" alt="" />
                     <div className='w-1/2'>
                         <h4 className='font-medium text-base'>UberGo <span><i className="ri-user-3-fill"></i>4</span></h4>
@@ -94,8 +123,9 @@ const Home = () => {
                     </div>
                     <h2 className='text-lg font-semibold'>₹200.75</h2>
                 </div>
-                
-                <div className='flex border-2 border-black mb-2 rounded-xl w-full p-3 items-center justify-between'>
+
+
+                <div className='flex border-2 border-gray-100 active:border-black mb-2 rounded-xl w-full p-3 items-center justify-between'>
                     <img className='h-10' src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png" alt="" />
                     <div className='w-1/2'>
                         <h4 className='font-medium text-base'>Moto <span><i className="ri-user-3-fill"></i>1</span></h4>
@@ -105,7 +135,8 @@ const Home = () => {
                     <h2 className='text-lg font-semibold'>₹120.30</h2>
                 </div>
 
-                <div className='flex border-2 border-black mb-2 rounded-xl w-full p-3 items-center justify-between'>
+
+                <div className='flex border-2 border-gray-100 active:border-black mb-2 rounded-xl w-full p-3 items-center justify-between'>
                     <img className='h-9' src="https://clipart-library.com/2023/Uber_Auto_312x208_pixels_Mobile.png" alt="" />
                     <div className='w-1/2'>
                         <h4 className='font-medium text-base'>UberAuto <span><i className="ri-user-3-fill"></i>3</span></h4>
