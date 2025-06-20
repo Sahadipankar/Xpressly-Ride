@@ -21,7 +21,7 @@ const captainSchema = new mongoose.Schema({     // Define the captain schema
         required: true,
         unique: true,
         lowercase: true,
-        match: [ /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Please fill a valid email address'],
+        match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Please fill a valid email address'],
     },
     password: {     // Password field with validation
         type: String,
@@ -32,7 +32,7 @@ const captainSchema = new mongoose.Schema({     // Define the captain schema
     socketId: {     // Optional field for storing socket ID
         type: String,
     },
-    status : {      // Status field with validation
+    status: {      // Status field with validation
         type: String,
         enum: ['active', 'inactive'],
         default: 'inactive',
@@ -57,7 +57,7 @@ const captainSchema = new mongoose.Schema({     // Define the captain schema
         vehicleType: {
             type: String,
             required: true,
-            enum: ['Car', 'Bike', 'Auto'],
+            enum: ['Car', 'Auto', 'Moto'],
         },
     },
     location: {     // Nested schema for location details
