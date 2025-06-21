@@ -1,17 +1,25 @@
 import React from 'react'
 
-const ConfirmRide = (props) => {
+const WaitingForDriver = (props) => {
     return (
         <div>
             <h5 className='p-1 text-center w-[93%] absolute top-0'
                 onClick={() => {
-                    props.setConfirmRidePanel(false);
+                    props.WaitingForDriver(false);
                 }}><i className="text-2xl text-gray-500 ri-arrow-down-wide-line"></i></h5>
 
-            <h3 className='text-2xl font-semibold mb-5'>Confirm your ride</h3>
+            <div className="flex items-center justify-between">
+                <img className='h-20' src="https://www.svgrepo.com/show/408292/car-white.svg" alt="" />
+                
+                <div className="text-right">
+                    <h2 className='text-lg font-medium'>Dipankar Saha</h2>
+                    <h4 className='text-2xl font-semibold -mt-1 -mb-1'>WB07 B3344</h4>
+                    <p className='text-sm text-gray-600'>Hero Honda Karizma</p>
+
+                </div>
+            </div>
 
             <div className='flex flex-col gap-4 justify-between items-center'>
-                <img className='h-30' src="https://www.svgrepo.com/show/408292/car-white.svg" alt="" />
 
                 <div className='w-full mt-5'>
 
@@ -40,13 +48,8 @@ const ConfirmRide = (props) => {
                     </div>
                 </div>
 
-                <button onClick={() => {
-                    props.setVehicleFound(true);
-                    props.setConfirmRidePanel(false);
-                }} className='w-full mt-5 bg-green-600 text-white font-semibold p-2 rounded-lg'>Confirm</button>
             </div>
-        </div>
-    )
+        </div>)
 }
 
-export default ConfirmRide
+export default WaitingForDriver
