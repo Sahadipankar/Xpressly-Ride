@@ -11,6 +11,7 @@ import UserLogout from './Pages/UserLogout'
 import CaptainDashboard from './Pages/CaptainDashboard'
 import CaptainProtectWrapper from './Pages/CaptainProtectWrapper'
 import CaptainLogout from './Pages/CaptainLogout'
+import Riding from './Pages/Riding'
 
 const App = () => { // This is the main App component that sets up the routes for the application
   return (
@@ -19,6 +20,8 @@ const App = () => { // This is the main App component that sets up the routes fo
         <Route path="/" element={<Start />} />
 
         <Route path="/login" element={<UserLogin />} />
+        <Route path="/riding" element={<Riding />} />
+
         <Route path="/signup" element={<UserSignUp />} />
         <Route path="/captain-login" element={<CaptainLogin />} />
         <Route path="/captain-signup" element={<CaptainSignUp />} />
