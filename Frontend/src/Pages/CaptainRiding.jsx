@@ -35,10 +35,10 @@ const CaptainRiding = () => {
                 <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
             </div>
 
-            <div className="h-1/5 p-6 flex items-center justify-between relative bg-yellow-400 pt-10" 
-            onClick={() => {
-                setFinishRidePanel(true);
-            }}>
+            <div className="h-1/5 p-6 flex items-center justify-between relative bg-yellow-400 pt-10"
+                onClick={() => {
+                    setFinishRidePanel(true);
+                }}>
 
                 <h5 className='p-1 text-center w-[90%] absolute top-0'
                     onClick={() => {

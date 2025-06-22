@@ -22,7 +22,7 @@ const App = () => { // This is the main App component that sets up the routes fo
 
         <Route path="/login" element={<UserLogin />} />
         <Route path="/riding" element={<Riding />} />
-        <Route path="/captain-riding" element={<CaptainRiding/>} />
+        <Route path="/captain-riding" element={<CaptainRiding />} />
 
         <Route path="/signup" element={<UserSignUp />} />
         <Route path="/captain-login" element={<CaptainLogin />} />
