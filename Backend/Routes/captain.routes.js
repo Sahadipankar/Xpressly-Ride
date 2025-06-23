@@ -1,7 +1,7 @@
 const express = require('express');             // Import Express framework
 const router = express.Router();                // Create a new router instance
 const { body } = require('express-validator');  // Import express-validator for request validation
-const captainController = require('../Controller/captain.controller'); // Import the captain controller
+const captainController = require('../Controllers/captain.controller'); // Import the captain controller
 const authMiddleware = require('../Middlewares/auth.middleware'); // Import authentication middleware
 
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();  // Create a new router instance
 const {body} = require('express-validator');  // Import express-validator for validation
-const userController = require('../Controller/user.controller');  // Import the user controller
+const userController = require('../Controllers/user.controller');  // Import the user controller
 const authMiddleware = require('../Middlewares/auth.middleware');  // Import the authentication middleware
 
 
