@@ -11,6 +11,7 @@ const mapsRoutes = require('./Routes/maps.routes'); // Import maps routes
 const rideRoutes = require('./Routes/ride.routes'); // Import ride routes
 
 
+
 connectToDB(); // Call the function to connect to the database
 
 

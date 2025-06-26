@@ -1,5 +1,4 @@
-import React, { useRef } from 'react'
-import { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import 'remixicon/fonts/remixicon.css'
@@ -9,6 +8,12 @@ import ConfirmRide from '../Components/ConfirmRide';
 import LookingForDriver from '../Components/LookingForDriver';
 import WaitingForDriver from '../Components/WaitingForDriver';
 import axios from 'axios';
+
+import { SocketContext } from '../Context/SocketContext';
+import { useContext } from 'react';
+import { UserDataContext } from '../Context/UserContext';
+import { useNavigate } from 'react-router-dom';
+
 
 
 const Home = () => {
@@ -38,6 +43,15 @@ const Home = () => {
     const [ride, setRide] = useState(null)
 
 
+    const { socket } = useContext(SocketContext)
+    const { user } = useContext(UserDataContext)
+
+
+    useEffect(() => {
+        socket.emit("join", { userType: "user", userId: user._id })
+    }, [user])
+
+    
 
 
     const handlePickupChange = async (e) => {
@@ -168,6 +182,18 @@ const Home = () => {
     }
 
 
+    async function createRide() {
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
+            pickup,
+            destination,
+            vehicleType
+        }, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+    }
+
 
     return (
         <div className='h-screen relative overflow-hidden'>
@@ -237,15 +263,22 @@ const Home = () => {
 
             <div ref={vehiclePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12'>
                 <VehiclePanel
+                    selectVehicle={setVehicleType}
+                    fare={fare}
                     setConfirmRidePanel={setConfirmRidePanel}
                     setVehiclePanel={setVehiclePanel}
-                    fare={fare}
                 />
             </div>
 
 
             <div ref={confirmRidePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12'>
                 <ConfirmRide
+                    createRide={createRide}
+                    pickup={pickup}
+                    destination={destination}
+                    fare={fare}
+                    vehicleType={vehicleType}
+
                     setConfirmRidePanel={setConfirmRidePanel}
                     setVehicleFound={setVehicleFound}
                 />
@@ -253,7 +286,15 @@ const Home = () => {
 
 
             <div ref={vehicleFoundRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12'>
-                <LookingForDriver setVehicleFound={setVehicleFound} />
+                <LookingForDriver
+                    createRide={createRide}
+                    pickup={pickup}
+                    destination={destination}
+                    fare={fare}
+                    vehicleType={vehicleType}
+
+                    setVehicleFound={setVehicleFound}
+                />
             </div>
 
 

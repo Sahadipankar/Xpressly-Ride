@@ -61,7 +61,7 @@ const captainSchema = new mongoose.Schema({     // Define the captain schema
         },
     },
     location: {     // Nested schema for location details
-        lat: {
+        ltd: {
             type: Number,
         },
         lng: {

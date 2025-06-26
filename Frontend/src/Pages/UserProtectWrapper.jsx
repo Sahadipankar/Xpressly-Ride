@@ -23,7 +23,7 @@ const UserProtectWrapper = ({
             }
         }).then(response => {
             if (response.status === 200) {
-                setUser(response.data.user) // If the response is successful, set the user data in the context.
+                setUser(response.data) // If the response is successful, set the user data in the context.
                 setIsLoading(false) // Set loading to false after fetching the user data.
             }
         })
