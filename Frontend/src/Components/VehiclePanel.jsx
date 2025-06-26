@@ -20,7 +20,7 @@ const VehiclePanel = (props) => {
                     <h5 className='font-medium text-sm'>2 mins away</h5>
                     <p className='font-normal text-gray-600 text-xs'>Affordable, compact rides</p>
                 </div>
-                <h2 className='text-lg font-semibold'>₹200.75</h2>
+                <h2 className='text-lg font-semibold'>₹{props.fare.Car}</h2>
             </div>
 
 
@@ -33,7 +33,7 @@ const VehiclePanel = (props) => {
                     <h5 className='font-medium text-sm'>3 mins away</h5>
                     <p className='font-normal text-gray-600 text-xs'>Affordable motorcycle rides</p>
                 </div>
-                <h2 className='text-lg font-semibold'>₹120.30</h2>
+                <h2 className='text-lg font-semibold'>₹{props.fare.Moto}</h2>
             </div>
 
 
@@ -46,7 +46,7 @@ const VehiclePanel = (props) => {
                     <h5 className='font-medium text-sm'>4 mins away</h5>
                     <p className='font-normal text-gray-600 text-xs'>Affordable auto rides</p>
                 </div>
-                <h2 className='text-lg font-semibold'>₹160.84</h2>
+                <h2 className='text-lg font-semibold'>₹{props.fare.Auto}</h2>
             </div>
         </div>
     )

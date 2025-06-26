@@ -14,15 +14,15 @@ async function getFare(pickup, destination) {
     const distanceTime = await mapService.getDistanceTime(pickup, destination);
 
     const baseFare = {
-        Auto: 30,
-        Car: 50,
-        Moto: 20
+        Car: 30,
+        Auto: 15,
+        Moto: 10
     };
 
     const perKmRate = {
-        Auto: 10,
-        Car: 15,
-        Moto: 8
+        Car: 10,
+        Auto: 8,
+        Moto: 5
     };
 
     const perMinuteRate = {
@@ -40,6 +40,8 @@ async function getFare(pickup, destination) {
 
     return fare;
 }
+
+module.exports.getFare = getFare;
 
 
 function getOtp(num) {

@@ -609,3 +609,172 @@ Logs out the currently authenticated captain by clearing the token cookie and bl
    ```
 
 ---
+
+### Ride
+
+- [Backend API Documentation (Create Ride)](#backend-api-documentation-create-ride)
+- [Backend API Documentation (Get Fare)](#backend-api-documentation-get-fare)
+
+---
+
+# Backend API Documentation (Create Ride)
+
+## Description
+Creates a new ride request and returns the ride details.
+
+---
+
+## HTTP Method
+**POST** `/rides/create`
+
+---
+
+## Required Packages
+Below are the main packages involved in this endpoint:
+
+1. **express-validator** – Used for validating incoming request data.  
+2. **ride.service.js** – Contains the business logic for creating a ride.  
+3. **ride.model.js** – MongoDB schema for storing ride details.  
+
+---
+
+## Controller File: `ride.controller.js`
+- **createRide(req, res)**  
+  - Validates request data using `express-validator`.  
+  - Extracts `pickup`, `destination`, and `vehicleType` from `req.body`.  
+  - Calls `rideService.createRide`, passing the user ID and ride details.  
+  - Responds with a **201** status code, returning the created ride object.
+
+---
+
+## Request Body
+```json
+{
+  "pickup": "string (≥3 chars, required)",
+  "destination": "string (≥3 chars, required)",
+  "vehicleType": "string (Auto | Car | Moto, required)"
+}
+```
+
+---
+
+## Status Codes & Responses
+
+1. **201 Created**  
+   Example Successful Response:
+   ```json
+   {
+     "_id": "ride-id-string",
+     "user": "user-id-string",
+     "pickup": "Pickup Address",
+     "destination": "Destination Address",
+     "fare": 100,
+     "status": "pending",
+     "otp": "123456"
+   }
+   ```
+
+2. **400 Bad Request**  
+   Returned if validation fails or required fields are missing. Example Error Response:
+   ```json
+   {
+     "errors": [
+       {
+         "msg": "Invalid pickup address",
+         "param": "pickup",
+         "location": "body"
+       }
+     ]
+   }
+   ```
+
+3. **500 Internal Server Error**  
+   Returned if an unexpected error occurs. Example Error Response:
+   ```json
+   {
+     "message": "Internal server error"
+   }
+   ```
+
+---
+
+[⬅️ Back to Table of Contents](#table-of-contents)
+
+---
+
+# Backend API Documentation (Get Fare)
+
+## Description
+Calculates the estimated fare for a ride based on the pickup and destination addresses.
+
+---
+
+## HTTP Method
+**GET** `/rides/get-fare`
+
+---
+
+## Required Packages
+Below are the main packages involved in this endpoint:
+
+1. **express-validator** – Used for validating incoming request data.  
+2. **ride.service.js** – Contains the business logic for calculating the fare.  
+
+---
+
+## Controller File: `ride.controller.js`
+- **getFare(req, res)**  
+  - Validates request data using `express-validator`.  
+  - Extracts `pickup` and `destination` from `req.query`.  
+  - Calls `rideService.getFare`, passing the pickup and destination addresses.  
+  - Responds with a **200** status code, returning the calculated fare.
+
+---
+
+## Request Query Parameters
+```json
+{
+  "pickup": "string (≥3 chars, required)",
+  "destination": "string (≥3 chars, required)"
+}
+```
+
+---
+
+## Status Codes & Responses
+
+1. **200 OK**  
+   Example Successful Response:
+   ```json
+   {
+     "Auto": 50,
+     "Car": 100,
+     "Moto": 30
+   }
+   ```
+
+2. **400 Bad Request**  
+   Returned if validation fails or required fields are missing. Example Error Response:
+   ```json
+   {
+     "errors": [
+       {
+         "msg": "Invalid pickup address",
+         "param": "pickup",
+         "location": "query"
+       }
+     ]
+   }
+   ```
+
+3. **500 Internal Server Error**  
+   Returned if an unexpected error occurs. Example Error Response:
+   ```json
+   {
+     "message": "Internal server error"
+   }
+   ```
+
+---
+
+[⬅️ Back to Table of Contents](#table-of-contents)
