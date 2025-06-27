@@ -47,7 +47,7 @@ userSchema.statics.hashPassword = async function (password) {  // Static method 
 }
 
 
-const userModel = mongoose.model('User', userSchema);  // Create a Mongoose model for the user schema
+const userModel = mongoose.model('user', userSchema);  // Create a Mongoose model for the user schema
 
 
 module.exports = userModel;  // Export the user model for use in other files

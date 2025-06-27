@@ -51,7 +51,13 @@ const Home = () => {
         socket.emit("join", { userType: "user", userId: user._id })
     }, [user])
 
-    
+
+    socket.on('ride-confirmed', ride => {
+        setVehicleFound(false)
+        setWaitingForDriver(true)
+        setRide(ride)
+    })
+
 
 
     const handlePickupChange = async (e) => {
@@ -299,7 +305,12 @@ const Home = () => {
 
 
             <div ref={waitingForDriverRef} className='fixed w-full z-10 bottom-0 bg-white px-3 py-6 pt-12'>
-                <WaitingForDriver waitingForDriver={waitingForDriver} />
+                <WaitingForDriver
+                    waitingForDriver={waitingForDriver}
+                    ride={ride}
+                    setVehicleFound={setVehicleFound}
+                    setWaitingForDriver={setWaitingForDriver}
+                />
             </div>
 
         </div>
