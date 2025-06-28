@@ -42,6 +42,7 @@ const Home = () => {
     const [vehicleType, setVehicleType] = useState(null)
     const [ride, setRide] = useState(null)
 
+    const navigate = useNavigate()
 
     const { socket } = useContext(SocketContext)
     const { user } = useContext(UserDataContext)
@@ -56,6 +57,12 @@ const Home = () => {
         setVehicleFound(false)
         setWaitingForDriver(true)
         setRide(ride)
+    })
+
+    socket.on('ride-started', ride => {
+        console.log("ride")
+        setWaitingForDriver(false)
+        navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
     })
 
 

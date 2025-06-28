@@ -1,5 +1,8 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom' // Added useLocation
+import { useEffect, useContext } from 'react'
+import { SocketContext } from '../Context/SocketContext'
+import { useNavigate } from 'react-router-dom'
 
 const Riding = () => {
     return (
