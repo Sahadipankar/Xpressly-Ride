@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 import FinishRide from '../Components/FinishRide'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import LiveTracking from '../Components/LiveTracking';
+
 
 const CaptainRiding = () => {
 
@@ -62,6 +64,9 @@ const CaptainRiding = () => {
                 />
             </div>
 
+            <div className='h-screen fixed w-screen top-0 z-[-1]'>
+                <LiveTracking />
+            </div>
         </div>
     )
 }
