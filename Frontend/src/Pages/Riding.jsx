@@ -5,6 +5,17 @@ import { SocketContext } from '../Context/SocketContext'
 import { useNavigate } from 'react-router-dom'
 
 const Riding = () => {
+
+    const location = useLocation()
+    const { ride } = location.state || {} // Retrieve ride data
+    const { socket } = useContext(SocketContext)
+    const navigate = useNavigate()
+
+    socket.on("ride-ended", () => {
+        navigate('/home')
+    })
+
+
     return (
         <div className='h-screen '>
 
@@ -22,8 +33,8 @@ const Riding = () => {
                     <img className='h-20' src="https://www.svgrepo.com/show/408292/car-white.svg" alt="" />
 
                     <div className="text-right">
-                        <h2 className='text-lg font-medium'>Dipankar Saha</h2>
-                        <h4 className='text-2xl font-semibold -mt-1 -mb-1'>WB07 B3344</h4>
+                        <h2 className='text-lg font-medium capitalize'>{ride?.captain.fullname.firstname}</h2>
+                        <h4 className='text-2xl font-semibold -mt-1 -mb-1'>{ride?.captain.vehicle.plate}</h4>
                         <p className='text-sm text-gray-600'>Hero Honda Karizma</p>
 
                     </div>
@@ -37,14 +48,14 @@ const Riding = () => {
                             <i className="text-lg ri-map-pin-fill"></i>
                             <div>
                                 <h3 className='text-lg font-medium'>33, Ballygunge Place </h3>
-                                <p className='text-sm  text-gray-600'>Ballygunge, Kolkata, West Bengal 700019</p>
+                                <p className='text-sm  text-gray-600'>{ride?.destination}</p>
                             </div>
                         </div>
 
                         <div className='flex items-center gap-5 p-3'>
                             <i className="text-lg ri-cash-line"></i>
                             <div>
-                                <h3 className='text-lg font-medium'>₹185.48</h3>
+                                <h3 className='text-lg font-medium'>₹{ride?.fare}</h3>
                                 <p className='text-sm  text-gray-600'>Cash Cash</p>
                             </div>
                         </div>

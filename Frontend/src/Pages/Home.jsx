@@ -225,7 +225,7 @@ const Home = () => {
                     </h5 >
                     <h4 className='text-2xl font-semibold'>Find a Trip</h4>
 
-                    <form onSubmit={(e) => {
+                    <form className='text-2xl font-semibold' onSubmit={(e) => {
                         submitHandler(e)
                     }}>
 
