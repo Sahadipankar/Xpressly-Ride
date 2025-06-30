@@ -94,22 +94,57 @@ const ConfirmRidePopUp = (props) => {
                     <form onSubmit={submitHandler} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Enter OTP from Passenger
+                                Enter 6-digit OTP from Passenger
                             </label>
-                            <input
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
-                                type="number"
-                                className='bg-gray-100 px-4 md:px-6 py-3 md:py-4 font-mono text-lg md:text-xl rounded-lg w-full border-2 border-transparent focus:outline-none focus:border-green-500 focus:bg-white transition-all duration-200'
-                                placeholder='Enter 4-digit OTP'
-                                maxLength="4"
-                                required
-                            />
+                            <div className="flex gap-2 justify-center mb-4">
+                                {[0, 1, 2, 3, 4, 5].map((index) => (
+                                    <input
+                                        key={index}
+                                        type="text"
+                                        maxLength="1"
+                                        className="w-10 h-10 md:w-12 md:h-12 text-center text-lg md:text-xl font-bold border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none transition-colors duration-200"
+                                        value={otp[index] || ''}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/[^0-9]/g, '');
+                                            if (value.length <= 1) {
+                                                const newOtp = otp.split('');
+                                                newOtp[index] = value;
+                                                setOtp(newOtp.join(''));
+
+                                                // Auto-focus next input
+                                                if (value && index < 5) {
+                                                    const nextInput = e.target.parentElement.children[index + 1];
+                                                    nextInput?.focus();
+                                                }
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            // Handle backspace
+                                            if (e.key === 'Backspace' && !otp[index] && index > 0) {
+                                                const prevInput = e.target.parentElement.children[index - 1];
+                                                prevInput?.focus();
+                                            }
+                                        }}
+                                        onPaste={(e) => {
+                                            e.preventDefault();
+                                            const pasteData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+                                            setOtp(pasteData);
+                                            // Focus the last filled input or the next empty one
+                                            const nextIndex = Math.min(pasteData.length, 5);
+                                            const targetInput = e.target.parentElement.children[nextIndex];
+                                            targetInput?.focus();
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                            <p className="text-xs text-gray-500 text-center mb-4">
+                                Ask the passenger for their 6-digit OTP to start the ride
+                            </p>
                         </div>
 
                         <button
                             type="submit"
-                            disabled={otp.length !== 4}
+                            disabled={otp.length !== 6}
                             className='w-full text-base md:text-lg flex justify-center bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold p-3 md:p-4 rounded-lg transition-colors duration-200'
                         >
                             Start Ride

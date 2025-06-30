@@ -52,7 +52,29 @@ const Home = () => {
 
     useEffect(() => {
         socket.emit("join", { userType: "user", userId: user._id })
-    }, [user])
+
+        // User location tracking
+        const updateLocation = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    socket.emit('update-location-user', {
+                        userId: user._id,
+                        location: {
+                            ltd: position.coords.latitude,
+                            lng: position.coords.longitude
+                        }
+                    })
+                }, (error) => {
+                    console.log('Error getting location:', error)
+                })
+            }
+        }
+
+        const locationInterval = setInterval(updateLocation, 10000)
+        updateLocation()
+
+        return () => clearInterval(locationInterval)
+    }, [user, socket])
 
 
     socket.on('ride-confirmed', ride => {
@@ -212,9 +234,35 @@ const Home = () => {
 
     return (
         <div className='h-screen relative overflow-hidden'>
-            {/* Header with Logo and Logout */}
-            <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 md:p-6 bg-white/90 backdrop-blur-sm shadow-sm">
-                <img className='w-12 md:w-16' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="Uber Logo" />
+            {/* Enhanced Header with Logo, User Greeting and Logout */}
+            <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 md:p-6 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100">
+                <div className="flex items-center gap-4">
+                    <img className='w-10 md:w-12' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="Uber Logo" />
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
+                            {user?.fullname?.firstname ? (
+                                <span className="text-white text-sm md:text-base font-semibold">
+                                    {user.fullname.firstname.charAt(0).toUpperCase()}
+                                </span>
+                            ) : user?.email ? (
+                                <span className="text-white text-sm md:text-base font-semibold">
+                                    {user.email.charAt(0).toUpperCase()}
+                                </span>
+                            ) : (
+                                <i className="ri-user-fill text-white text-sm md:text-base"></i>
+                            )}
+                        </div>
+                        <div className="block">
+                            <p className="text-xs md:text-sm text-gray-500 leading-tight">Hello,</p>
+                            <p className="text-sm md:text-base font-semibold text-gray-800 leading-tight">
+                                {user?.fullname?.firstname ?
+                                    `${user.fullname.firstname} ${user.fullname.lastname || ''}`.trim() :
+                                    user?.email ? user.email.split('@')[0] : 'User'
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 <Link
                     to='/user/logout'
                     className="bg-black text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium hover:bg-gray-800 transition-colors flex items-center gap-2"

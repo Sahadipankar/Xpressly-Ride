@@ -63,3 +63,20 @@ module.exports.getAutoCompleteSuggestions = async (req, res, next) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+
+
+module.exports.getAddressFromCoordinates = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { lat, lng } = req.query;
+
+    try {
+        const addressData = await mapService.getAddressFromCoordinates(lat, lng);
+        res.status(200).json(addressData);
+    } catch (error) {
+        res.status(404).json({ message: 'Address not found' });
+    }
+}

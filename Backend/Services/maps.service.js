@@ -88,3 +88,20 @@ module.exports.getCaptainsInTheRadius = async (ltd, lng, radius) => {
     });
     return captains;
 }
+
+module.exports.getAddressFromCoordinates = async (lat, lng) => {
+    const apiKey = process.env.GOOGLE_MAPS_API;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&components=country:in&key=${apiKey}`;
+
+    try {
+        const response = await axios.get(url);
+        if (response.data.status === 'OK') {
+            return response.data;
+        } else {
+            throw new Error('Unable to fetch address');
+        }
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}

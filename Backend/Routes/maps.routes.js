@@ -28,6 +28,13 @@ router.get('/get-suggestions',
 )
 
 
+router.get('/get-address',
+    query('lat').isFloat(),
+    query('lng').isFloat(),
+    authMiddleware.authUser,
+    mapController.getAddressFromCoordinates
+);
+
 
 
 module.exports = router;
