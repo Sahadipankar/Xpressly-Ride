@@ -26,7 +26,7 @@ const LocationSearchPanel = ({ suggestions, setVehiclePanel, setPanelOpen, setPi
             setDestination(suggestion)
         }
         addToRecentLocations(suggestion)
-        setPanelOpen(false)
+        setPanelOpen(true)
     }
 
     const addToRecentLocations = (location) => {
