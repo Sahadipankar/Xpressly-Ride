@@ -23,14 +23,13 @@ const UserProtectWrapper = ({
             }
         }).then(response => {
             if (response.status === 200) {
-                setUser(response.data) // If the response is successful, set the user data in the context.
-                setIsLoading(false) // Set loading to false after fetching the user data.
+                setUser(response.data)
+                setIsLoading(false)
             }
         })
             .catch(err => {
-                console.log(err) // Log any errors that occur during the request.
-                localStorage.removeItem('token') // Remove the token from local storage if there is an error.
-                navigate('/login') // If there is an error, redirect to the login page.
+                localStorage.removeItem('token')
+                navigate('/login')
             })
 
     }, [token])

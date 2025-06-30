@@ -26,7 +26,6 @@ const CaptainLogout = () => {
                     navigate('/captain-login')
                 }
             } catch (error) {
-                console.error('Logout error:', error)
                 localStorage.removeItem('token')
                 navigate('/captain-login')
             }

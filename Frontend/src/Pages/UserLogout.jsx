@@ -26,7 +26,6 @@ const UserLogout = () => {
                     navigate('/login')
                 }
             } catch (error) {
-                console.error('Logout error:', error)
                 localStorage.removeItem('token')
                 navigate('/login')
             }

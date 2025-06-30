@@ -13,29 +13,94 @@ async function getFare(pickup, destination) {
 
     const distanceTime = await mapService.getDistanceTime(pickup, destination);
 
+    // More realistic base fares (Indian market pricing)
     const baseFare = {
-        Car: 30,
-        Auto: 15,
-        Moto: 10
+        Car: 50,    // Base fare for cars (like UberGo)
+        Auto: 25,   // Base fare for auto-rickshaws
+        Moto: 15    // Base fare for motorcycles (like Uber Moto)
     };
 
+    // Per kilometer rates (more realistic pricing)
     const perKmRate = {
-        Car: 10,
-        Auto: 8,
-        Moto: 5
+        Car: 12,    // ₹12 per km for cars
+        Auto: 10,   // ₹10 per km for autos
+        Moto: 6     // ₹6 per km for motorcycles
     };
 
+    // Per minute rates for time-based charging
     const perMinuteRate = {
-        Auto: 2,
-        Car: 3,
-        Moto: 1.5
+        Car: 2.5,   // ₹2.5 per minute for cars
+        Auto: 2,    // ₹2 per minute for autos  
+        Moto: 1.5   // ₹1.5 per minute for motorcycles
     };
 
+    // Surge pricing factors (can be dynamic based on demand)
+    const surgePricing = {
+        Car: 1.0,   // No surge by default
+        Auto: 1.0,
+        Moto: 1.0
+    };
+
+    // Distance in kilometers and duration in minutes
+    const distanceKm = distanceTime.distance.value / 1000;
+    const durationMinutes = distanceTime.duration.value / 60;
+
+    // Calculate fare for each vehicle type
+    const calculateVehicleFare = (vehicleType) => {
+        const base = baseFare[vehicleType];
+        const distanceFare = distanceKm * perKmRate[vehicleType];
+        const timeFare = durationMinutes * perMinuteRate[vehicleType];
+        const surgeFactor = surgePricing[vehicleType];
+
+        // Total before surge
+        const baseTotalFare = base + distanceFare + timeFare;
+
+        // Apply surge pricing
+        const fareWithSurge = baseTotalFare * surgeFactor;
+
+        // Minimum fare guarantee
+        const minimumFare = {
+            Car: 80,   // Minimum ₹80 for cars
+            Auto: 40,  // Minimum ₹40 for autos
+            Moto: 25   // Minimum ₹25 for motorcycles
+        };
+
+        return Math.max(Math.round(fareWithSurge), minimumFare[vehicleType]);
+    };
 
     const fare = {
-        Auto: Math.round(baseFare.Auto + ((distanceTime.distance.value / 1000) * perKmRate.Auto) + ((distanceTime.duration.value / 60) * perMinuteRate.Auto)),
-        Car: Math.round(baseFare.Car + ((distanceTime.distance.value / 1000) * perKmRate.Car) + ((distanceTime.duration.value / 60) * perMinuteRate.Car)),
-        Moto: Math.round(baseFare.Moto + ((distanceTime.distance.value / 1000) * perKmRate.Moto) + ((distanceTime.duration.value / 60) * perMinuteRate.Moto))
+        Auto: calculateVehicleFare('Auto'),
+        Car: calculateVehicleFare('Car'),
+        Moto: calculateVehicleFare('Moto'),
+        // Additional fare breakdown for transparency
+        distance: {
+            value: distanceTime.distance.value,
+            text: distanceTime.distance.text
+        },
+        duration: {
+            value: distanceTime.duration.value,
+            text: distanceTime.duration.text
+        },
+        breakdown: {
+            Auto: {
+                baseFare: baseFare.Auto,
+                distanceFare: Math.round(distanceKm * perKmRate.Auto),
+                timeFare: Math.round(durationMinutes * perMinuteRate.Auto),
+                surgeFactor: surgePricing.Auto
+            },
+            Car: {
+                baseFare: baseFare.Car,
+                distanceFare: Math.round(distanceKm * perKmRate.Car),
+                timeFare: Math.round(durationMinutes * perMinuteRate.Car),
+                surgeFactor: surgePricing.Car
+            },
+            Moto: {
+                baseFare: baseFare.Moto,
+                distanceFare: Math.round(distanceKm * perKmRate.Moto),
+                timeFare: Math.round(durationMinutes * perMinuteRate.Moto),
+                surgeFactor: surgePricing.Moto
+            }
+        }
     };
 
     return fare;

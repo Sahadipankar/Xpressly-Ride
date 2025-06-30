@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { useContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { SocketContext } from '../Context/SocketContext'
-import { useNavigate } from 'react-router-dom'
-import LiveTracking from '../Components/LiveTracking';
+import LiveTracking from '../Components/LiveTracking'
+import axios from 'axios'
 
 
 const Riding = () => {
@@ -15,14 +14,239 @@ const Riding = () => {
     const [currentTime, setCurrentTime] = useState(new Date())
     const [paymentMethod, setPaymentMethod] = useState('cash')
     const [isRideCompleted, setIsRideCompleted] = useState(false)
+    const [isWaitingForDriver, setIsWaitingForDriver] = useState(false)
+    const [tripData, setTripData] = useState({
+        remainingDistance: null,
+        estimatedArrival: null,
+        originalDistance: null,
+        originalDuration: null,
+        distanceInKm: null,
+        averageSpeed: null,
+        currentSpeed: null,
+        trafficCondition: 'normal',
+        trafficIncidents: [],
+        routeAlerts: [],
+        alternativeRoutes: 0
+    })
+    const [isLoadingTripData, setIsLoadingTripData] = useState(true)
+    const [trafficAlerts, setTrafficAlerts] = useState([])
+    const [showTrafficDetails, setShowTrafficDetails] = useState(false)    // Fetch initial trip data
+    useEffect(() => {
+        const fetchTripData = async () => {
+            if (ride?.pickup && ride?.destination) {
+                try {
+                    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/get-fare`, {
+                        params: { pickup: ride.pickup, destination: ride.destination },
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    })
 
+                    const distanceInKm = response.data.distance.value / 1000
+                    const durationInSeconds = response.data.duration.value
+                    const calculatedAvgSpeed = (distanceInKm / (durationInSeconds / 3600)).toFixed(1)
+
+                    setTripData({
+                        remainingDistance: response.data.distance.text,
+                        estimatedArrival: new Date(Date.now() + durationInSeconds * 1000),
+                        originalDistance: response.data.distance.text,
+                        originalDuration: durationInSeconds,
+                        distanceInKm: distanceInKm,
+                        averageSpeed: calculatedAvgSpeed,
+                        currentSpeed: parseFloat(calculatedAvgSpeed), // Initialize current speed
+                        trafficCondition: determineTrafficCondition(durationInSeconds, distanceInKm),
+                        trafficIncidents: generateTrafficIncidents(),
+                        routeAlerts: generateRouteAlerts(),
+                        alternativeRoutes: Math.floor(Math.random() * 3) + 1
+                    })
+                } catch (error) {
+                    // Fallback values - calculate dynamic average based on distance and duration
+                    const fallbackDistance = 3.2
+                    const fallbackDuration = 720 // seconds
+                    const fallbackAvgSpeed = (fallbackDistance / (fallbackDuration / 3600)).toFixed(1)
+
+                    setTripData({
+                        remainingDistance: '3.2 km',
+                        estimatedArrival: new Date(Date.now() + 12 * 60000),
+                        originalDistance: '3.2 km',
+                        originalDuration: 720,
+                        distanceInKm: 3.2,
+                        averageSpeed: fallbackAvgSpeed,
+                        currentSpeed: parseFloat(fallbackAvgSpeed), // Initialize current speed
+                        trafficCondition: 'normal',
+                        trafficIncidents: generateTrafficIncidents(),
+                        routeAlerts: generateRouteAlerts(),
+                        alternativeRoutes: 2
+                    })
+                }
+                setIsLoadingTripData(false)
+            }
+        }
+
+        fetchTripData()
+    }, [ride])
+
+    // Update time every second
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date())
         }, 1000)
 
         return () => clearInterval(timer)
-    }, [])
+    }, [])    // Enhanced dynamic trip updates with comprehensive traffic simulation
+    useEffect(() => {
+        const updateTripProgress = () => {
+            if (tripData.originalDuration && !isRideCompleted) {
+                const elapsedTime = (currentTime - rideStartTime) / 1000 // seconds
+                const progressPercentage = Math.min(elapsedTime / tripData.originalDuration, 1)
+
+                // More realistic distance calculation with GPS simulation
+                const baseDistance = tripData.distanceInKm || 3.2
+                const remainingKm = Math.max(baseDistance * (1 - progressPercentage), 0.05)
+
+                // Advanced traffic simulation
+                const trafficMultiplier = simulateTrafficConditions()
+
+                // Dynamic base speed based on vehicle type and conditions
+                const vehicleType = ride?.captain?.vehicle?.vehicleType?.toLowerCase()
+                let baseSpeed = 25 // Default base speed
+
+                switch (vehicleType) {
+                    case 'motorcycle':
+                    case 'moto':
+                        baseSpeed = 35 // Motorcycles are generally faster
+                        break
+                    case 'car':
+                        baseSpeed = 30 // Cars have good speed
+                        break
+                    case 'auto':
+                        baseSpeed = 20 // Auto-rickshaws are slower
+                        break
+                }
+
+                // Apply traffic conditions with enhanced multipliers
+                let adjustedSpeed = baseSpeed / trafficMultiplier
+
+                // Adventure/high-speed scenarios enhancement - increased frequency
+                const isAdventureMode = Math.random() < 0.25 // 25% chance for adventure (increased from 8%)
+                if (isAdventureMode && trafficMultiplier < 1.0) {
+                    // Highway/expressway scenario - significant speed boost
+                    const adventureBoost = 2.0 + Math.random() * 1.5 // 200-350% boost (increased)
+                    adjustedSpeed *= adventureBoost
+                }
+
+                // Additional dynamic factors for realism
+                const roadConditionFactor = 0.8 + (Math.random() * 0.4) // 0.8 to 1.2
+                const driverBehaviorFactor = 0.9 + (Math.random() * 0.2) // 0.9 to 1.1
+                const weatherFactor = Math.random() > 0.85 ? 0.7 : 1.0 // 15% chance of weather impact
+
+                // Calculate current speed with all factors
+                let currentSpeed = adjustedSpeed * roadConditionFactor * driverBehaviorFactor * weatherFactor
+
+                // Apply vehicle speed limits - increased caps
+                let maxSpeedCap = 120 // Increased default
+                switch (vehicleType) {
+                    case 'motorcycle':
+                    case 'moto':
+                        maxSpeedCap = 200 // Increased significantly
+                        break
+                    case 'car':
+                        maxSpeedCap = 180 // Increased significantly  
+                        break
+                    case 'auto':
+                        maxSpeedCap = 100 // Increased from 80
+                        break
+                }
+
+                currentSpeed = Math.max(Math.min(currentSpeed, maxSpeedCap), 5)
+
+                // Calculate dynamic ETA based on current speed and conditions
+                const timeToDestination = (remainingKm / currentSpeed) * 3600 // seconds
+
+                // Enhanced traffic delay calculation
+                let trafficDelayBuffer = 0
+                if (trafficMultiplier > 1.2) {
+                    trafficDelayBuffer = (trafficMultiplier - 1) * 200 // Heavy traffic delays
+                } else if (trafficMultiplier < 0.8) {
+                    trafficDelayBuffer = -60 // Light traffic time savings
+                }
+
+                const randomBuffer = Math.random() * 90 + 30 // 30-120 seconds buffer
+                const adjustedETA = Math.max(timeToDestination + trafficDelayBuffer + randomBuffer, 60)
+
+                // Determine traffic condition with enhanced granularity
+                let trafficCondition = 'normal'
+                if (currentSpeed < 8) trafficCondition = 'severe'
+                else if (currentSpeed < 15) trafficCondition = 'heavy'
+                else if (currentSpeed < 25) trafficCondition = 'moderate'
+                else if (currentSpeed > 60) trafficCondition = 'light' // Lowered threshold for light traffic
+
+                // Calculate dynamic trip average speed
+                const tripElapsedTime = elapsedTime / 3600 // hours
+                const distanceTraveled = baseDistance - remainingKm
+                let dynamicAvgSpeed = tripElapsedTime > 0 ? (distanceTraveled / tripElapsedTime) : currentSpeed
+
+                // Smooth the average speed changes to avoid jumps
+                const previousAvgSpeed = parseFloat(tripData.averageSpeed) || currentSpeed
+                dynamicAvgSpeed = (previousAvgSpeed * 0.7) + (dynamicAvgSpeed * 0.3) // 70-30 smoothing
+
+                // Update traffic alerts based on conditions
+                if (trafficCondition === 'heavy' || trafficCondition === 'severe') {
+                    setTrafficAlerts(prev => {
+                        const newAlert = {
+                            id: Date.now(),
+                            message: `${trafficCondition === 'severe' ? 'Severe' : 'Heavy'} traffic detected - ETA updated`,
+                            type: 'warning',
+                            timestamp: new Date()
+                        }
+                        return [...prev.slice(-2), newAlert] // Keep last 3 alerts
+                    })
+                }
+
+                // High-speed adventure alerts - increased frequency
+                if (currentSpeed > 50 && trafficCondition === 'light') { // Lowered threshold
+                    const adventureAlerts = [
+                        'High-speed zone - enjoying the ride! 🏎️',
+                        'Clear roads ahead - smooth sailing!',
+                        'Express route activated - fast journey!',
+                        'Highway mode - cruising at high speed!',
+                        'Speed boost activated - hold tight! 🚀',
+                        'Racing mode engaged - feel the rush! ⚡'
+                    ]
+
+                    if (Math.random() > 0.75) { // 25% chance when at high speed (increased)
+                        setTrafficAlerts(prev => {
+                            const newAlert = {
+                                id: Date.now(),
+                                message: adventureAlerts[Math.floor(Math.random() * adventureAlerts.length)],
+                                type: 'adventure',
+                                timestamp: new Date()
+                            }
+                            return [...prev.slice(-2), newAlert]
+                        })
+                    }
+                }
+
+                // Store current speed for average calculation
+                const currentSpeedForCalc = currentSpeed
+
+                setTripData(prev => ({
+                    ...prev,
+                    remainingDistance: `${remainingKm.toFixed(1)} km`,
+                    estimatedArrival: new Date(Date.now() + adjustedETA * 1000),
+                    averageSpeed: dynamicAvgSpeed.toFixed(1),
+                    trafficCondition: trafficCondition,
+                    currentSpeed: currentSpeedForCalc, // Store current speed in state
+                    // Occasionally update incidents and alerts
+                    ...(Math.random() > 0.8 && {
+                        trafficIncidents: generateTrafficIncidents(),
+                        routeAlerts: generateRouteAlerts()
+                    })
+                }))
+            }
+        }
+
+        const intervalId = setInterval(updateTripProgress, 3000) // Update every 3 seconds for more dynamic feel
+        return () => clearInterval(intervalId)
+    }, [currentTime, rideStartTime, tripData.originalDuration, tripData.distanceInKm, isRideCompleted, ride])
 
     useEffect(() => {
         socket.on("ride-ended", () => {
@@ -30,10 +254,278 @@ const Riding = () => {
             setTimeout(() => navigate('/home'), 2000)
         })
 
+        // Listen for captain acknowledgment of completion request
+        socket.on("ride-completion-acknowledged", () => {
+            // Captain has received the completion request
+        })
+
         return () => {
             socket.off("ride-ended")
+            socket.off("ride-completion-acknowledged")
         }
     }, [socket, navigate])
+
+    // Handle complete ride button click
+    const handleCompleteRide = async () => {
+        try {
+            setIsWaitingForDriver(true)
+
+            // Notify the captain that the user wants to complete the ride
+            socket.emit('user-complete-ride-request', {
+                rideId: ride._id,
+                paymentMethod: paymentMethod
+            })
+
+        } catch (error) {
+            setIsWaitingForDriver(false)
+        }
+    }
+
+    // Generate realistic traffic incidents
+    const generateTrafficIncidents = () => {
+        const incidents = [
+            { type: 'construction', message: 'Road work ahead - expect delays', severity: 'moderate', icon: 'ri-hammer-line' },
+            { type: 'accident', message: 'Minor accident cleared - traffic resuming', severity: 'light', icon: 'ri-alarm-warning-line' },
+            { type: 'congestion', message: 'Heavy traffic on main route', severity: 'heavy', icon: 'ri-traffic-light-line' },
+            { type: 'event', message: 'Local event causing increased traffic', severity: 'moderate', icon: 'ri-calendar-event-line' },
+            { type: 'weather', message: 'Light rain affecting visibility', severity: 'light', icon: 'ri-rainy-line' },
+            { type: 'highway', message: 'Entering highway - high speed zone', severity: 'adventure', icon: 'ri-roadster-line' },
+            { type: 'express', message: 'Clear expressway - optimal driving conditions', severity: 'adventure', icon: 'ri-rocket-line' },
+            { type: 'scenic', message: 'Beautiful scenic route - enjoy the journey', severity: 'adventure', icon: 'ri-landscape-line' }
+        ]
+
+        // Higher chance of positive incidents when traffic is light
+        const adventureWeight = tripData.trafficCondition === 'light' ? 3 : 0.5
+
+        // Randomly select 0-2 incidents
+        const numIncidents = Math.random() > 0.7 ? Math.floor(Math.random() * 2) + 1 : 0
+        const selectedIncidents = []
+
+        for (let i = 0; i < numIncidents; i++) {
+            let randomIncident
+
+            // Favor adventure incidents when traffic is light
+            if (tripData.trafficCondition === 'light' && Math.random() > 0.6) {
+                const adventureIncidents = incidents.filter(inc => inc.severity === 'adventure')
+                randomIncident = adventureIncidents[Math.floor(Math.random() * adventureIncidents.length)]
+            } else {
+                randomIncident = incidents[Math.floor(Math.random() * incidents.length)]
+            }
+
+            if (!selectedIncidents.find(inc => inc.type === randomIncident.type)) {
+                selectedIncidents.push(randomIncident)
+            }
+        }
+
+        return selectedIncidents
+    }
+
+    // Generate route alerts
+    const generateRouteAlerts = () => {
+        const alerts = [
+            { type: 'faster_route', message: 'Faster route available - save 3 min', icon: 'ri-direction-line', action: 'Switch Route' },
+            { type: 'toll', message: 'Toll road ahead - ₹25', icon: 'ri-coin-line', action: 'View Details' },
+            { type: 'fuel', message: 'Fuel station nearby', icon: 'ri-gas-station-line', action: 'Add Stop' },
+            { type: 'express', message: 'Express highway available - faster journey', icon: 'ri-roadster-line', action: 'Take Express' },
+            { type: 'adventure', message: 'Scenic route available - enjoy the view', icon: 'ri-landscape-line', action: 'Take Scenic' },
+            { type: 'speed', message: 'High-speed zone ahead - buckle up!', icon: 'ri-rocket-line', action: 'Continue' }
+        ]
+
+        // 30% chance of having an alert, higher chance for adventure routes
+        const chanceMultiplier = tripData.trafficCondition === 'light' ? 1.5 : 1.0
+        if (Math.random() > (0.7 / chanceMultiplier)) {
+            return [alerts[Math.floor(Math.random() * alerts.length)]]
+        }
+        return []
+    }
+
+    // Enhanced traffic simulation with real-world factors and adventure scenarios
+    const simulateTrafficConditions = () => {
+        const currentHour = new Date().getHours()
+        const currentMinute = new Date().getMinutes()
+        const dayOfWeek = new Date().getDay() // 0 = Sunday, 6 = Saturday
+
+        // Base traffic factors
+        let trafficMultiplier = 1.0
+
+        // Time-based traffic patterns
+        if ((currentHour >= 7 && currentHour <= 10) || (currentHour >= 17 && currentHour <= 20)) {
+            trafficMultiplier = 1.5 // Rush hour
+        } else if (currentHour >= 22 || currentHour <= 6) {
+            trafficMultiplier = 0.7 // Night time - often clearer roads
+
+            // Late night adventure scenarios (higher chance of light traffic)
+            if (currentHour >= 23 || currentHour <= 5) {
+                trafficMultiplier = Math.random() > 0.7 ? 0.4 : 0.6 // Very light traffic for adventure
+            }
+        } else if (currentHour >= 11 && currentHour <= 14) {
+            trafficMultiplier = 1.2 // Lunch hour
+        } else if (currentHour >= 15 && currentHour <= 16) {
+            // Early afternoon - good driving conditions
+            trafficMultiplier = 0.8
+        }
+
+        // Weekend vs weekday
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+            trafficMultiplier *= 0.8 // Weekends generally lighter
+
+            // Weekend highway scenarios (better for high speeds)
+            if ((currentHour >= 10 && currentHour <= 12) || (currentHour >= 14 && currentHour <= 16)) {
+                trafficMultiplier *= Math.random() > 0.6 ? 0.7 : 0.9 // Even lighter weekend traffic
+            }
+        }
+
+        // Weather simulation (20% chance of weather impact)
+        const weatherImpact = Math.random() > 0.8 ? 1.3 : 1.0
+
+        // Event simulation (10% chance of special events)
+        const eventImpact = Math.random() > 0.9 ? 1.4 : 1.0
+
+        // Highway/expressway simulation (30% chance of highway conditions - increased)
+        const isHighwayRoute = Math.random() < 0.30
+        if (isHighwayRoute && trafficMultiplier < 1.0) {
+            trafficMultiplier *= 0.4 // Even better conditions on highways (improved)
+        }
+
+        // Adventure route scenarios (20% chance - significantly increased)
+        const isAdventureRoute = Math.random() < 0.20
+        if (isAdventureRoute) {
+            trafficMultiplier *= 0.3 // Clear roads for adventure (improved)
+        }
+
+        return trafficMultiplier * weatherImpact * eventImpact
+    }
+
+    // Enhanced helper function to determine traffic condition
+    const determineTrafficCondition = (duration, distance, currentSpeedOverride = null) => {
+        const avgSpeed = currentSpeedOverride || (distance / (duration / 3600)) // km/h
+
+        // More granular traffic condition determination favoring higher speeds
+        if (avgSpeed < 10) return 'severe'
+        if (avgSpeed < 20) return 'heavy'
+        if (avgSpeed < 35) return 'moderate'
+        if (avgSpeed > 60) return 'light' // Lowered from 50 to get light traffic more often
+        return 'normal'
+    }
+
+    // Get traffic condition color and icon with enhanced speed ranges
+    const getTrafficInfo = () => {
+        const currentSpeed = getCurrentSpeed()
+
+        switch (tripData.trafficCondition) {
+            case 'light':
+                if (currentSpeed > 100) {
+                    return { color: 'text-purple-600', bgColor: 'bg-purple-50', icon: 'ri-rocket-2-line', text: 'Super High Speed', intensity: '●●●●●' }
+                } else if (currentSpeed > 70) {
+                    return { color: 'text-green-600', bgColor: 'bg-green-50', icon: 'ri-rocket-line', text: 'High Speed Zone', intensity: '●●●●' }
+                }
+                return { color: 'text-green-600', bgColor: 'bg-green-50', icon: 'ri-speed-up-line', text: 'Light Traffic', intensity: '●○○○' }
+            case 'moderate':
+                return { color: 'text-yellow-600', bgColor: 'bg-yellow-50', icon: 'ri-speed-line', text: 'Moderate Traffic', intensity: '●●○○' }
+            case 'heavy':
+                return { color: 'text-red-600', bgColor: 'bg-red-50', icon: 'ri-speed-down-line', text: 'Heavy Traffic', intensity: '●●●○' }
+            case 'severe':
+                return { color: 'text-red-800', bgColor: 'bg-red-100', icon: 'ri-alarm-warning-line', text: 'Severe Congestion', intensity: '●●●●' }
+            default:
+                if (currentSpeed > 80) {
+                    return { color: 'text-blue-600', bgColor: 'bg-blue-50', icon: 'ri-roadster-line', text: 'Fast Cruise', intensity: '●●●●' }
+                } else if (currentSpeed > 60) {
+                    return { color: 'text-blue-600', bgColor: 'bg-blue-50', icon: 'ri-roadster-line', text: 'Good Speed', intensity: '●●●○' }
+                }
+                return { color: 'text-blue-600', bgColor: 'bg-blue-50', icon: 'ri-roadster-line', text: 'Normal Traffic', intensity: '●●○○' }
+        }
+    }
+
+    const getEstimatedArrival = () => {
+        if (tripData.estimatedArrival) {
+            const now = new Date()
+            const eta = tripData.estimatedArrival
+            const diffMinutes = Math.max(Math.ceil((eta - now) / (1000 * 60)), 1)
+
+            if (diffMinutes < 60) {
+                return `${diffMinutes} min`
+            } else {
+                const hours = Math.floor(diffMinutes / 60)
+                const minutes = diffMinutes % 60
+                return `${hours}h ${minutes}m`
+            }
+        }
+        return 'Calculating...'
+    }
+
+    // Enhanced current speed with dynamic real-time variations
+    const getCurrentSpeed = () => {
+        // Use stored current speed from trip updates as base
+        const baseCurrentSpeed = tripData.currentSpeed || parseFloat(getTripAverageSpeed()) || 25
+
+        // Add larger real-time variations for more excitement (±8 km/h)
+        const timeVariation = Math.sin(Date.now() / 5000) * 4 // ±4 km/h variation every 5 seconds
+        const microVariation = (Math.random() - 0.5) * 8 // ±4 km/h micro variation
+
+        // Factor in traffic conditions for immediate speed adjustments
+        let instantSpeedFactor = 1.0
+        switch (tripData.trafficCondition) {
+            case 'severe':
+                instantSpeedFactor = 0.6 + Math.random() * 0.4 // 60-100% fluctuation
+                break
+            case 'heavy':
+                instantSpeedFactor = 0.8 + Math.random() * 0.3 // 80-110% fluctuation
+                break
+            case 'moderate':
+                instantSpeedFactor = 0.9 + Math.random() * 0.2 // 90-110% fluctuation
+                break
+            case 'light':
+                instantSpeedFactor = 1.2 + Math.random() * 0.5 // 120-170% speed boost (significant increase)
+                break
+            default:
+                instantSpeedFactor = 1.0 + Math.random() * 0.3 // 100-130% fluctuation
+        }
+
+        // Apply enhanced vehicle speed limits
+        const vehicleType = ride?.captain?.vehicle?.vehicleType?.toLowerCase()
+        let maxSpeedCap = 120
+        switch (vehicleType) {
+            case 'motorcycle':
+            case 'moto':
+                maxSpeedCap = 200 // Very high for motorcycles
+                break
+            case 'car':
+                maxSpeedCap = 180 // High for cars
+                break
+            case 'auto':
+                maxSpeedCap = 100 // Increased for autos
+                break
+        }
+
+        const currentSpeed = (baseCurrentSpeed + timeVariation + microVariation) * instantSpeedFactor
+        return Math.round(Math.max(Math.min(currentSpeed, maxSpeedCap), 2))
+    }
+
+    // Get the actual trip average speed
+    const getTripAverageSpeed = () => {
+        const elapsedTime = (currentTime - rideStartTime) / 1000 / 3600 // hours
+        if (elapsedTime <= 0) return '25'
+
+        const baseDistance = tripData.distanceInKm || 3.2
+        // Calculate progress based on elapsed time and estimated trip duration
+        const estimatedDurationHours = (tripData.originalDuration || 600) / 3600 // convert seconds to hours
+        const progressPercentage = Math.min(elapsedTime / estimatedDurationHours, 1)
+        const distanceTraveled = baseDistance * progressPercentage
+
+        const actualAvgSpeed = distanceTraveled / elapsedTime
+        return actualAvgSpeed.toFixed(1)
+    }
+
+    const getFormattedETA = () => {
+        if (tripData.estimatedArrival) {
+            return tripData.estimatedArrival.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            })
+        }
+        return 'Calculating...'
+    }
 
     const getRideDuration = () => {
         const diff = Math.floor((currentTime - rideStartTime) / 1000)
@@ -61,14 +553,77 @@ const Riding = () => {
                     <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                     <h1 className="text-lg font-semibold text-gray-800">Riding</h1>
                     <span className="text-sm text-gray-500">• {getRideDuration()}</span>
+                    <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded-md">
+                        <i className={`ri-speed-line ${getCurrentSpeed() > 80 ? 'text-green-600 animate-pulse' :
+                            getCurrentSpeed() > 50 ? 'text-blue-600' :
+                                tripData.trafficCondition === 'heavy' || tripData.trafficCondition === 'severe' ? 'text-red-600' : 'text-gray-600'
+                            }`}></i>
+                        <span className={`${getCurrentSpeed() > 80 ? 'text-green-600 font-bold' :
+                            getCurrentSpeed() > 50 ? 'text-blue-600 font-medium' :
+                                tripData.trafficCondition === 'heavy' || tripData.trafficCondition === 'severe' ? 'text-red-600 font-medium' : ''
+                            }`}>
+                            {getCurrentSpeed()} km/h
+                        </span>
+                        {getCurrentSpeed() > 80 && (
+                            <i className="ri-rocket-line text-green-600 text-xs animate-bounce"></i>
+                        )}
+                        {getCurrentSpeed() > 50 && getCurrentSpeed() <= 80 && (
+                            <i className="ri-flashlight-line text-blue-600 text-xs"></i>
+                        )}
+                        {(tripData.trafficCondition === 'heavy' || tripData.trafficCondition === 'severe') && (
+                            <i className="ri-alert-line text-red-500 text-xs animate-pulse"></i>
+                        )}
+                    </div>
                 </div>
-                <Link to='/home' className="h-10 w-10 bg-gray-100 hover:bg-gray-200 flex items-center justify-center rounded-full transition-colors">
-                    <i className="text-lg font-medium ri-home-5-line text-gray-600"></i>
-                </Link>
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center gap-1 text-sm text-gray-600 bg-blue-50 px-3 py-2 rounded-lg border shadow-sm">
+                        <i className="ri-time-line flex-shrink-0" style={{ lineHeight: '1' }}></i>
+                        <span className="font-medium" style={{ lineHeight: '1' }}>{getEstimatedArrival()}</span>
+                    </div>
+                    <Link to='/home' className="h-10 w-10 bg-gray-100 hover:bg-gray-200 flex items-center justify-center rounded-full transition-colors">
+                        <i className="text-lg font-medium ri-home-5-line text-gray-600"></i>
+                    </Link>
+                </div>
             </div>
 
-            <div className="h-[45%]">
+            <div className="h-[45%] relative">
                 <LiveTracking />
+
+                {/* Live Traffic Alerts Overlay */}
+                {trafficAlerts.length > 0 && (
+                    <div className="absolute top-4 left-4 right-4 z-10">
+                        {trafficAlerts.slice(-1).map((alert) => ( // Show only the latest alert
+                            <div
+                                key={alert.id}
+                                className={`${alert.type === 'adventure'
+                                    ? 'bg-green-100 border-l-4 border-green-500 text-green-700'
+                                    : 'bg-orange-100 border-l-4 border-orange-500 text-orange-700'
+                                    } p-3 rounded-r shadow-lg animate-pulse`}
+                                onClick={() => setTrafficAlerts(prev => prev.filter(a => a.id !== alert.id))}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <i className={`${alert.type === 'adventure'
+                                            ? 'ri-rocket-line'
+                                            : 'ri-alert-line'
+                                            } text-lg`}></i>
+                                        <span className="text-sm font-medium">{alert.message}</span>
+                                    </div>
+                                    <button className={`${alert.type === 'adventure'
+                                        ? 'text-green-600 hover:text-green-800'
+                                        : 'text-orange-600 hover:text-orange-800'
+                                        }`}>
+                                        <i className="ri-close-line"></i>
+                                    </button>
+                                </div>
+                                <p className={`text-xs ${alert.type === 'adventure' ? 'text-green-600' : 'text-orange-600'
+                                    } mt-1`}>
+                                    {alert.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div className="h-[55%] bg-white rounded-t-3xl shadow-lg overflow-y-auto">
@@ -136,7 +691,108 @@ const Riding = () => {
                 {/* Trip Details */}
                 <div className="p-4 space-y-4">
                     <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-3">Trip Details</h3>
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-lg font-semibold text-gray-800">Trip Details</h3>
+                            <div className="flex items-center gap-3 text-sm">
+                                <div className="flex items-center gap-1 text-gray-600">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                    <span>Live</span>
+                                </div>
+                                <div
+                                    className={`flex items-center gap-2 ${getTrafficInfo().color} ${getTrafficInfo().bgColor} px-2 py-1 rounded-lg cursor-pointer transition-all hover:shadow-sm`}
+                                    onClick={() => setShowTrafficDetails(!showTrafficDetails)}
+                                >
+                                    <i className={`${getTrafficInfo().icon} text-sm`}></i>
+                                    <span className="font-medium">{getTrafficInfo().text}</span>
+                                    <span className="text-xs opacity-70">{getTrafficInfo().intensity}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Traffic Details Expandable Section */}
+                        {showTrafficDetails && (
+                            <div className="mb-4 p-3 bg-white/80 rounded-lg border border-gray-200">
+                                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                    <i className="ri-traffic-light-line"></i>
+                                    Traffic Information
+                                </h4>
+
+                                {/* Traffic Incidents */}
+                                {tripData.trafficIncidents && tripData.trafficIncidents.length > 0 && (
+                                    <div className="mb-3">
+                                        <p className="text-xs text-gray-600 mb-1">Current Incidents:</p>
+                                        {tripData.trafficIncidents.map((incident, index) => (
+                                            <div key={index} className="flex items-center gap-2 text-xs text-gray-700 mb-1">
+                                                <i className={`${incident.icon} ${incident.severity === 'adventure' ? 'text-green-600' :
+                                                    incident.severity === 'heavy' ? 'text-red-600' :
+                                                        incident.severity === 'moderate' ? 'text-yellow-600' : 'text-orange-600'
+                                                    }`}></i>
+                                                <span className={incident.severity === 'adventure' ? 'text-green-700 font-medium' : ''}>
+                                                    {incident.message}
+                                                </span>
+                                                {incident.severity === 'adventure' && (
+                                                    <i className="ri-sparkle-line text-green-500 text-xs animate-pulse"></i>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Route Alerts */}
+                                {tripData.routeAlerts && tripData.routeAlerts.length > 0 && (
+                                    <div className="mb-3">
+                                        <p className="text-xs text-gray-600 mb-1">Route Alerts:</p>
+                                        {tripData.routeAlerts.map((alert, index) => (
+                                            <div key={index} className="flex items-center justify-between text-xs bg-blue-50 p-2 rounded">
+                                                <div className="flex items-center gap-2">
+                                                    <i className={`${alert.icon} text-blue-600`}></i>
+                                                    <span className="text-gray-700">{alert.message}</span>
+                                                </div>
+                                                <button className="text-blue-600 font-medium hover:underline">
+                                                    {alert.action}
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Traffic Stats */}
+                                <div className="grid grid-cols-2 gap-3 text-xs">
+                                    <div className="bg-gray-50 p-2 rounded">
+                                        <p className="text-gray-500">Alternative Routes</p>
+                                        <p className="font-semibold text-gray-800">{tripData.alternativeRoutes || 1} available</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-2 rounded">
+                                        <p className="text-gray-500">Traffic Delay</p>
+                                        <p className="font-semibold text-gray-800">
+                                            {tripData.trafficCondition === 'heavy' || tripData.trafficCondition === 'severe' ? '+3-8 min' :
+                                                tripData.trafficCondition === 'moderate' ? '+1-3 min' : 'None'}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Speed Analysis */}
+                                <div className="mt-3 p-2 bg-blue-50 rounded-lg">
+                                    <div className="flex items-center justify-between text-xs">
+                                        <span className="text-gray-600">Speed Analysis:</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`font-medium ${getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'text-green-600' :
+                                                getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'text-red-600' :
+                                                    'text-blue-600'
+                                                }`}>
+                                                {getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'Above Average' :
+                                                    getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'Below Average' :
+                                                        'Normal Speed'}
+                                            </span>
+                                            <i className={`${getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'ri-arrow-up-line text-green-600' :
+                                                getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'ri-arrow-down-line text-red-600' :
+                                                    'ri-subtract-line text-blue-600'
+                                                } text-xs`}></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         <div className='space-y-3'>
                             <div className='flex items-start gap-4 p-3 bg-white/70 rounded-lg'>
@@ -145,8 +801,12 @@ const Riding = () => {
                                     <h4 className='text-sm font-medium text-green-700'>Pickup Location</h4>
                                     <p className='text-gray-700 font-medium'>{ride?.pickup || 'Loading pickup location...'}</p>
                                     <p className="text-xs text-gray-500 mt-1">
-                                        <i className="ri-time-line mr-1"></i>
-                                        Started at {rideStartTime.toLocaleTimeString()}
+                                        <i className="ri-time-line mr-1" style={{ verticalAlign: 'baseline' }}></i>
+                                        Started at {rideStartTime.toLocaleTimeString([], {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: true
+                                        })}
                                     </p>
                                 </div>
                             </div>
@@ -160,10 +820,66 @@ const Riding = () => {
                                 <div className="flex-1">
                                     <h4 className='text-sm font-medium text-red-700'>Destination</h4>
                                     <p className='text-gray-700 font-medium'>{ride?.destination || 'Loading destination...'}</p>
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        <i className="ri-roadster-line mr-1"></i>
-                                        {ride?.distance || '3.2 km'} • Est. arrival: {new Date(Date.now() + 12 * 60000).toLocaleTimeString()}
-                                    </p>
+                                    <div className="flex items-center gap-4 mt-2">
+                                        <p className="text-xs text-gray-600 flex items-center">
+                                            <i className="ri-roadster-line mr-1"></i>
+                                            <span className="font-semibold text-blue-600">
+                                                {isLoadingTripData ? 'Calculating...' : tripData.remainingDistance}
+                                            </span>
+                                            <span className="ml-1">remaining</span>
+                                        </p>
+                                        <p className="text-xs text-gray-600 flex items-center">
+                                            <i className="ri-time-line mr-1 flex-shrink-0" style={{ lineHeight: '1' }}></i>
+                                            <span style={{ lineHeight: '1' }}>
+                                                ETA: <span className="font-semibold text-green-600">{getFormattedETA()}</span>
+                                                <span className="text-gray-500 ml-1">({getEstimatedArrival()})</span>
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-4 mt-2">
+                                        <p className="text-xs text-gray-600 flex items-center">
+                                            <i className={`ri-speed-line mr-1 ${getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'text-green-600' :
+                                                getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'text-red-600' :
+                                                    'text-gray-600'
+                                                }`}></i>
+                                            <span>Current: </span>
+                                            <span className={`font-semibold ml-1 ${getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'text-green-600' :
+                                                getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'text-red-600' :
+                                                    'text-purple-600'
+                                                }`}>
+                                                {getCurrentSpeed()} km/h
+                                            </span>
+                                            {getCurrentSpeed() > parseFloat(getTripAverageSpeed()) && (
+                                                <i className="ri-arrow-up-line text-green-600 text-xs ml-1"></i>
+                                            )}
+                                            {getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 && (
+                                                <i className="ri-arrow-down-line text-red-600 text-xs ml-1"></i>
+                                            )}
+                                        </p>
+                                        <p className="text-xs text-gray-600 flex items-center">
+                                            <i className="ri-route-line mr-1"></i>
+                                            <span>Trip Avg: </span>
+                                            <span className="font-semibold text-indigo-600 ml-1">
+                                                {getTripAverageSpeed()} km/h
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div className="mt-3 bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
+                                        <div
+                                            className="bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 h-full transition-all duration-2000 ease-out relative"
+                                            style={{
+                                                width: `${Math.min((currentTime - rideStartTime) / (tripData.originalDuration * 1000) * 100, 100)}%`
+                                            }}
+                                        >
+                                            <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/30 rounded-full animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center mt-2">
+                                        <p className="text-xs text-gray-500">Trip Progress</p>
+                                        <p className="text-xs font-semibold text-gray-700">
+                                            {Math.min(Math.round((currentTime - rideStartTime) / (tripData.originalDuration * 1000) * 100), 100)}% Complete
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -200,8 +916,8 @@ const Riding = () => {
                             <button
                                 onClick={() => setPaymentMethod('cash')}
                                 className={`flex-1 p-3 rounded-lg border-2 transition-all ${paymentMethod === 'cash'
-                                        ? 'border-green-500 bg-green-50 text-green-700'
-                                        : 'border-gray-200 bg-white text-gray-600'
+                                    ? 'border-green-500 bg-green-50 text-green-700'
+                                    : 'border-gray-200 bg-white text-gray-600'
                                     }`}
                             >
                                 <i className="ri-cash-line text-xl mb-1"></i>
@@ -210,8 +926,8 @@ const Riding = () => {
                             <button
                                 onClick={() => setPaymentMethod('digital')}
                                 className={`flex-1 p-3 rounded-lg border-2 transition-all ${paymentMethod === 'digital'
-                                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                        : 'border-gray-200 bg-white text-gray-600'
+                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                    : 'border-gray-200 bg-white text-gray-600'
                                     }`}
                             >
                                 <i className="ri-smartphone-line text-xl mb-1"></i>
@@ -228,8 +944,29 @@ const Riding = () => {
                             <i className="ri-check-line text-xl mr-2"></i>
                             Ride Completed! Redirecting...
                         </div>
+                    ) : isWaitingForDriver ? (
+                        <div className="space-y-3">
+                            <div className="bg-yellow-100 text-yellow-800 font-semibold p-4 rounded-xl text-center">
+                                <div className="flex items-center justify-center gap-2">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-600"></div>
+                                    <span>Waiting for driver to end the trip...</span>
+                                </div>
+                                <p className="text-sm mt-2 text-yellow-700">
+                                    Payment method: {paymentMethod === 'cash' ? 'Cash' : 'Digital Payment'}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setIsWaitingForDriver(false)}
+                                className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium p-3 rounded-lg transition-all duration-200"
+                            >
+                                Cancel Request
+                            </button>
+                        </div>
                     ) : (
-                        <button className='w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold p-4 rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2'>
+                        <button
+                            onClick={handleCompleteRide}
+                            className='w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold p-4 rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2'
+                        >
                             <i className="ri-secure-payment-line"></i>
                             Complete Ride & Pay ₹{ride?.fare}
                         </button>

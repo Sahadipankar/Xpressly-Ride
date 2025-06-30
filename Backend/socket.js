@@ -13,9 +13,6 @@ function initializeSocket(server) {
     });
 
     io.on('connection', (socket) => {
-        console.log(`Client connected: ${socket.id}`);
-
-
         socket.on('join', async (data) => {
             const { userId, userType } = data;
 
@@ -25,7 +22,6 @@ function initializeSocket(server) {
                 await captainModel.findByIdAndUpdate(userId, { socketId: socket.id });
             }
         });
-
 
         socket.on('update-location-captain', async (data) => {
             const { userId, location } = data;
@@ -42,21 +38,38 @@ function initializeSocket(server) {
             });
         });
 
+        socket.on('user-complete-ride-request', async (data) => {
+            const { rideId, paymentMethod } = data;
+
+            try {
+                const rideModel = require('./Models/ride.model');
+                const ride = await rideModel.findById(rideId).populate('captain');
+
+                if (ride && ride.captain && ride.captain.socketId) {
+                    io.to(ride.captain.socketId).emit('user-requests-ride-completion', {
+                        rideId: rideId,
+                        paymentMethod: paymentMethod,
+                        message: 'User has requested to complete the ride'
+                    });
+
+                    socket.emit('ride-completion-acknowledged', {
+                        message: 'Request sent to driver'
+                    });
+                }
+            } catch (error) {
+                socket.emit('error', { message: 'Failed to send completion request' });
+            }
+        });
 
         socket.on('disconnect', () => {
-            console.log(`Client disconnected: ${socket.id}`);
+            // Connection cleanup is handled automatically
         });
     });
 }
 
 const sendMessageToSocketId = (socketId, messageObject) => {
-
-    console.log(messageObject);
-
     if (io) {
         io.to(socketId).emit(messageObject.event, messageObject.data);
-    } else {
-        console.log('Socket.io not initialized.');
     }
 }
 

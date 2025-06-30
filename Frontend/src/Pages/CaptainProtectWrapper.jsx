@@ -23,14 +23,13 @@ const CaptainProtectWrapper = ({
             }
         }).then((response) => {
             if (response.status === 200) {
-                setCaptain(response.data.captain) // If the response is successful, set the captain data in the context.
-                setIsLoading(false) // Set loading to false after fetching the captain data.
+                setCaptain(response.data.captain)
+                setIsLoading(false)
             }
         })
             .catch(err => {
-                console.log(err) // Log any errors that occur during the request.
-                localStorage.removeItem('token') // Remove the token from local storage if there is an error.
-                navigate('/captain-login') // If there is an error, redirect to the login page.
+                localStorage.removeItem('token')
+                navigate('/captain-login')
             })
     }, [token])
 

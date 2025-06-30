@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useContext } from 'react'
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import 'remixicon/fonts/remixicon.css'
@@ -8,9 +8,7 @@ import ConfirmRide from '../Components/ConfirmRide';
 import LookingForDriver from '../Components/LookingForDriver';
 import WaitingForDriver from '../Components/WaitingForDriver';
 import axios from 'axios';
-
 import { SocketContext } from '../Context/SocketContext';
-import { useContext } from 'react';
 import { UserDataContext } from '../Context/UserContext';
 import { useNavigate, Link } from 'react-router-dom';
 import LiveTracking from '../Components/LiveTracking';
@@ -43,11 +41,22 @@ const Home = () => {
     const [fare, setFare] = useState({})
     const [vehicleType, setVehicleType] = useState(null)
     const [ride, setRide] = useState(null)
+    const [gettingCurrentLocation, setGettingCurrentLocation] = useState(false)
+    const [currentTime, setCurrentTime] = useState(new Date())
 
     const navigate = useNavigate()
 
     const { socket } = useContext(SocketContext)
     const { user } = useContext(UserDataContext)
+
+    // Update clock every second
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date())
+        }, 1000)
+
+        return () => clearInterval(timer)
+    }, [])
 
 
     useEffect(() => {
@@ -65,7 +74,7 @@ const Home = () => {
                         }
                     })
                 }, (error) => {
-                    console.log('Error getting location:', error)
+                    // Error getting location
                 })
             }
         }
@@ -84,9 +93,8 @@ const Home = () => {
     })
 
     socket.on('ride-started', ride => {
-        console.log("ride")
         setWaitingForDriver(false)
-        navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
+        navigate('/riding', { state: { ride } })
     })
 
 
@@ -119,6 +127,47 @@ const Home = () => {
             setDestinationSuggestions(response.data)
         } catch {
             // handle error
+        }
+    }
+
+    const handleCurrentLocationAsPickup = async () => {
+        setGettingCurrentLocation(true)
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    try {
+                        const { latitude, longitude } = position.coords
+
+                        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-address`, {
+                            params: { lat: latitude, lng: longitude },
+                            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                        })
+
+                        let address = response.data.results?.[0]?.formatted_address ||
+                            response.data.display_name ||
+                            response.data.address ||
+                            `Current Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`
+
+                        setPickup(address)
+
+                    } catch (error) {
+                        const { latitude, longitude } = position.coords
+                        const fallbackAddress = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+                        setPickup(fallbackAddress)
+                    } finally {
+                        setGettingCurrentLocation(false)
+                    }
+                },
+                (error) => {
+                    alert('Unable to get your location. Please allow location access.')
+                    setGettingCurrentLocation(false)
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            )
+        } else {
+            alert('Geolocation is not supported by this browser.')
+            setGettingCurrentLocation(false)
         }
     }
 
@@ -234,7 +283,7 @@ const Home = () => {
 
     return (
         <div className='h-screen relative overflow-hidden'>
-            {/* Enhanced Header with Logo, User Greeting and Logout */}
+            {/* Enhanced Header with Logo, User Greeting, Clock and Logout */}
             <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 md:p-6 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100">
                 <div className="flex items-center gap-4">
                     <img className='w-10 md:w-12' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="Uber Logo" />
@@ -263,13 +312,46 @@ const Home = () => {
                         </div>
                     </div>
                 </div>
-                <Link
-                    to='/user/logout'
-                    className="bg-black text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium hover:bg-gray-800 transition-colors flex items-center gap-2"
-                >
-                    <i className="ri-logout-box-r-line"></i>
-                    <span className="hidden sm:inline">Logout</span>
-                </Link>
+
+                {/* Clock and Logout section */}
+                <div className="flex items-center gap-3">
+                    {/* Digital Clock - Desktop */}
+                    <div className="hidden sm:flex flex-col items-center justify-center bg-gray-50 px-3 py-2 rounded-lg border shadow-sm">
+                        <div className="text-lg md:text-xl font-bold text-gray-800 leading-tight">
+                            {currentTime.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true
+                            })}
+                        </div>
+                        <div className="text-xs text-gray-500 leading-tight mt-0.5">
+                            {currentTime.toLocaleDateString([], {
+                                month: 'short',
+                                day: 'numeric'
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Mobile Clock */}
+                    <div className="sm:hidden flex items-center justify-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border shadow-sm">
+                        <i className="ri-time-line text-gray-600 text-sm flex-shrink-0" style={{ lineHeight: '1' }}></i>
+                        <span className="text-sm font-medium text-gray-800" style={{ lineHeight: '1' }}>
+                            {currentTime.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true
+                            })}
+                        </span>
+                    </div>
+
+                    <Link
+                        to='/user/logout'
+                        className="bg-black text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium hover:bg-gray-800 transition-colors flex items-center gap-2"
+                    >
+                        <i className="ri-logout-box-r-line"></i>
+                        <span className="hidden sm:inline">Logout</span>
+                    </Link>
+                </div>
             </div>
 
             <div className='h-screen w-screen pt-16 md:pt-20'>
@@ -288,12 +370,9 @@ const Home = () => {
                     <form className='relative' onSubmit={(e) => {
                         submitHandler(e)
                     }}>
-
-                        <div className="line absolute h-12 md:h-16 w-1 top-[45%] bg-gray-400 left-8 md:left-10 rounded-full z-10"></div>
-
                         {/* Pickup Input */}
-                        <div className="relative">
-                            <div className="absolute left-6 md:left-8 top-1/2 transform -translate-y-1/2 z-10">
+                        <div className="relative mt-4 md:mt-5">
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
                                 <i className="ri-map-pin-user-fill text-lg text-green-600"></i>
                             </div>
                             <input
@@ -303,15 +382,45 @@ const Home = () => {
                                 }}
                                 value={pickup}
                                 onChange={handlePickupChange}
-                                className='bg-gray-100 pl-12 md:pl-14 pr-4 py-2 md:py-3 text-base md:text-lg rounded-xl w-full mt-4 md:mt-5 border-2 border-transparent focus:outline-none focus:border-green-500 focus:bg-white transition-all duration-200'
+                                className='bg-gray-100 pl-12 pr-20 py-2 md:py-3 text-base md:text-lg rounded-xl w-full border-2 border-transparent focus:outline-none focus:border-green-500 focus:bg-white transition-all duration-200'
                                 type="text"
                                 placeholder="Add a pick-up location"
                             />
+                            {/* Current Location Icon */}
+                            <div
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCurrentLocationAsPickup();
+                                }}
+                                className={`absolute right-12 top-1/2 transform -translate-y-1/2 z-10 cursor-pointer transition-all duration-300 ${gettingCurrentLocation
+                                    ? 'text-gray-400 cursor-not-allowed'
+                                    : 'text-green-600 hover:text-green-700 hover:scale-110'
+                                    }`}
+                                title="Use my current location"
+                            >
+                                {gettingCurrentLocation ? (
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-600 border-t-transparent"></div>
+                                ) : (
+                                    <i className="ri-crosshair-line text-lg"></i>
+                                )}
+                            </div>
+                            {pickup && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPickup('');
+                                        setPickupSuggestions([]);
+                                    }}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 text-gray-500 hover:text-gray-700 transition-colors"
+                                >
+                                    <i className="ri-close-line text-lg"></i>
+                                </button>
+                            )}
                         </div>
 
                         {/* Destination Input */}
-                        <div className="relative">
-                            <div className="absolute left-6 md:left-8 top-1/2 transform -translate-y-1/2 z-10">
+                        <div className="relative mt-3">
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
                                 <i className="ri-map-pin-fill text-lg text-red-600"></i>
                             </div>
                             <input
@@ -321,10 +430,22 @@ const Home = () => {
                                 }}
                                 value={destination}
                                 onChange={handleDestinationChange}
-                                className='bg-gray-100 pl-12 md:pl-14 pr-4 py-2 md:py-3 text-base md:text-lg rounded-xl w-full mt-3 border-2 border-transparent focus:outline-none focus:border-red-500 focus:bg-white transition-all duration-200'
+                                className='bg-gray-100 pl-12 pr-12 py-2 md:py-3 text-base md:text-lg rounded-xl w-full border-2 border-transparent focus:outline-none focus:border-red-500 focus:bg-white transition-all duration-200'
                                 type="text"
                                 placeholder="Enter your destination"
                             />
+                            {destination && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setDestination('');
+                                        setDestinationSuggestions([]);
+                                    }}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 text-gray-500 hover:text-gray-700 transition-colors"
+                                >
+                                    <i className="ri-close-line text-lg"></i>
+                                </button>
+                            )}
                         </div>
                     </form>
                     <button
