@@ -12,7 +12,7 @@ import axios from 'axios';
 import { SocketContext } from '../Context/SocketContext';
 import { useContext } from 'react';
 import { UserDataContext } from '../Context/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import LiveTracking from '../Components/LiveTracking';
 
 
@@ -212,57 +212,82 @@ const Home = () => {
 
     return (
         <div className='h-screen relative overflow-hidden'>
-            <img className='w-17 absolute left-5 top-5' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="Uber Logo" />
+            {/* Header with Logo and Logout */}
+            <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 md:p-6 bg-white/90 backdrop-blur-sm shadow-sm">
+                <img className='w-12 md:w-16' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="Uber Logo" />
+                <Link
+                    to='/user/logout'
+                    className="bg-black text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium hover:bg-gray-800 transition-colors flex items-center gap-2"
+                >
+                    <i className="ri-logout-box-r-line"></i>
+                    <span className="hidden sm:inline">Logout</span>
+                </Link>
+            </div>
 
-            <div className='h-screen w-screen'>
+            <div className='h-screen w-screen pt-16 md:pt-20'>
                 <LiveTracking />
             </div>
 
-            <div className='flex flex-col justify-end h-screen absolute top-0 w-full'>
-                <div className='h-[30%] bg-white p-6 relative'>
+            <div className='flex flex-col justify-end h-screen absolute top-0 w-full pt-16 md:pt-20'>
+                <div className='h-[30%] bg-white p-4 md:p-6 relative rounded-t-3xl shadow-2xl'>
                     <h5 ref={panelCloseRef}
                         onClick={() => setPanelOpen(false)}
-                        className='absolute opacity-0 right-6 top-6 text-2xl'>
+                        className='absolute opacity-0 right-4 md:right-6 top-4 md:top-6 text-2xl cursor-pointer hover:text-gray-600 transition-colors'>
                         <i className="ri-arrow-down-wide-line"></i>
-                    </h5 >
-                    <h4 className='text-2xl font-semibold'>Find a Trip</h4>
+                    </h5>
+                    <h4 className='text-xl md:text-2xl font-semibold mb-4'>Find a Trip</h4>
 
-                    <form className='text-2xl font-semibold' onSubmit={(e) => {
+                    <form className='relative' onSubmit={(e) => {
                         submitHandler(e)
                     }}>
 
-                        <div className="line absolute h-16 w-1 top-[45%] bg-gray-700 left-10 rounded-full"></div>
-                        <input
-                            onClick={() => {
-                                setPanelOpen(true)
-                                setActiveField('pickup')
-                            }}
-                            value={pickup}
-                            onChange={handlePickupChange}
-                            className='bg-[#eee] px-12 py-2 text-lg rounded-lg w-full mt-5 focus:outline-none focus:ring-2 focus:ring-yellow-500'
-                            type="text"
-                            placeholder="Add a pick-up location"
-                        />
-                        <input
-                            onClick={() => {
-                                setPanelOpen(true)
-                                setActiveField('destination')
-                            }}
-                            value={destination}
-                            onChange={handleDestinationChange}
-                            className='bg-[#eee] px-12 py-2 text-lg rounded-lg w-full mt-3 focus:outline-none focus:ring-2 focus:ring-yellow-400'
-                            type="text"
-                            placeholder="Enter your destination"
-                        />
+                        <div className="line absolute h-12 md:h-16 w-1 top-[45%] bg-gray-400 left-8 md:left-10 rounded-full z-10"></div>
+
+                        {/* Pickup Input */}
+                        <div className="relative">
+                            <div className="absolute left-6 md:left-8 top-1/2 transform -translate-y-1/2 z-10">
+                                <i className="ri-map-pin-user-fill text-lg text-green-600"></i>
+                            </div>
+                            <input
+                                onClick={() => {
+                                    setPanelOpen(true)
+                                    setActiveField('pickup')
+                                }}
+                                value={pickup}
+                                onChange={handlePickupChange}
+                                className='bg-gray-100 pl-12 md:pl-14 pr-4 py-2 md:py-3 text-base md:text-lg rounded-xl w-full mt-4 md:mt-5 border-2 border-transparent focus:outline-none focus:border-green-500 focus:bg-white transition-all duration-200'
+                                type="text"
+                                placeholder="Add a pick-up location"
+                            />
+                        </div>
+
+                        {/* Destination Input */}
+                        <div className="relative">
+                            <div className="absolute left-6 md:left-8 top-1/2 transform -translate-y-1/2 z-10">
+                                <i className="ri-map-pin-fill text-lg text-red-600"></i>
+                            </div>
+                            <input
+                                onClick={() => {
+                                    setPanelOpen(true)
+                                    setActiveField('destination')
+                                }}
+                                value={destination}
+                                onChange={handleDestinationChange}
+                                className='bg-gray-100 pl-12 md:pl-14 pr-4 py-2 md:py-3 text-base md:text-lg rounded-xl w-full mt-3 border-2 border-transparent focus:outline-none focus:border-red-500 focus:bg-white transition-all duration-200'
+                                type="text"
+                                placeholder="Enter your destination"
+                            />
+                        </div>
                     </form>
                     <button
                         onClick={findTrip}
-                        className='bg-black text-white px-4 py-2 rounded-lg mt-3 w-full'>
-                        Find Trip
+                        disabled={!pickup || !destination}
+                        className='bg-black text-white px-4 py-2 md:py-3 rounded-xl mt-3 md:mt-4 w-full font-semibold hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 text-sm md:text-base'>
+                        {pickup && destination ? 'Find Trip' : 'Enter pickup and destination'}
                     </button>
                 </div>
 
-                <div ref={panelOpenRef} className='bg-white h-0'>
+                <div ref={panelOpenRef} className='bg-white h-0 rounded-t-3xl'>
                     <LocationSearchPanel
                         suggestions={activeField === 'pickup' ? pickupSuggestions : destinationSuggestions}
                         setPanelOpen={setPanelOpen}
@@ -275,8 +300,7 @@ const Home = () => {
 
             </div>
 
-
-            <div ref={vehiclePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12'>
+            <div ref={vehiclePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12 rounded-t-3xl shadow-2xl'>
                 <VehiclePanel
                     selectVehicle={setVehicleType}
                     fare={fare}
@@ -285,35 +309,30 @@ const Home = () => {
                 />
             </div>
 
-
-            <div ref={confirmRidePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12'>
+            <div ref={confirmRidePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12 rounded-t-3xl shadow-2xl'>
                 <ConfirmRide
                     createRide={createRide}
                     pickup={pickup}
                     destination={destination}
                     fare={fare}
                     vehicleType={vehicleType}
-
                     setConfirmRidePanel={setConfirmRidePanel}
                     setVehicleFound={setVehicleFound}
                 />
             </div>
 
-
-            <div ref={vehicleFoundRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12'>
+            <div ref={vehicleFoundRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12 rounded-t-3xl shadow-2xl'>
                 <LookingForDriver
                     createRide={createRide}
                     pickup={pickup}
                     destination={destination}
                     fare={fare}
                     vehicleType={vehicleType}
-
                     setVehicleFound={setVehicleFound}
                 />
             </div>
 
-
-            <div ref={waitingForDriverRef} className='fixed w-full z-10 bottom-0 bg-white px-3 py-6 pt-12'>
+            <div ref={waitingForDriverRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12 rounded-t-3xl shadow-2xl'>
                 <WaitingForDriver
                     waitingForDriver={waitingForDriver}
                     ride={ride}

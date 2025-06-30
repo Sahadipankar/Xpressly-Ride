@@ -1,25 +1,47 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 const UserLogout = () => {
+    const navigate = useNavigate()
 
-    const token = localStorage.getItem('token') // Retrieve the token from local storage.
-    const navigate = useNavigate() // Hook to programmatically navigate to different routes.
+    useEffect(() => {
+        const logoutUser = async () => {
+            try {
+                const token = localStorage.getItem('token')
 
-    axios.get(`${import.meta.env.VITE_API_URL}/users/logout`, {
-        headers: {
-            Authorization: `Bearer ${token}`
+                if (!token) {
+                    navigate('/login')
+                    return
+                }
+
+                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/logout`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+
+                if (response.status === 200) {
+                    localStorage.removeItem('token')
+                    navigate('/login')
+                }
+            } catch (error) {
+                console.error('Logout error:', error)
+                localStorage.removeItem('token')
+                navigate('/login')
+            }
         }
-    }).then((response) => {
-        if (response.status === 200) {
-            localStorage.removeItem('token') // Remove the token from local storage on logout.
-            navigate('/login') // Redirect to the login page after successful logout.
-        }
-    })
+
+        logoutUser()
+    }, [navigate])
 
     return (
-        <div>UserLogout</div>
+        <div className="flex items-center justify-center h-screen bg-gray-50">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+                <p className="text-lg text-gray-600">Logging out...</p>
+            </div>
+        </div>
     )
 }
 
