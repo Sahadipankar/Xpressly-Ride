@@ -22,102 +22,199 @@ const RidePopUp = (props) => {
     }, [props]);
 
     return (
-        <div className="p-4">
-            <h5 className='p-1 text-center w-[93%] absolute top-0'
-                onClick={() => {
-                    props.setRidePopUpPanel(false);
-                }}><i className="text-2xl text-gray-500 ri-arrow-down-wide-line"></i></h5>
+        <div className="relative">
+            {/* Header with close button */}
+            <div className="flex justify-center mb-4">
+                <button
+                    onClick={() => props.setRidePopUpPanel(false)}
+                    className="w-12 h-1 bg-gray-300 rounded-full hover:bg-gray-400 transition-colors"
+                ></button>
+            </div>
 
-            {/* Header with Timer */}
-            <div className="text-center mb-4">
-                <h3 className='text-xl md:text-2xl font-bold mb-2 text-green-600'>New Ride Request!</h3>
-                <div className="flex items-center justify-center gap-2">
-                    <div className={`w-12 h-12 rounded-full border-4 ${timeLeft > 10 ? 'border-green-500' : 'border-red-500'} flex items-center justify-center`}>
-                        <span className={`text-lg font-bold ${timeLeft > 10 ? 'text-green-600' : 'text-red-600'}`}>
+            {/* Animated Header with Timer */}
+            <div className="text-center mb-6">
+                <div className="relative inline-block">
+                    <h2 className='text-2xl md:text-3xl font-bold mb-3 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent'>
+                        🚗 New Ride Request!
+                    </h2>
+                    <div className="absolute -top-2 -right-8 animate-bounce">
+                        <span className="text-2xl">⚡</span>
+                    </div>
+                </div>
+
+                {/* Enhanced Timer */}
+                <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className={`relative w-16 h-16 rounded-full border-4 ${timeLeft > 15 ? 'border-green-500 bg-green-50' :
+                            timeLeft > 5 ? 'border-yellow-500 bg-yellow-50' :
+                                'border-red-500 bg-red-50'
+                        } flex items-center justify-center transition-all duration-300`}>
+                        <span className={`text-xl font-bold ${timeLeft > 15 ? 'text-green-600' :
+                                timeLeft > 5 ? 'text-yellow-600' :
+                                    'text-red-600'
+                            }`}>
                             {timeLeft}
                         </span>
+                        <div className={`absolute inset-0 rounded-full ${timeLeft > 15 ? 'border-green-400' :
+                                timeLeft > 5 ? 'border-yellow-400' :
+                                    'border-red-400'
+                            } border-2 animate-pulse`}></div>
                     </div>
-                    <span className="text-sm text-gray-600">seconds to respond</span>
+                    <div className="text-center">
+                        <p className="text-sm font-medium text-gray-700">Respond in</p>
+                        <p className="text-xs text-gray-500">
+                            {timeLeft > 15 ? '🟢 Good time' :
+                                timeLeft > 5 ? '🟡 Hurry up' :
+                                    '🔴 Almost expired'}
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            {/* Passenger Info Card */}
-            <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <img
-                            className='h-14 w-14 md:h-16 md:w-16 rounded-full object-cover border-3 border-white shadow-md'
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKAjn0EsJc3E-9hgTU6GxsMuCioyJbeeRK4A&s"
-                            alt="User Avatar"
-                        />
-                        <div>
-                            <h4 className='text-lg md:text-xl font-semibold capitalize'>
-                                {props.ride?.user?.fullname?.firstname} {props.ride?.user?.fullname?.lastname}
-                            </h4>
-                            <div className="flex items-center gap-2">
-                                <span className="text-yellow-500">
-                                    <i className="ri-star-fill text-sm"></i>
-                                    4.8
-                                </span>
-                                <span className="text-gray-400">•</span>
-                                <span className="text-sm text-gray-600">Premium</span>
+            {/* Enhanced Passenger Info Card */}
+            <div className="bg-gradient-to-br from-white to-blue-50 border-2 border-blue-200 rounded-2xl p-5 mb-6 shadow-lg">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                        <div className="relative">
+                            <img
+                                className='h-16 w-16 md:h-20 md:w-20 rounded-full object-cover border-4 border-white shadow-lg'
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKAjn0EsJc3E-9hgTU6GxsMuCioyJbeeRK4A&s"
+                                alt="Passenger"
+                            />
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                                <i className="ri-check-line text-white text-xs"></i>
                             </div>
+                        </div>
+                        <div>
+                            <h3 className='text-xl md:text-2xl font-bold capitalize text-gray-800'>
+                                {props.ride?.user?.fullname?.firstname} {props.ride?.user?.fullname?.lastname}
+                            </h3>
+                            <div className="flex items-center gap-3 mt-1">
+                                <div className="flex items-center gap-1">
+                                    <span className="text-yellow-500 flex">
+                                        {[...Array(5)].map((_, i) => (
+                                            <i key={i} className={`ri-star-${i < 4 ? 'fill' : 'line'} text-sm`}></i>
+                                        ))}
+                                    </span>
+                                    <span className="text-sm font-medium text-gray-700">4.8</span>
+                                </div>
+                                <span className="text-gray-400">•</span>
+                                <span className="text-sm bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
+                                    👑 Premium
+                                </span>
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">
+                                <i className="ri-smartphone-line mr-1"></i>
+                                Member since 2022
+                            </p>
                         </div>
                     </div>
                     <div className="text-right">
-                        <h5 className="text-xl md:text-2xl font-bold text-blue-600">
-                            ₹{props.ride?.fare || 'N/A'}
-                        </h5>
-                        <p className="text-sm text-gray-600">{props.ride?.distance || estimatedTime}</p>
+                        <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-xl p-3">
+                            <h4 className="text-2xl md:text-3xl font-bold">
+                                ₹{props.ride?.fare || 'N/A'}
+                            </h4>
+                            <p className="text-sm opacity-90">{estimatedTime}</p>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                            💰 Cash payment
+                        </p>
                     </div>
+                </div>
+
+                {/* Passenger Preferences */}
+                <div className="flex gap-2 mt-3">
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                        🎵 Music OK
+                    </span>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                        ❄️ AC Preferred
+                    </span>
+                    <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">
+                        💬 Quiet Ride
+                    </span>
                 </div>
             </div>
 
-            {/* Route Information */}
-            <div className='w-full space-y-3'>
-                <div className='flex items-start gap-4 p-3 bg-white rounded-lg border border-gray-200'>
-                    <i className="text-xl ri-map-pin-user-fill text-green-600 mt-1"></i>
-                    <div className="flex-1">
-                        <h3 className='text-base md:text-lg font-semibold mb-1'>Pickup Location</h3>
-                        <p className='text-sm text-gray-700 leading-relaxed'>
-                            {props.ride?.pickup || 'Loading pickup location...'}
-                        </p>
-                        <p className="text-xs text-green-600 mt-1 font-medium">
-                            <i className="ri-time-line mr-1"></i>
-                            {estimatedTime} away
-                        </p>
+            {/* Enhanced Route Information */}
+            <div className='w-full space-y-4 mb-6'>
+                <div className='relative bg-gradient-to-r from-green-50 to-green-100 rounded-2xl p-4 border-l-4 border-green-500'>
+                    <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                            <i className="ri-map-pin-user-fill text-white text-lg"></i>
+                        </div>
+                        <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                                <h4 className='text-lg font-bold text-gray-800'>Pickup Location</h4>
+                                <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full font-medium">
+                                    <i className="ri-time-line mr-1"></i>
+                                    {estimatedTime} away
+                                </span>
+                            </div>
+                            <p className='text-sm text-gray-700 leading-relaxed mb-2'>
+                                {props.ride?.pickup || 'Loading pickup location...'}
+                            </p>
+                            <div className="flex items-center gap-4 text-xs text-gray-600">
+                                <span>
+                                    <i className="ri-road-map-line mr-1"></i>
+                                    Main road access
+                                </span>
+                                <span>
+                                    <i className="ri-parking-line mr-1"></i>
+                                    Easy pickup
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+                {/* Animated Route Line */}
                 <div className="flex justify-center">
-                    <div className="w-px h-6 bg-gray-300"></div>
+                    <div className="flex flex-col items-center">
+                        <div className="w-px h-6 bg-gradient-to-b from-green-500 to-red-500"></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                        <div className="w-px h-6 bg-gradient-to-b from-red-500 to-red-600"></div>
+                    </div>
                 </div>
 
-                <div className='flex items-start gap-4 p-3 bg-white rounded-lg border border-gray-200'>
-                    <i className="text-xl ri-map-pin-fill text-red-600 mt-1"></i>
-                    <div className="flex-1">
-                        <h3 className='text-base md:text-lg font-semibold mb-1'>Destination</h3>
-                        <p className='text-sm text-gray-700 leading-relaxed'>
-                            {props.ride?.destination || 'Loading destination...'}
-                        </p>
-                        <p className="text-xs text-blue-600 mt-1 font-medium">
-                            <i className="ri-roadster-line mr-1"></i>
-                            {props.ride?.distance || '3.2 km'} • Est. 12 min
-                        </p>
+                <div className='relative bg-gradient-to-r from-red-50 to-red-100 rounded-2xl p-4 border-l-4 border-red-500'>
+                    <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                            <i className="ri-map-pin-fill text-white text-lg"></i>
+                        </div>
+                        <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                                <h4 className='text-lg font-bold text-gray-800'>Destination</h4>
+                                <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full font-medium">
+                                    <i className="ri-roadster-line mr-1"></i>
+                                    {props.ride?.distance || '3.2 km'}
+                                </span>
+                            </div>
+                            <p className='text-sm text-gray-700 leading-relaxed mb-2'>
+                                {props.ride?.destination || 'Loading destination...'}
+                            </p>
+                            <div className="flex items-center gap-4 text-xs text-gray-600">
+                                <span>
+                                    <i className="ri-timer-line mr-1"></i>
+                                    Est. 12 min
+                                </span>
+                                <span>
+                                    <i className="ri-traffic-light-line mr-1"></i>
+                                    Light traffic
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex mt-6 gap-3 w-full">
+            {/* Enhanced Action Buttons */}
+            <div className="flex gap-4 mb-6">
                 <button
-                    onClick={() => {
-                        props.setRidePopUpPanel(false);
-                    }}
-                    className='flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold p-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2'
+                    onClick={() => props.setRidePopUpPanel(false)}
+                    className='flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-800 font-bold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105'
                 >
-                    <i className="ri-close-line"></i>
-                    Decline
+                    <i className="ri-close-line text-xl"></i>
+                    <span>Decline</span>
                 </button>
 
                 <button
@@ -125,20 +222,41 @@ const RidePopUp = (props) => {
                         props.setConfirmRidePopUpPanel(true);
                         props.confirmRide()
                     }}
-                    className='flex-2 bg-green-600 hover:bg-green-700 text-white font-semibold p-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg'
+                    className='flex-2 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105'
                 >
-                    <i className="ri-check-line"></i>
-                    Accept Ride
+                    <i className="ri-check-line text-xl"></i>
+                    <span>Accept Ride</span>
                 </button>
             </div>
 
-            {/* Quick Info */}
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                    <i className="ri-information-line text-yellow-600"></i>
-                    <span className="text-sm text-yellow-800">
-                        Payment: Cash • {props.ride?.vehicleType || 'Car'} requested
+            {/* Enhanced Quick Info */}
+            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                        <i className="ri-information-line text-xl text-yellow-600"></i>
+                        <span className="font-semibold text-yellow-800">Trip Information</span>
+                    </div>
+                    <span className="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full font-medium">
+                        Important
                     </span>
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                        <i className="ri-money-dollar-circle-line text-green-600"></i>
+                        <span className="text-gray-700">Payment: <strong>Cash</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <i className="ri-car-line text-blue-600"></i>
+                        <span className="text-gray-700">Vehicle: <strong>{props.ride?.vehicleType || 'Car'}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <i className="ri-shield-check-line text-purple-600"></i>
+                        <span className="text-gray-700">Verified rider</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <i className="ri-customer-service-2-line text-indigo-600"></i>
+                        <span className="text-gray-700">24/7 Support</span>
+                    </div>
                 </div>
             </div>
         </div>

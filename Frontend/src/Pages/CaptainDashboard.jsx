@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import CaptainDetails from '../Components/CaptainDetails'
 import RidePopUp from '../Components/RidePopUp'
 import gsap from 'gsap'
@@ -13,9 +13,12 @@ import axios from 'axios'
 
 
 const CaptainDashboard = () => {
-
+    const navigate = useNavigate()
     const [ridePopUpPanel, setRidePopUpPanel] = useState(false);
     const [confirmRidePopUpPanel, setConfirmRidePopUpPanel] = useState(false);
+    const [isOnline, setIsOnline] = useState(true);
+    const [currentTime, setCurrentTime] = useState(new Date());
+    const [refreshing, setRefreshing] = useState(false);
 
     const ridePopUpPanelRef = useRef(null)
     const confirmRidePopUpPanelRef = useRef(null)
@@ -23,6 +26,27 @@ const CaptainDashboard = () => {
 
     const { socket } = useContext(SocketContext)
     const { captain } = useContext(CaptainDataContext)
+
+    // Update current time every minute
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 60000)
+        return () => clearInterval(timer)
+    }, [])
+
+    // Handle refresh
+    const handleRefresh = () => {
+        setRefreshing(true)
+        setTimeout(() => {
+            setRefreshing(false)
+            window.location.reload()
+        }, 1000)
+    }
+
+    // Handle logout
+    const handleLogout = () => {
+        localStorage.removeItem('token')
+        navigate('/captain-login')
+    }
 
     useEffect(() => {
         socket.emit('join', {
@@ -106,39 +130,152 @@ const CaptainDashboard = () => {
 
 
     return (
-        <div className='h-screen '>
-            <div className="fixed p-5 top-0 flex items-center justify-between w-screen">
-                <img className='w-16' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="" />
-                <Link to='/captain-dashboard' className="h-10 w-10 bg-white flex items-center justify-center rounded-full">
-                    <i className="text-lg font-medium ri-logout-box-r-line"></i>
-                </Link>
+        <div className='min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50'>
+            {/* Enhanced Header */}
+            <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+                <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
+                    {/* Logo and Brand */}
+                    <div className="flex items-center gap-3">
+                        <div className="relative">
+                            <img
+                                className='w-10 h-10 md:w-12 md:h-12 object-contain'
+                                src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png"
+                                alt="Uber Logo"
+                            />
+                            <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
+                        </div>
+                        <div className="hidden md:block">
+                            <h1 className="text-lg font-bold text-gray-800">Captain Dashboard</h1>
+                            <p className="text-xs text-gray-600">
+                                {currentTime.toLocaleDateString('en-US', {
+                                    weekday: 'short',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Captain Info (Mobile) */}
+                    <div className="flex md:hidden items-center gap-2">
+                        <div className="text-right">
+                            <h3 className="text-sm font-semibold capitalize">
+                                {captain?.fullname?.firstname}
+                            </h3>
+                            <p className="text-xs text-gray-600 flex items-center gap-1">
+                                <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                {isOnline ? 'Online' : 'Offline'}
+                            </p>
+                        </div>
+                        <img
+                            className='w-8 h-8 rounded-full object-cover border-2 border-green-400'
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkKX2y-92Lgl0fEgjNpgWZhDcDZNz9J1jkrg&s"
+                            alt="Captain Avatar"
+                        />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2">
+                        {/* Online/Offline Toggle */}
+                        <button
+                            onClick={() => setIsOnline(!isOnline)}
+                            className={`hidden md:flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${isOnline
+                                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                    : 'bg-red-100 text-red-700 hover:bg-red-200'
+                                }`}
+                        >
+                            <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></span>
+                            {isOnline ? 'Online' : 'Offline'}
+                        </button>
+
+                        {/* Refresh Button */}
+                        <button
+                            onClick={handleRefresh}
+                            disabled={refreshing}
+                            className="flex items-center justify-center w-10 h-10 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-full transition-all duration-200 disabled:opacity-50"
+                        >
+                            <i className={`ri-refresh-line text-lg ${refreshing ? 'animate-spin' : ''}`}></i>
+                        </button>
+
+                        {/* Logout Button */}
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center justify-center w-10 h-10 bg-red-100 hover:bg-red-200 text-red-600 rounded-full transition-all duration-200"
+                        >
+                            <i className="ri-logout-box-r-line text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
+                {/* Map Section */}
+                <div className="flex-1 relative">
+                    <div className="relative h-64 md:h-96 lg:h-full">
+                        <img
+                            className='h-full w-full object-cover'
+                            src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
+                            alt="Live Map"
+                        />
+
+                        {/* Map Overlay - Status Indicator */}
+                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                            <div className="flex items-center gap-2">
+                                <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
+                                <span className="text-sm font-medium">
+                                    {isOnline ? 'Available for rides' : 'Currently offline'}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Map Controls */}
+                        <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+                            <button className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
+                                <i className="ri-add-line text-lg"></i>
+                            </button>
+                            <button className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
+                                <i className="ri-subtract-line text-lg"></i>
+                            </button>
+                            <button className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
+                                <i className="ri-navigation-line text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Captain Details Panel */}
+                <div className="lg:w-96 bg-white lg:border-l border-gray-200 lg:shadow-xl">
+                    <div className="p-4 lg:p-6 lg:h-full lg:overflow-y-auto">
+                        <CaptainDetails isOnline={isOnline} setIsOnline={setIsOnline} />
+                    </div>
+                </div>
+            </main>
+
+            {/* Ride Request Popup */}
+            <div ref={ridePopUpPanelRef} className='fixed w-full z-20 bottom-0 translate-y-full bg-white rounded-t-3xl shadow-2xl'>
+                <div className="px-4 py-6">
+                    <RidePopUp
+                        ride={ride}
+                        setRidePopUpPanel={setRidePopUpPanel}
+                        setConfirmRidePopUpPanel={setConfirmRidePopUpPanel}
+                        confirmRide={confirmRide}
+                    />
+                </div>
             </div>
 
-            <div className="h-3/5">
-                <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
+            {/* Confirm Ride Popup */}
+            <div ref={confirmRidePopUpPanelRef} className='fixed w-full h-screen z-20 bottom-0 translate-y-full bg-white'>
+                <div className="px-4 py-6 h-full overflow-y-auto">
+                    <ConfirmRidePopUp
+                        ride={ride}
+                        setConfirmRidePopUpPanel={setConfirmRidePopUpPanel}
+                        setRidePopUpPanel={setRidePopUpPanel}
+                    />
+                </div>
             </div>
-
-            <div className="h-2/5 p-6">
-                <CaptainDetails />
-            </div>
-
-            <div ref={ridePopUpPanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12'>
-                <RidePopUp
-                    ride={ride}
-                    setRidePopUpPanel={setRidePopUpPanel}
-                    setConfirmRidePopUpPanel={setConfirmRidePopUpPanel}
-                    confirmRide={confirmRide}
-                />
-            </div>
-
-            <div ref={confirmRidePopUpPanelRef} className='fixed w-full h-screen z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12'>
-                <ConfirmRidePopUp
-                    ride={ride}
-                    setConfirmRidePopUpPanel={setConfirmRidePopUpPanel}
-                    setRidePopUpPanel={setRidePopUpPanel}
-                />
-            </div>
-
         </div>
     )
 }

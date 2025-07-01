@@ -1,12 +1,15 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { CaptainDataContext } from '../Context/CaptainContext'
 
-const CaptainDetails = () => {
+const CaptainDetails = ({ isOnline = true, setIsOnline }) => {
 
     const { captain } = useContext(CaptainDataContext)
     const [currentTime, setCurrentTime] = useState(new Date())
-    const [onlineStatus, setOnlineStatus] = useState(true)
     const [sessionStats, setSessionStats] = useState(null)
+    const [notifications, setNotifications] = useState([
+        { id: 1, type: 'earnings', message: 'Daily goal 80% complete!', time: '2 min ago', icon: 'ri-award-line' },
+        { id: 2, type: 'info', message: 'Peak hours starting soon', time: '5 min ago', icon: 'ri-time-line' }
+    ])
 
     // Update time every minute
     useEffect(() => {
@@ -49,158 +52,237 @@ const CaptainDetails = () => {
     }
 
     return (
-        <div className="space-y-4">
-            {/* Captain Info and Status */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center justify-start gap-3">
-                    <div className="relative">
-                        <img
-                            className='h-12 w-12 md:h-14 md:w-14 rounded-full object-cover border-3 border-green-400'
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkKX2y-92Lgl0fEgjNpgWZhDcDZNz9J1jkrg&s"
-                            alt="Captain Avatar"
-                        />
-                        <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${onlineStatus ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+        <div className="space-y-6">
+            {/* Captain Profile Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-green-600 rounded-2xl p-6 text-white">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                        <div className="relative">
+                            <img
+                                className='h-16 w-16 md:h-20 md:w-20 rounded-full object-cover border-4 border-white shadow-lg'
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkKX2y-92Lgl0fEgjNpgWZhDcDZNz9J1jkrg&s"
+                                alt="Captain Avatar"
+                            />
+                            <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-3 border-white ${isOnline ? 'bg-green-400' : 'bg-red-400'} flex items-center justify-center`}>
+                                <i className={`text-xs text-white ${isOnline ? 'ri-check-line' : 'ri-close-line'}`}></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 className="text-xl md:text-2xl font-bold capitalize">
+                                {captain?.fullname?.firstname} {captain?.fullname?.lastname}
+                            </h3>
+                            <div className="flex items-center gap-3 mt-1">
+                                <span className="flex items-center gap-1 text-yellow-300">
+                                    <i className="ri-star-fill"></i>
+                                    {sessionStats?.rating}
+                                </span>
+                                <span className="text-blue-200">•</span>
+                                <span className="text-sm opacity-90 capitalize">
+                                    {captain?.vehicle?.vehicleType}
+                                </span>
+                            </div>
+                            <p className="text-sm opacity-75 mt-1">
+                                {captain?.vehicle?.plate} • {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                        </div>
                     </div>
+                    <div className="text-right">
+                        <h2 className="text-3xl md:text-4xl font-bold">₹{sessionStats?.todayEarnings}</h2>
+                        <p className="text-sm opacity-80">Today's Earnings</p>
+                        <p className="text-xs opacity-60 mt-1">₹{sessionStats?.weeklyEarnings} this week</p>
+                    </div>
+                </div>
+
+                {/* Quick Action Buttons */}
+                <div className="flex gap-3">
+                    <button className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2">
+                        <i className="ri-route-line"></i>
+                        Navigation
+                    </button>
+                    <button className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2">
+                        <i className="ri-customer-service-line"></i>
+                        Support
+                    </button>
+                    <button className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2">
+                        <i className="ri-history-line"></i>
+                        History
+                    </button>
+                </div>
+            </div>
+
+            {/* Real-time Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                    <div className="flex items-center justify-between mb-2">
+                        <i className="text-2xl ri-timer-2-line text-blue-600"></i>
+                        <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">ONLINE</span>
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-800">{sessionStats?.hoursOnline}h</h4>
+                    <p className="text-xs text-gray-600">Hours Today</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+                    <div className="flex items-center justify-between mb-2">
+                        <i className="text-2xl ri-taxi-line text-green-600"></i>
+                        <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">TRIPS</span>
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-800">{sessionStats?.totalRides}</h4>
+                    <p className="text-xs text-gray-600">Completed</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200">
+                    <div className="flex items-center justify-between mb-2">
+                        <i className="text-2xl ri-roadster-line text-orange-600"></i>
+                        <span className="text-xs font-medium text-orange-600 bg-orange-100 px-2 py-1 rounded-full">DISTANCE</span>
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-800">{sessionStats?.totalDistance}km</h4>
+                    <p className="text-xs text-gray-600">Traveled</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
+                    <div className="flex items-center justify-between mb-2">
+                        <i className="text-2xl ri-money-dollar-circle-line text-purple-600"></i>
+                        <span className="text-xs font-medium text-purple-600 bg-purple-100 px-2 py-1 rounded-full">AVG</span>
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-800">₹{sessionStats?.avgTripEarnings}</h4>
+                    <p className="text-xs text-gray-600">Per Trip</p>
+                </div>
+            </div>
+
+            {/* Enhanced Performance Dashboard */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Weekly Performance */}
+                <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <h5 className="font-semibold text-gray-800">Weekly Overview</h5>
+                            <p className="text-xs text-gray-500">Performance metrics</p>
+                        </div>
+                        <i className="ri-bar-chart-2-line text-xl text-blue-500"></i>
+                    </div>
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Total Trips</span>
+                            <span className="font-bold text-blue-600">{sessionStats?.totalTrips}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Completion Rate</span>
+                            <span className="font-bold text-green-600">{sessionStats?.completionRate}%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Weekly Earnings</span>
+                            <span className="font-bold text-purple-600">₹{sessionStats?.monthlyEarnings}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Environmental Impact */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <h5 className="font-semibold text-gray-800">Eco Impact</h5>
+                            <p className="text-xs text-gray-500">Your contribution</p>
+                        </div>
+                        <i className="ri-leaf-line text-xl text-green-500"></i>
+                    </div>
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Fuel Saved</span>
+                            <span className="font-bold text-green-600">₹{sessionStats?.fuelSavings}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">CO₂ Offset</span>
+                            <span className="font-bold text-emerald-600">{sessionStats?.carbonOffset}kg</span>
+                        </div>
+                        <div className="bg-green-100 rounded-lg p-2">
+                            <p className="text-xs text-green-700 text-center font-medium">🌱 You're making a difference!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Daily Goal Progress */}
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-5 border border-indigo-200">
+                <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h4 className="text-lg md:text-xl font-semibold capitalize flex items-center gap-2">
-                            {captain?.fullname?.firstname} {captain?.fullname?.lastname}
-                            <span className="text-yellow-500">
-                                <i className="ri-star-fill text-sm"></i>
-                                {sessionStats.rating}
-                            </span>
-                        </h4>
-                        <p className="text-sm text-gray-600 capitalize">
-                            {captain?.vehicle?.vehicleType} • {captain?.vehicle?.plate}
-                        </p>
-                        <p className="text-xs text-green-600 font-medium">
-                            {onlineStatus ? 'Online' : 'Offline'} • {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
+                        <h5 className="font-semibold text-gray-800">Daily Goal Progress</h5>
+                        <p className="text-xs text-gray-500">₹{sessionStats?.todayEarnings} of ₹1000 target</p>
+                    </div>
+                    <div className="text-right">
+                        <span className="text-2xl font-bold text-indigo-600">{Math.floor((sessionStats?.todayEarnings / 1000) * 100)}%</span>
+                        <p className="text-xs text-gray-500">Complete</p>
                     </div>
                 </div>
-                <div className="text-right">
-                    <h4 className="text-xl md:text-2xl font-bold text-green-600">₹{sessionStats.todayEarnings}</h4>
-                    <p className="text-sm text-gray-600">Today's Earnings</p>
-                    <p className="text-xs text-gray-500">₹{sessionStats.weeklyEarnings} this week</p>
-                </div>
-            </div>
-
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-3 gap-2 md:gap-4 p-3 md:p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl">
-                <div className="text-center">
-                    <div className="flex justify-center mb-1">
-                        <i className="text-xl md:text-2xl ri-timer-2-line text-blue-600"></i>
+                <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                    <div
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-1000 ease-out"
+                        style={{ width: `${Math.min((sessionStats?.todayEarnings / 1000) * 100, 100)}%` }}
+                    >
+                        <div className="h-full bg-white/30 rounded-full animate-pulse"></div>
                     </div>
-                    <h5 className="text-sm md:text-lg font-bold text-gray-800">{sessionStats.hoursOnline}h</h5>
-                    <p className="text-xs text-gray-600">Online Today</p>
                 </div>
-                <div className="text-center">
-                    <div className="flex justify-center mb-1">
-                        <i className="text-xl md:text-2xl ri-roadster-line text-orange-600"></i>
-                    </div>
-                    <h5 className="text-sm md:text-lg font-bold text-gray-800">{sessionStats.totalDistance}km</h5>
-                    <p className="text-xs text-gray-600">Distance</p>
-                </div>
-                <div className="text-center">
-                    <div className="flex justify-center mb-1">
-                        <i className="text-xl md:text-2xl ri-taxi-line text-green-600"></i>
-                    </div>
-                    <h5 className="text-sm md:text-lg font-bold text-gray-800">{sessionStats.totalRides}</h5>
-                    <p className="text-xs text-gray-600">Rides Today</p>
+                <div className="flex justify-between text-xs text-gray-600">
+                    <span>₹0</span>
+                    <span>₹500</span>
+                    <span>₹1000</span>
                 </div>
             </div>
 
-            {/* Enhanced Stats with Environmental Impact */}
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-                <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                        <h6 className="text-sm font-medium text-gray-700">Performance</h6>
-                        <i className="ri-bar-chart-line text-blue-500"></i>
+            {/* Notifications */}
+            {notifications.length > 0 && (
+                <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <h5 className="font-semibold text-gray-800">Recent Updates</h5>
+                        <button className="text-xs text-blue-600 hover:text-blue-700 font-medium">View All</button>
                     </div>
-                    <div className="space-y-1">
-                        <div className="flex justify-between text-xs">
-                            <span className="text-gray-600">Total Trips</span>
-                            <span className="font-semibold">{sessionStats.totalTrips}</span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                            <span className="text-gray-600">Completion Rate</span>
-                            <span className="font-semibold text-green-600">{sessionStats.completionRate}%</span>
-                        </div>
+                    <div className="space-y-3">
+                        {notifications.map((notification) => (
+                            <div key={notification.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${notification.type === 'earnings' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+                                    }`}>
+                                    <i className={`${notification.icon} text-sm`}></i>
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-sm font-medium text-gray-800">{notification.message}</p>
+                                    <p className="text-xs text-gray-500">{notification.time}</p>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
+            )}
 
-                <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                        <h6 className="text-sm font-medium text-gray-700">Earnings</h6>
-                        <i className="ri-money-dollar-circle-line text-green-500"></i>
-                    </div>
-                    <div className="space-y-1">
-                        <div className="flex justify-between text-xs">
-                            <span className="text-gray-600">This Month</span>
-                            <span className="font-semibold">₹{sessionStats.monthlyEarnings}</span>
+            {/* Online Status Control */}
+            <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isOnline ? 'bg-green-100' : 'bg-gray-100'}`}>
+                            <i className={`text-xl ${isOnline ? 'ri-signal-tower-line text-green-600' : 'ri-signal-tower-fill text-gray-400'}`}></i>
                         </div>
-                        <div className="flex justify-between text-xs">
-                            <span className="text-gray-600">Per Trip Avg</span>
-                            <span className="font-semibold text-blue-600">₹{sessionStats.avgTripEarnings}</span>
+                        <div>
+                            <h6 className="font-medium text-gray-800">Availability Status</h6>
+                            <p className="text-sm text-gray-600">{isOnline ? 'Ready to accept rides' : 'Currently offline'}</p>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            {/* Environmental Impact & Daily Goals */}
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-                <div className="bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-lg border border-green-200">
-                    <div className="flex items-center justify-between mb-2">
-                        <h6 className="text-sm font-medium text-gray-700">Eco Impact</h6>
-                        <i className="ri-leaf-line text-green-500"></i>
-                    </div>
-                    <div className="space-y-1">
-                        <div className="flex justify-between text-xs">
-                            <span className="text-gray-600">Fuel Saved</span>
-                            <span className="font-semibold text-green-600">₹{sessionStats.fuelSavings}</span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                            <span className="text-gray-600">CO₂ Offset</span>
-                            <span className="font-semibold text-blue-600">{sessionStats.carbonOffset}kg</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg border border-purple-200">
-                    <div className="flex items-center justify-between mb-2">
-                        <h6 className="text-sm font-medium text-gray-700">Daily Goal</h6>
-                        <i className="ri-target-line text-purple-500"></i>
-                    </div>
-                    <div className="space-y-1">
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                                className="bg-purple-600 h-2 rounded-full transition-all duration-500"
-                                style={{ width: `${Math.min((sessionStats.todayEarnings / 1000) * 100, 100)}%` }}
-                            ></div>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                            <span className="text-gray-600">₹{sessionStats.todayEarnings}/₹1000</span>
-                            <span className="font-semibold text-purple-600">{Math.floor((sessionStats.todayEarnings / 1000) * 100)}%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Online Status Toggle */}
-            <div className="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
-                <div className="flex items-center gap-2">
-                    <i className="ri-signal-tower-line text-blue-600"></i>
-                    <span className="text-sm font-medium">Online Status</span>
-                </div>
-                <button
-                    onClick={() => setOnlineStatus(!onlineStatus)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${onlineStatus ? 'bg-green-600' : 'bg-gray-300'
-                        }`}
-                >
-                    <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${onlineStatus ? 'translate-x-6' : 'translate-x-1'
+                    <button
+                        onClick={() => setIsOnline && setIsOnline(!isOnline)}
+                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${isOnline ? 'bg-green-600 focus:ring-green-500' : 'bg-gray-300 focus:ring-gray-500'
                             }`}
-                    />
-                </button>
+                    >
+                        <span
+                            className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${isOnline ? 'translate-x-7' : 'translate-x-1'
+                                }`}
+                        />
+                    </button>
+                </div>
+                {isOnline && (
+                    <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div className="flex items-center gap-2">
+                            <i className="ri-information-line text-green-600"></i>
+                            <span className="text-sm text-green-800">You're visible to nearby passengers</span>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )
