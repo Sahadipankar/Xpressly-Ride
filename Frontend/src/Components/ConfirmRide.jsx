@@ -8,7 +8,7 @@ const ConfirmRide = (props) => {
     };
 
     return (
-        <div className="p-4">
+        <div className="p-4 h-full flex flex-col">
             <h5 className='p-1 text-center w-[93%] absolute top-0'
                 onClick={() => {
                     props.setConfirmRidePanel(false);
@@ -16,8 +16,8 @@ const ConfirmRide = (props) => {
 
             <h3 className='text-xl md:text-2xl font-semibold mb-5 text-center'>Confirm your ride</h3>
 
-            <div className='flex flex-col gap-4 justify-between items-center'>
-                <div className="bg-gray-100 rounded-xl p-4 w-full text-center">
+            <div className='flex flex-col gap-4 justify-between items-center flex-1 overflow-y-auto'>
+                <div className="bg-gray-100 rounded-xl p-4 w-full text-center flex-shrink-0">
                     <img
                         className='h-16 md:h-20 mx-auto mb-2'
                         src={vehicleImages[props.vehicleType] || vehicleImages.Car}
@@ -26,26 +26,32 @@ const ConfirmRide = (props) => {
                     <h4 className="text-lg font-semibold capitalize">{props.vehicleType || 'Car'}</h4>
                 </div>
 
-                <div className='w-full space-y-3'>
+                <div className='w-full space-y-3 flex-1 overflow-y-auto'>
 
-                    <div className='flex items-center gap-5 p-3 border-gray-200 border-b-2'>
-                        <i className="text-lg ri-map-pin-user-fill text-green-600"></i>
-                        <div className="flex-1">
-                            <h3 className='text-lg font-medium'>Pickup Location</h3>
-                            <p className='text-sm text-gray-600'>{props.pickup || 'Loading pickup location...'}</p>
+                    <div className='flex items-start gap-3 sm:gap-5 p-3 border-gray-200 border-b-2'>
+                        <div className="flex-shrink-0">
+                            <i className="text-lg ri-map-pin-user-fill text-green-600"></i>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h3 className='text-lg font-medium mb-1'>Pickup Location</h3>
+                            <p className='text-sm text-gray-600 address-text'>{props.pickup || 'Loading pickup location...'}</p>
                         </div>
                     </div>
 
-                    <div className='flex items-center gap-5 p-3 border-gray-200 border-b-2'>
-                        <i className="text-lg ri-map-pin-fill text-red-600"></i>
-                        <div className="flex-1">
-                            <h3 className='text-lg font-medium'>Destination</h3>
-                            <p className='text-sm text-gray-600'>{props.destination || 'Loading destination...'}</p>
+                    <div className='flex items-start gap-3 sm:gap-5 p-3 border-gray-200 border-b-2'>
+                        <div className="flex-shrink-0">
+                            <i className="text-lg ri-map-pin-fill text-red-600"></i>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h3 className='text-lg font-medium mb-1'>Destination</h3>
+                            <p className='text-sm text-gray-600 address-text'>{props.destination || 'Loading destination...'}</p>
                         </div>
                     </div>
 
-                    <div className='flex items-center gap-5 p-3'>
-                        <i className="text-lg ri-cash-line text-green-600"></i>
+                    <div className='flex items-center gap-3 sm:gap-5 p-3'>
+                        <div className="flex-shrink-0">
+                            <i className="text-lg ri-cash-line text-green-600"></i>
+                        </div>
                         <div className="flex-1">
                             <h3 className='text-lg font-medium'>₹{props.fare?.[props.vehicleType] || 'Calculating...'}</h3>
                             <p className='text-sm text-gray-600'>Cash Payment</p>
@@ -59,7 +65,7 @@ const ConfirmRide = (props) => {
                         props.setConfirmRidePanel(false);
                         props.createRide()
                     }}
-                    className='w-full mt-5 bg-green-600 hover:bg-green-700 text-white font-semibold p-3 md:p-4 rounded-lg transition-colors duration-200 text-base md:text-lg'
+                    className='w-full mt-5 bg-green-600 hover:bg-green-700 text-white font-semibold p-3 md:p-4 rounded-lg transition-colors duration-200 text-base md:text-lg flex-shrink-0'
                 >
                     Confirm Ride
                 </button>

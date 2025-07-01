@@ -536,10 +536,11 @@ const Riding = () => {
 
     const getVehicleIcon = (vehicleType) => {
         switch (vehicleType?.toLowerCase()) {
-            case 'motorcycle':
-                return 'https://www.svgrepo.com/show/408292/motorcycle.svg'
+            case 'moto':
+                return 'https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png'
             case 'auto':
-                return 'https://www.svgrepo.com/show/408292/rickshaw.svg'
+                return 'https://clipart-library.com/2023/Uber_Auto_312x208_pixels_Mobile.png'
+            case 'car':
             default:
                 return 'https://www.svgrepo.com/show/408292/car-white.svg'
         }

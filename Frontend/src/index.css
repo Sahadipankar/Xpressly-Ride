@@ -1,2 +1,51 @@
 @import "tailwindcss";
 
+/* Custom utilities for responsive text and long address handling */
+@layer utilities {
+    .text-wrap-balance {
+        text-wrap: balance;
+    }
+
+    .address-text {
+        word-break: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        line-height: 1.4;
+    }
+
+    .safe-area-bottom {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .prevent-zoom {
+        touch-action: manipulation;
+    }
+
+    /* Smooth scrolling for panels */
+    .panel-scroll {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Ensure buttons are always accessible */
+    .sticky-button {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        z-index: 10;
+    }
+}
+
+/* Mobile-first responsive adjustments */
+@media (max-width: 640px) {
+    .panel-container {
+        max-height: calc(100vh - 120px);
+    }
+}
+
+/* Ensure panels don't exceed viewport on small devices */
+@media (max-height: 600px) {
+    .panel-container {
+        max-height: 85vh;
+    }
+}
