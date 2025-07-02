@@ -725,7 +725,7 @@ const Riding = () => {
                             <div className="relative">
                                 <img
                                     className='h-16 w-16 rounded-full object-cover border-3 border-green-300 shadow-lg'
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKAjn0EsJc3E-9hgTU6GxsMuCioyJbeeRK4A&s"
+                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkKX2y-92Lgl0fEgjNpgWZhDcDZNz9J1jkrg&s"
                                     alt="Driver"
                                 />
                                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
