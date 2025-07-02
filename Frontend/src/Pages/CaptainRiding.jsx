@@ -214,13 +214,15 @@ const CaptainRiding = () => {
                 </div>
             </div>
 
-            {/* Finish Ride Panel */}
-            <div ref={finishRidePanelRef} className='fixed w-full z-20 bottom-0 translate-y-full bg-white rounded-t-3xl shadow-2xl'>
-                <FinishRide
-                    ride={rideData}
-                    setFinishRidePanel={setFinishRidePanel}
-                    tripDuration={formatDuration(tripDuration)}
-                />
+            {/* Finish Ride Panel - Full Screen */}
+            <div ref={finishRidePanelRef} className='fixed w-full h-screen z-20 bottom-0 translate-y-full bg-white'>
+                <div className="h-full overflow-y-auto">
+                    <FinishRide
+                        ride={rideData}
+                        setFinishRidePanel={setFinishRidePanel}
+                        tripDuration={formatDuration(tripDuration)}
+                    />
+                </div>
             </div>
 
             {/* Live Tracking Background */}

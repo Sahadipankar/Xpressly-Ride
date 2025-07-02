@@ -39,14 +39,26 @@ const FinishRide = (props) => {
     }
 
     return (
-        <div className="relative bg-white">
-            {/* Enhanced Header */}
+        <div className="relative bg-white min-h-full">
+            {/* Enhanced Header with Close Arrow */}
             <div className="sticky top-0 bg-white z-10 border-b border-gray-200 pb-4">
+                <div className="flex justify-center mb-4 pt-3">
+                    <button
+                        onClick={() => props.setFinishRidePanel(false)}
+                        className="w-16 h-2 bg-gray-300 rounded-full hover:bg-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+                        aria-label="Continue ride"
+                    ></button>
+                </div>
+
+                {/* Down Arrow Icon */}
                 <div className="flex justify-center mb-4">
                     <button
                         onClick={() => props.setFinishRidePanel(false)}
-                        className="w-12 h-1 bg-gray-300 rounded-full hover:bg-gray-400 transition-colors"
-                    ></button>
+                        className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+                        aria-label="Continue ride and close finish panel"
+                    >
+                        <i className="ri-arrow-down-line text-xl text-gray-600"></i>
+                    </button>
                 </div>
 
                 <div className="text-center">
@@ -210,8 +222,8 @@ const FinishRide = (props) => {
                         onClick={endRide}
                         disabled={!paymentConfirmed || isCompleting}
                         className={`w-full text-lg font-bold py-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg transform ${paymentConfirmed && !isCompleting
-                                ? 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white hover:scale-105 shadow-xl'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            ? 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white hover:scale-105 shadow-xl'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             }`}
                     >
                         {isCompleting ? (
