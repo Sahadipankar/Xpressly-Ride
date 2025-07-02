@@ -428,10 +428,17 @@ const Home = () => {
 
                     <Link
                         to='/user/logout'
-                        className="bg-black text-white px-2 py-1.5 sm:px-3 sm:py-2 md:px-4 md:py-2 rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-gray-800 transition-colors flex items-center gap-1 sm:gap-2"
+                        className="relative overflow-hidden group px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-xs sm:text-sm md:text-base font-semibold transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 hover:from-gray-800 hover:via-gray-900 hover:to-black text-white"
+                        title="Logout from your account"
                     >
-                        <i className="ri-logout-box-r-line"></i>
-                        <span className="hidden sm:inline">Logout</span>
+                        {/* Animated background shimmer */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform transition-transform duration-1000 -translate-x-full group-hover:translate-x-full"></div>
+
+                        {/* Icon with enhanced animations */}
+                        <div className="relative z-10 flex items-center gap-2">
+                            <i className="ri-logout-box-r-line text-base sm:text-lg transition-all duration-500 group-hover:rotate-12"></i>
+                            <span className="hidden sm:inline font-medium">Logout</span>
+                        </div>
                     </Link>
                 </div>
             </div>
