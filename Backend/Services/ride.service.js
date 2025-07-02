@@ -15,9 +15,9 @@ async function getFare(pickup, destination) {
 
     // More realistic base fares (Indian market pricing)
     const baseFare = {
-        Car: 50,    // Base fare for cars (like UberGo)
+        Car: 50,    // Base fare for cars (like XpressGo)
         Auto: 25,   // Base fare for auto-rickshaws
-        Moto: 15    // Base fare for motorcycles (like Uber Moto)
+        Moto: 15    // Base fare for motorcycles (like XpressMoto)
     };
 
     // Per kilometer rates (more realistic pricing)

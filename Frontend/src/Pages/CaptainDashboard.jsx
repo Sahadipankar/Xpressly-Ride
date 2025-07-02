@@ -140,7 +140,7 @@ const CaptainDashboard = () => {
                             <img
                                 className='w-10 h-10 md:w-12 md:h-12 object-contain'
                                 src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png"
-                                alt="Uber Logo"
+                                alt="Xpressly Logo"
                             />
                             <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
                         </div>

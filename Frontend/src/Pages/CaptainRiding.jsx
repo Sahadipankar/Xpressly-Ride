@@ -58,7 +58,7 @@ const CaptainRiding = () => {
                         <img
                             className='w-10 h-10 object-contain'
                             src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png"
-                            alt="Uber Logo"
+                            alt="Xpressly Logo"
                         />
                         <div className="hidden md:block">
                             <h2 className="text-lg font-bold text-gray-800">Ride in Progress</h2>

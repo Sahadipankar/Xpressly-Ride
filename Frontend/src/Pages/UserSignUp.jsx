@@ -47,7 +47,7 @@ const UserSignUp = () => {
     return (
         <div className='p-7 h-screen flex flex-col justify-between'>
             <div>
-                <img className='w-17 mb-10' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="Uber Logo" />
+                <img className='w-17 mb-10' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="Xpressly Logo" />
 
                 <form onSubmit={(e) =>
                     submitHandler(e)

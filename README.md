@@ -1,12 +1,12 @@
-# 🚗 Uber Clone - Full Stack MERN Application
+# 🚗 Xpressly - Full Stack MERN Application
 
 A sleek and modern ride-booking platform built with the power of the MERN stack. Designed to reflect real-world applications, this project blends intuitive design with scalable architecture—perfect for showcasing full-stack development skills in a real-life scenario.
 
-# 🚗 Live Demo: Experience the Uber Clone project in action [here](https://uberclone0406.netlify.app).
+# 🚗 Live Demo: Experience the Xpressly project in action [here](https://uberclone0406.netlify.app).
 
 ## 📋 Table of Contents
 
-- [🚗 Uber Clone - Full Stack MERN Application](#-uber-clone---full-stack-mern-application)
+- [🚗 Xpressly - Full Stack MERN Application](#-xpressly---full-stack-mern-application)
   - [📋 Table of Contents](#-table-of-contents)
   - [✨ Features](#-features)
   - [🏗️ Project Architecture](#️-project-architecture)
@@ -65,7 +65,7 @@ A sleek and modern ride-booking platform built with the power of the MERN stack.
 ## 🏗️ Project Architecture
 
 ```
-uber-clone/
+xpressly/
 ├── Backend/                  # Node.js Express Server
 │   ├── Controllers/          # Route controllers
 │   ├── Models/               # MongoDB schemas
@@ -138,8 +138,8 @@ Before running this application, make sure you have the following installed:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/Sahadipankar/uber-clone.git
-cd uber-clone
+git clone https://github.com/Sahadipankar/xpressly.git
+cd xpressly
 ```
 
 ### 2. Backend Setup
@@ -173,9 +173,9 @@ npm run dev
 ### Backend Environment Variables (`.env`)
 ```bash
 # Database Configuration
-DB_CONNECT=mongodb://localhost:27017/uber-clone
+DB_CONNECT=mongodb://localhost:27017/xpressly
 # or for MongoDB Atlas:
-# DB_CONNECT=mongodb+srv://username:password@cluster.mongodb.net/uber-clone
+# DB_CONNECT=mongodb+srv://username:password@cluster.mongodb.net/xpressly
 
 # JWT Secret (generate a strong secret)
 JWT_SECRET=your_super_secret_jwt_key_here
@@ -291,7 +291,7 @@ For detailed API documentation, see: [Backend/Readme.md](./Backend/Readme.md)
 - **Toast Notifications**: Non-intrusive status notifications
 
 ### Color Scheme
-- **Primary**: Uber-inspired black and green palette
+- **Primary**: Xpressly-inspired black and green palette
 - **Secondary**: Gray tones for secondary information
 - **Accents**: Orange/yellow for call-to-action elements
 - **Status Colors**: Green for success, red for errors, blue for information
@@ -449,7 +449,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/Sahadipankar/uber-clone/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/Sahadipankar/xpressly/issues).
 
 ### Development Guidelines
 1. Fork the repository

@@ -1,7 +1,7 @@
-# User UI/UX Enhancements - Uber Clone
+# User UI/UX Enhancements - Xpressly
 
 ## Overview
-This document outlines the comprehensive UI/UX enhancements made to the user-side of the Uber Clone application, focusing on making the interface more realistic, dynamic, and fully responsive.
+This document outlines the comprehensive UI/UX enhancements made to the user-side of the Xpressly application, focusing on making the interface more realistic, dynamic, and fully responsive.
 
 ## Key Enhancements
 
