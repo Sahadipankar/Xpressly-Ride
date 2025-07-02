@@ -91,65 +91,11 @@ const CaptainRiding = () => {
                 </div>
             </header>
 
-            {/* Map Section */}
-            <div className="pt-20 h-screen">
+            {/* Map Section - Shortened and Responsive */}
+            <div className="pt-20 h-[50vh] md:h-[60vh]">
                 <div className="relative h-full">
-                    <img
-                        className='h-full w-full object-cover'
-                        src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
-                        alt="Live Map"
-                    />
-
-                    {/* Map Overlays */}
-                    <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                        {/* Ride Status Card */}
-                        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg max-w-xs">
-                            <div className="flex items-center gap-3 mb-3">
-                                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-                                    <i className="ri-car-line text-white text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-gray-800">Riding to Destination</h3>
-                                    <p className="text-sm text-gray-600">Stay on route</p>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-600">Distance left</span>
-                                    <span className="font-semibold text-blue-600">{distanceRemaining}</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-600">Est. arrival</span>
-                                    <span className="font-semibold text-green-600">{estimatedTime}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Navigation Controls */}
-                        <div className="flex flex-col gap-2">
-                            <button className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
-                                <i className="ri-navigation-line text-xl text-blue-600"></i>
-                            </button>
-                            <button className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
-                                <i className="ri-refresh-line text-xl text-gray-600"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Speed and Navigation Info */}
-                    <div className="absolute bottom-32 left-4 bg-black/80 text-white rounded-2xl px-4 py-3">
-                        <div className="flex items-center gap-4">
-                            <div className="text-center">
-                                <div className="text-2xl font-bold">45</div>
-                                <div className="text-xs opacity-75">km/h</div>
-                            </div>
-                            <div className="w-px h-8 bg-white/30"></div>
-                            <div className="text-center">
-                                <div className="text-lg font-bold">350m</div>
-                                <div className="text-xs opacity-75">Turn right</div>
-                            </div>
-                        </div>
-                    </div>
+                    {/* Replace static image with LiveTracking component */}
+                    <LiveTracking />
                 </div>
             </div>
 
