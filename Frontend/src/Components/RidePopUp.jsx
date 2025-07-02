@@ -1,17 +1,29 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 const RidePopUp = (props) => {
     const [timeLeft, setTimeLeft] = useState(30) // 30 seconds to respond
     const [estimatedTime, setEstimatedTime] = useState('5-8 min')
+    const [audioPlayed, setAudioPlayed] = useState(false)
+
+    // Auto-decline handler
+    const handleAutoDecline = useCallback(() => {
+        if (props.setRidePopUpPanel) {
+            props.setRidePopUpPanel(false);
+        }
+    }, [props])
 
     useEffect(() => {
+        // Play notification sound on first render
+        if (!audioPlayed) {
+            // You can add audio notification here
+            setAudioPlayed(true)
+        }
+
         const timer = setInterval(() => {
             setTimeLeft(prev => {
                 if (prev <= 1) {
                     // Use setTimeout to avoid setState during render
-                    setTimeout(() => {
-                        props.setRidePopUpPanel(false);
-                    }, 0);
+                    setTimeout(handleAutoDecline, 0);
                     return 0;
                 }
                 return prev - 1;
@@ -19,44 +31,58 @@ const RidePopUp = (props) => {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [props]);
+    }, [audioPlayed, handleAutoDecline])
+
+    const handleAcceptRide = useCallback(() => {
+        if (props.setConfirmRidePopUpPanel && props.confirmRide) {
+            props.setConfirmRidePopUpPanel(true);
+            props.confirmRide();
+        }
+    }, [props])
+
+    const handleDeclineRide = useCallback(() => {
+        if (props.setRidePopUpPanel) {
+            props.setRidePopUpPanel(false);
+        }
+    }, [props])
 
     return (
-        <div className="relative">
+        <div className="relative" role="dialog" aria-labelledby="ride-request-title" aria-describedby="ride-request-desc">
             {/* Header with close button */}
             <div className="flex justify-center mb-4">
                 <button
-                    onClick={() => props.setRidePopUpPanel(false)}
-                    className="w-12 h-1 bg-gray-300 rounded-full hover:bg-gray-400 transition-colors"
+                    onClick={handleDeclineRide}
+                    className="w-12 h-1 bg-gray-300 rounded-full hover:bg-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    aria-label="Close ride request"
                 ></button>
             </div>
 
             {/* Animated Header with Timer */}
             <div className="text-center mb-6">
                 <div className="relative inline-block">
-                    <h2 className='text-2xl md:text-3xl font-bold mb-3 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent'>
+                    <h2 id="ride-request-title" className='text-2xl md:text-3xl font-bold mb-3 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent'>
                         🚗 New Ride Request!
                     </h2>
                     <div className="absolute -top-2 -right-8 animate-bounce">
-                        <span className="text-2xl">⚡</span>
+                        <span className="text-2xl" role="img" aria-label="Lightning bolt">⚡</span>
                     </div>
                 </div>
 
                 {/* Enhanced Timer */}
                 <div className="flex items-center justify-center gap-3 mb-4">
                     <div className={`relative w-16 h-16 rounded-full border-4 ${timeLeft > 15 ? 'border-green-500 bg-green-50' :
-                            timeLeft > 5 ? 'border-yellow-500 bg-yellow-50' :
-                                'border-red-500 bg-red-50'
+                        timeLeft > 5 ? 'border-yellow-500 bg-yellow-50' :
+                            'border-red-500 bg-red-50'
                         } flex items-center justify-center transition-all duration-300`}>
                         <span className={`text-xl font-bold ${timeLeft > 15 ? 'text-green-600' :
-                                timeLeft > 5 ? 'text-yellow-600' :
-                                    'text-red-600'
-                            }`}>
+                            timeLeft > 5 ? 'text-yellow-600' :
+                                'text-red-600'
+                            }`} aria-live="polite">
                             {timeLeft}
                         </span>
                         <div className={`absolute inset-0 rounded-full ${timeLeft > 15 ? 'border-green-400' :
-                                timeLeft > 5 ? 'border-yellow-400' :
-                                    'border-red-400'
+                            timeLeft > 5 ? 'border-yellow-400' :
+                                'border-red-400'
                             } border-2 animate-pulse`}></div>
                     </div>
                     <div className="text-center">
@@ -78,18 +104,18 @@ const RidePopUp = (props) => {
                             <img
                                 className='h-16 w-16 md:h-20 md:w-20 rounded-full object-cover border-4 border-white shadow-lg'
                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKAjn0EsJc3E-9hgTU6GxsMuCioyJbeeRK4A&s"
-                                alt="Passenger"
+                                alt={`Passenger ${props.ride?.user?.fullname?.firstname || 'profile'} photo`}
                             />
                             <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                                <i className="ri-check-line text-white text-xs"></i>
+                                <i className="ri-check-line text-white text-xs" aria-label="Verified passenger"></i>
                             </div>
                         </div>
                         <div>
                             <h3 className='text-xl md:text-2xl font-bold capitalize text-gray-800'>
-                                {props.ride?.user?.fullname?.firstname} {props.ride?.user?.fullname?.lastname}
+                                {props.ride?.user?.fullname?.firstname || 'Passenger'} {props.ride?.user?.fullname?.lastname || ''}
                             </h3>
                             <div className="flex items-center gap-3 mt-1">
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1" role="img" aria-label="4.8 star rating">
                                     <span className="text-yellow-500 flex">
                                         {[...Array(5)].map((_, i) => (
                                             <i key={i} className={`ri-star-${i < 4 ? 'fill' : 'line'} text-sm`}></i>
@@ -97,13 +123,13 @@ const RidePopUp = (props) => {
                                     </span>
                                     <span className="text-sm font-medium text-gray-700">4.8</span>
                                 </div>
-                                <span className="text-gray-400">•</span>
+                                <span className="text-gray-400" aria-hidden="true">•</span>
                                 <span className="text-sm bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
                                     👑 Premium
                                 </span>
                             </div>
                             <p className="text-sm text-gray-600 mt-1">
-                                <i className="ri-smartphone-line mr-1"></i>
+                                <i className="ri-smartphone-line mr-1" aria-label="Phone icon"></i>
                                 Member since 2022
                             </p>
                         </div>
@@ -122,14 +148,14 @@ const RidePopUp = (props) => {
                 </div>
 
                 {/* Passenger Preferences */}
-                <div className="flex gap-2 mt-3">
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                <div className="flex gap-2 mt-3" role="list" aria-label="Passenger preferences">
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full" role="listitem">
                         🎵 Music OK
                     </span>
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full" role="listitem">
                         ❄️ AC Preferred
                     </span>
-                    <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">
+                    <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full" role="listitem">
                         💬 Quiet Ride
                     </span>
                 </div>
@@ -150,7 +176,7 @@ const RidePopUp = (props) => {
                                     {estimatedTime} away
                                 </span>
                             </div>
-                            <p className='text-sm text-gray-700 leading-relaxed mb-2'>
+                            <p className='text-sm text-gray-700 leading-relaxed mb-2 address-text'>
                                 {props.ride?.pickup || 'Loading pickup location...'}
                             </p>
                             <div className="flex items-center gap-4 text-xs text-gray-600">
@@ -189,7 +215,7 @@ const RidePopUp = (props) => {
                                     {props.ride?.distance || '3.2 km'}
                                 </span>
                             </div>
-                            <p className='text-sm text-gray-700 leading-relaxed mb-2'>
+                            <p className='text-sm text-gray-700 leading-relaxed mb-2 address-text'>
                                 {props.ride?.destination || 'Loading destination...'}
                             </p>
                             <div className="flex items-center gap-4 text-xs text-gray-600">
@@ -210,19 +236,18 @@ const RidePopUp = (props) => {
             {/* Enhanced Action Buttons */}
             <div className="flex gap-4 mb-6">
                 <button
-                    onClick={() => props.setRidePopUpPanel(false)}
-                    className='flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-800 font-bold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105'
+                    onClick={handleDeclineRide}
+                    className='flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-800 font-bold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500'
+                    aria-label="Decline ride request"
                 >
                     <i className="ri-close-line text-xl"></i>
                     <span>Decline</span>
                 </button>
 
                 <button
-                    onClick={() => {
-                        props.setConfirmRidePopUpPanel(true);
-                        props.confirmRide()
-                    }}
-                    className='flex-2 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105'
+                    onClick={handleAcceptRide}
+                    className='flex-2 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500'
+                    aria-label="Accept ride request"
                 >
                     <i className="ri-check-line text-xl"></i>
                     <span>Accept Ride</span>

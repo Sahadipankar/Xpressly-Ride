@@ -1,7 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useMemo } from 'react'
 import { CaptainDataContext } from '../Context/CaptainContext'
 
-const CaptainDetails = ({ isOnline = true, setIsOnline }) => {
+const CaptainDetails = ({ isOnline = true, setIsOnline, isConnected = true, locationError = null }) => {
 
     const { captain } = useContext(CaptainDataContext)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -17,42 +17,74 @@ const CaptainDetails = ({ isOnline = true, setIsOnline }) => {
         return () => clearInterval(timer)
     }, [])
 
-    // Generate dynamic stats on component mount (simulating different sessions)
-    useEffect(() => {
-        const generateDynamicStats = () => {
-            const baseEarnings = Math.floor(Math.random() * 500) + 600; // 600-1100
-            const hoursOnline = (Math.random() * 6 + 2).toFixed(1); // 2-8 hours
-            const totalRides = Math.floor(Math.random() * 15) + 8; // 8-23 rides
-            const rating = (Math.random() * 0.5 + 4.5).toFixed(1); // 4.5-5.0
-            const completionRate = Math.floor(Math.random() * 5) + 95; // 95-100%
+    // Memoized stats generation for better performance
+    const dynamicStats = useMemo(() => {
+        const baseEarnings = Math.floor(Math.random() * 500) + 600; // 600-1100
+        const hoursOnline = (Math.random() * 6 + 2).toFixed(1); // 2-8 hours
+        const totalRides = Math.floor(Math.random() * 15) + 8; // 8-23 rides
+        const rating = (Math.random() * 0.5 + 4.5).toFixed(1); // 4.5-5.0
+        const completionRate = Math.floor(Math.random() * 5) + 95; // 95-100%
 
-            return {
-                todayEarnings: baseEarnings,
-                weeklyEarnings: baseEarnings * 6 + Math.floor(Math.random() * 1000),
-                monthlyEarnings: baseEarnings * 25 + Math.floor(Math.random() * 5000),
-                hoursOnline: parseFloat(hoursOnline),
-                totalDistance: Math.floor(Math.random() * 100) + 80, // 80-180 km
-                totalRides: totalRides,
-                rating: parseFloat(rating),
-                totalTrips: Math.floor(Math.random() * 200) + 150, // 150-350 total trips
-                completionRate: completionRate,
-                avgTripEarnings: Math.floor(baseEarnings / totalRides),
-                fuelSavings: Math.floor(Math.random() * 200) + 100, // 100-300
-                carbonOffset: (Math.random() * 15 + 10).toFixed(1) // 10-25 kg CO2
-            }
+        return {
+            todayEarnings: baseEarnings,
+            weeklyEarnings: baseEarnings * 6 + Math.floor(Math.random() * 1000),
+            monthlyEarnings: baseEarnings * 25 + Math.floor(Math.random() * 5000),
+            hoursOnline: parseFloat(hoursOnline),
+            totalDistance: Math.floor(Math.random() * 100) + 80, // 80-180 km
+            totalRides: totalRides,
+            rating: parseFloat(rating),
+            totalTrips: Math.floor(Math.random() * 200) + 150, // 150-350 total trips
+            completionRate: completionRate,
+            avgTripEarnings: Math.floor(baseEarnings / totalRides),
+            fuelSavings: Math.floor(Math.random() * 200) + 100, // 100-300
+            carbonOffset: (Math.random() * 15 + 10).toFixed(1) // 10-25 kg CO2
         }
-
-        setSessionStats(generateDynamicStats())
     }, [])
 
+    // Set stats on component mount
+    useEffect(() => {
+        if (!sessionStats) {
+            setSessionStats(dynamicStats)
+        }
+    }, [dynamicStats, sessionStats])
+
     if (!sessionStats) {
-        return <div className="flex justify-center items-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-        </div>
+        return (
+            <div className="flex justify-center items-center h-32" role="status" aria-label="Loading captain statistics">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                <span className="sr-only">Loading...</span>
+            </div>
+        )
     }
+
+    // Handle potential missing captain data
+    const captainName = captain?.fullname ?
+        `${captain.fullname.firstname} ${captain.fullname.lastname}` :
+        'Captain'
+
+    const vehicleInfo = captain?.vehicle ?
+        `${captain.vehicle.vehicleType} • ${captain.vehicle.plate}` :
+        'Vehicle Info Not Available'
 
     return (
         <div className="space-y-6">
+            {/* Connection Status Alert */}
+            {(!isConnected || locationError) && (
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
+                    <div className="flex items-center">
+                        <i className="ri-error-warning-line text-yellow-600 mr-2"></i>
+                        <div>
+                            <h4 className="text-sm font-medium text-yellow-800">
+                                {!isConnected ? 'Connection Issue' : 'Location Error'}
+                            </h4>
+                            <p className="text-sm text-yellow-700">
+                                {!isConnected ? 'Reconnecting to server...' : locationError}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Captain Profile Header */}
             <div className="bg-gradient-to-r from-blue-600 to-green-600 rounded-2xl p-6 text-white">
                 <div className="flex items-center justify-between mb-4">
@@ -61,28 +93,28 @@ const CaptainDetails = ({ isOnline = true, setIsOnline }) => {
                             <img
                                 className='h-16 w-16 md:h-20 md:w-20 rounded-full object-cover border-4 border-white shadow-lg'
                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkKX2y-92Lgl0fEgjNpgWZhDcDZNz9J1jkrg&s"
-                                alt="Captain Avatar"
+                                alt={`Profile picture of ${captainName}`}
                             />
-                            <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-3 border-white ${isOnline ? 'bg-green-400' : 'bg-red-400'} flex items-center justify-center`}>
-                                <i className={`text-xs text-white ${isOnline ? 'ri-check-line' : 'ri-close-line'}`}></i>
+                            <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-3 border-white ${isOnline && isConnected ? 'bg-green-400' : 'bg-red-400'} flex items-center justify-center`}>
+                                <i className={`text-xs text-white ${isOnline && isConnected ? 'ri-check-line' : 'ri-close-line'}`}></i>
                             </div>
                         </div>
                         <div>
                             <h3 className="text-xl md:text-2xl font-bold capitalize">
-                                {captain?.fullname?.firstname} {captain?.fullname?.lastname}
+                                {captainName}
                             </h3>
                             <div className="flex items-center gap-3 mt-1">
                                 <span className="flex items-center gap-1 text-yellow-300">
-                                    <i className="ri-star-fill"></i>
+                                    <i className="ri-star-fill" aria-label="Rating"></i>
                                     {sessionStats?.rating}
                                 </span>
                                 <span className="text-blue-200">•</span>
                                 <span className="text-sm opacity-90 capitalize">
-                                    {captain?.vehicle?.vehicleType}
+                                    {captain?.vehicle?.vehicleType || 'Vehicle'}
                                 </span>
                             </div>
-                            <p className="text-sm opacity-75 mt-1">
-                                {captain?.vehicle?.plate} • {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                            <p className="text-sm opacity-75 mt-1 address-text">
+                                {vehicleInfo} • {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                             </p>
                         </div>
                     </div>
@@ -95,15 +127,24 @@ const CaptainDetails = ({ isOnline = true, setIsOnline }) => {
 
                 {/* Quick Action Buttons */}
                 <div className="flex gap-3">
-                    <button className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2">
+                    <button
+                        className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        aria-label="Open navigation"
+                    >
                         <i className="ri-route-line"></i>
                         Navigation
                     </button>
-                    <button className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2">
+                    <button
+                        className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        aria-label="Contact support"
+                    >
                         <i className="ri-customer-service-line"></i>
                         Support
                     </button>
-                    <button className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2">
+                    <button
+                        className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg py-2 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        aria-label="View ride history"
+                    >
                         <i className="ri-history-line"></i>
                         History
                     </button>
@@ -256,30 +297,43 @@ const CaptainDetails = ({ isOnline = true, setIsOnline }) => {
             <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isOnline ? 'bg-green-100' : 'bg-gray-100'}`}>
-                            <i className={`text-xl ${isOnline ? 'ri-signal-tower-line text-green-600' : 'ri-signal-tower-fill text-gray-400'}`}></i>
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isOnline && isConnected ? 'bg-green-100' : 'bg-gray-100'}`}>
+                            <i className={`text-xl ${isOnline && isConnected ? 'ri-signal-tower-line text-green-600' : 'ri-signal-tower-fill text-gray-400'}`}></i>
                         </div>
                         <div>
                             <h6 className="font-medium text-gray-800">Availability Status</h6>
-                            <p className="text-sm text-gray-600">{isOnline ? 'Ready to accept rides' : 'Currently offline'}</p>
+                            <p className="text-sm text-gray-600">
+                                {isOnline && isConnected ? 'Ready to accept rides' :
+                                    !isConnected ? 'Connection lost' : 'Currently offline'}
+                            </p>
                         </div>
                     </div>
                     <button
                         onClick={() => setIsOnline && setIsOnline(!isOnline)}
-                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${isOnline ? 'bg-green-600 focus:ring-green-500' : 'bg-gray-300 focus:ring-gray-500'
+                        disabled={!isConnected}
+                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${isOnline && isConnected ? 'bg-green-600 focus:ring-green-500' : 'bg-gray-300 focus:ring-gray-500'
                             }`}
+                        aria-label={`${isOnline ? 'Go offline' : 'Go online'}`}
                     >
                         <span
-                            className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${isOnline ? 'translate-x-7' : 'translate-x-1'
+                            className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${isOnline && isConnected ? 'translate-x-7' : 'translate-x-1'
                                 }`}
                         />
                     </button>
                 </div>
-                {isOnline && (
+                {isOnline && isConnected && (
                     <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
                         <div className="flex items-center gap-2">
                             <i className="ri-information-line text-green-600"></i>
                             <span className="text-sm text-green-800">You're visible to nearby passengers</span>
+                        </div>
+                    </div>
+                )}
+                {!isConnected && (
+                    <div className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
+                        <div className="flex items-center gap-2">
+                            <i className="ri-wifi-off-line text-red-600"></i>
+                            <span className="text-sm text-red-800">Connection required to go online</span>
                         </div>
                     </div>
                 )}

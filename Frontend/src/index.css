@@ -11,6 +11,7 @@
         overflow-wrap: break-word;
         hyphens: auto;
         line-height: 1.4;
+        max-width: 100%;
     }
 
     .safe-area-bottom {
@@ -33,6 +34,60 @@
         bottom: 0;
         background: white;
         z-index: 10;
+        padding: 1rem;
+        border-top: 1px solid rgb(229, 231, 235);
+    }
+
+    /* Loading skeleton animation */
+    .skeleton {
+        animation: skeleton-loading 1s linear infinite alternate;
+    }
+
+    @keyframes skeleton-loading {
+        0% {
+            background-color: hsl(200, 20%, 80%);
+        }
+
+        100% {
+            background-color: hsl(200, 20%, 95%);
+        }
+    }
+
+    /* Focus visible styles for better accessibility */
+    .focus-visible:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+        .bg-gradient-to-r {
+            background: solid;
+        }
+
+        .text-gray-600 {
+            color: #000;
+        }
+
+        .border-gray-200 {
+            border-color: #000;
+        }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+
+        .animate-pulse,
+        .animate-bounce,
+        .animate-spin {
+            animation: none;
+        }
+
+        .transition-all,
+        .transition-colors,
+        .transition-transform {
+            transition: none;
+        }
     }
 }
 
@@ -40,6 +95,25 @@
 @media (max-width: 640px) {
     .panel-container {
         max-height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
+
+    /* Ensure text is readable on small screens */
+    .text-xs {
+        font-size: 0.75rem;
+        line-height: 1rem;
+    }
+
+    /* Better touch targets for mobile */
+    button,
+    [role="button"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Prevent horizontal scroll */
+    body {
+        overflow-x: hidden;
     }
 }
 
@@ -47,5 +121,25 @@
 @media (max-height: 600px) {
     .panel-container {
         max-height: 85vh;
+    }
+}
+
+/* Tablet optimizations */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .lg\\:w-96 {
+        width: 20rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .print-friendly {
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
     }
 }
