@@ -31,9 +31,11 @@ const WaitingForDriver = (props) => {
                 <div className="flex items-center gap-4">
                     {/* Driver Avatar */}
                     <div className="relative">
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
-                            {props.ride?.captain?.fullname?.firstname?.charAt(0)?.toUpperCase() || 'D'}
-                        </div>
+                        <img
+                            className='w-16 h-16 rounded-full object-cover border-2 border-green-400 shadow-lg'
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkKX2y-92Lgl0fEgjNpgWZhDcDZNz9J1jkrg&s"
+                            alt="Driver Avatar"
+                        />
                         <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
                             <i className="ri-check-line text-white text-xs"></i>
                         </div>
