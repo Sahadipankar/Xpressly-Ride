@@ -3,7 +3,7 @@ import React from 'react'
 const VehiclePanel = (props) => {
     return (
         <div className="p-4 h-full flex flex-col">
-            <h5 className='p-1 text-center w-[93%] absolute top-0'
+            <h5 className='absolute top-3 left-1/2 transform -translate-x-1/2 cursor-pointer hover:text-gray-700 transition-colors'
                 onClick={() => {
                     props.setVehiclePanel(false);
                 }}><i className="text-2xl text-gray-500 ri-arrow-down-wide-line"></i></h5>

@@ -42,6 +42,7 @@ const Home = () => {
     const [vehicleType, setVehicleType] = useState(null)
     const [ride, setRide] = useState(null)
     const [gettingCurrentLocation, setGettingCurrentLocation] = useState(false)
+    const [refreshing, setRefreshing] = useState(false)
     const [currentTime, setCurrentTime] = useState(new Date())
 
     const navigate = useNavigate()
@@ -280,42 +281,52 @@ const Home = () => {
         })
     }
 
-    // Refresh session function
-    const refreshSession = () => {
-        // Clear any ongoing searches or selections
-        setPickup('')
-        setDestination('')
-        setPickupSuggestions([])
-        setDestinationSuggestions([])
-        setActiveField(null)
+    // Enhanced refresh function - Complete page refresh like captain dashboard
+    const refreshSession = async () => {
+        setRefreshing(true)
 
-        // Close all panels
-        setPanelOpen(false)
-        setVehiclePanel(false)
-        setConfirmRidePanel(false)
-        setVehicleFound(false)
-        setWaitingForDriver(false)
+        try {
+            // Clear all state and local storage data
+            setPickup('')
+            setDestination('')
+            setPickupSuggestions([])
+            setDestinationSuggestions([])
+            setActiveField(null)
+            setPanelOpen(false)
+            setVehiclePanel(false)
+            setConfirmRidePanel(false)
+            setVehicleFound(false)
+            setWaitingForDriver(false)
+            setFare({})
+            setVehicleType(null)
+            setRide(null)
+            setGettingCurrentLocation(false)
 
-        // Clear fare and vehicle selections
-        setFare({})
-        setVehicleType(null)
-        setRide(null)
-
-        // Refresh location
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
-                socket.emit('update-location-user', {
-                    userId: user._id,
-                    location: {
-                        ltd: position.coords.latitude,
-                        lng: position.coords.longitude
-                    }
+            // Clear browser cache and storage
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name)
+                    })
                 })
-            })
-        }
+            }
 
-        // Re-join socket room to ensure fresh connection
-        socket.emit("join", { userType: "user", userId: user._id })
+            // Clear session storage
+            sessionStorage.clear()
+
+            // Show refreshing animation for better UX
+            await new Promise(resolve => setTimeout(resolve, 800))
+
+            // Force complete page reload like captain dashboard
+            window.location.reload()
+
+        } catch (error) {
+            console.error('Refresh failed:', error)
+            // Fallback: still reload the page
+            window.location.reload()
+        } finally {
+            setRefreshing(false)
+        }
     }
 
     return (
@@ -325,18 +336,16 @@ const Home = () => {
                 <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
                     <img className='w-8 sm:w-10 md:w-12 flex-shrink-0' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="Uber Logo" />
                     <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md flex-shrink-0">
-                            {user?.fullname?.firstname ? (
-                                <span className="text-white text-xs sm:text-sm md:text-base font-semibold">
-                                    {user.fullname.firstname.charAt(0).toUpperCase()}
-                                </span>
-                            ) : user?.email ? (
-                                <span className="text-white text-xs sm:text-sm md:text-base font-semibold">
-                                    {user.email.charAt(0).toUpperCase()}
-                                </span>
-                            ) : (
-                                <i className="ri-user-fill text-white text-xs sm:text-sm md:text-base"></i>
-                            )}
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full overflow-hidden shadow-md flex-shrink-0 border-2 border-gray-200">
+                            <img
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKAjn0EsJc3E-9hgTU6GxsMuCioyJbeeRK4A&s"
+                                alt="User Avatar"
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM5Q0E3RjQiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHlsZT0idHJhbnNmb3JtOiB0cmFuc2xhdGUoOHB4LCA4cHgpOyI+CjxwYXRoIGQ9Ik0xMiAyQzEzLjEgMiAxNCAyLjkgMTQgNEMxNCA1LjEgMTMuMSA2IDEyIDZDMTAuOSA2IDEwIDUuMSAxMCA0QzEwIDIuOSAxMC45IDIgMTIgMloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMSAyMlYyMEMxOSAxNi45IDE2IDE1IDEyIDE1QzggMTUgNSAxNi45IDMgMjBWMjJIMjFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+';
+                                }}
+                            />
                         </div>
                         <div className="block min-w-0 flex-1">
                             <p className="text-xs text-gray-500 leading-tight">Hello,</p>
@@ -381,14 +390,40 @@ const Home = () => {
                         </span>
                     </div>
 
-                    {/* Refresh Button */}
+                    {/* Enhanced Refresh Button */}
                     <button
                         onClick={refreshSession}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1.5 sm:px-3 sm:py-2 md:px-3 md:py-2 rounded-lg text-xs sm:text-sm md:text-base font-medium transition-colors flex items-center gap-1 sm:gap-2"
-                        title="Refresh Session"
+                        disabled={refreshing}
+                        className={`relative overflow-hidden group px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-xs sm:text-sm md:text-base font-semibold transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed ${refreshing
+                            ? 'bg-gradient-to-r from-orange-400 to-red-500 text-white animate-pulse'
+                            : 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 text-white'
+                            }`}
+                        title={refreshing ? "Refreshing entire page..." : "Refresh Complete Page"}
                     >
-                        <i className="ri-refresh-line"></i>
-                        <span className="hidden sm:inline">Refresh</span>
+                        {/* Animated background shimmer */}
+                        <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform transition-transform duration-1000 ${refreshing ? 'translate-x-full' : '-translate-x-full group-hover:translate-x-full'}`}></div>
+
+                        {/* Icon with enhanced animations */}
+                        <div className="relative z-10 flex items-center gap-2">
+                            <i className={`ri-refresh-line text-base sm:text-lg transition-all duration-500 ${refreshing ? 'animate-spin scale-110' : 'group-hover:rotate-180'}`}></i>
+                            <span className="hidden sm:inline font-medium">
+                                {refreshing ? 'Refreshing...' : 'Refresh'}
+                            </span>
+                        </div>
+
+                        {/* Enhanced loading animation */}
+                        {refreshing && (
+                            <div className="hidden sm:flex items-center gap-1 ml-1">
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '400ms' }}></div>
+                            </div>
+                        )}
+
+                        {/* Mobile loading indicator */}
+                        {refreshing && (
+                            <div className="sm:hidden absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping"></div>
+                        )}
                     </button>
 
                     <Link
@@ -406,7 +441,7 @@ const Home = () => {
                 <LiveTracking />
 
                 {/* Map Overlay Features - Hidden when panel is open */}
-                <div className={`absolute top-16 sm:top-18 md:top-20 lg:top-24 left-4 right-4 flex justify-between items-start z-10 transition-opacity duration-300 ${panelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                <div className={`absolute top-16 sm:top-18 md:top-20 lg:top-24 right-4 z-10 transition-opacity duration-300 ${panelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                     {/* Weather Widget */}
                     <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-white/20">
                         <div className="flex items-center gap-2">
@@ -417,38 +452,9 @@ const Home = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Traffic Status */}
-                    <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-white/20">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                            <p className="text-xs font-medium text-gray-800">Light Traffic</p>
-                        </div>
-                    </div>
                 </div>
 
-                {/* Map Controls - Hidden when panel is open */}
-                <div className={`absolute bottom-4 right-4 flex flex-col gap-2 z-10 transition-opacity duration-300 ${panelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                    <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-all">
-                        <i className="ri-add-line text-lg text-gray-700"></i>
-                    </button>
-                    <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-all">
-                        <i className="ri-subtract-line text-lg text-gray-700"></i>
-                    </button>
-                    <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-all">
-                        <i className="ri-crosshair-line text-lg text-blue-600"></i>
-                    </button>
-                </div>
 
-                {/* Nearby Places Indicator - Hidden when panel is open */}
-                <div className={`absolute bottom-4 left-4 z-10 transition-opacity duration-300 ${panelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                    <div className="bg-white/90 backdrop-blur-sm rounded-xl p-2 shadow-lg border border-white/20">
-                        <div className="flex items-center gap-1">
-                            <i className="ri-map-pin-line text-sm text-blue-600"></i>
-                            <p className="text-xs font-medium text-gray-800">5 nearby</p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div className='flex flex-col justify-end h-screen absolute top-0 w-full pt-12 sm:pt-14 md:pt-16 lg:pt-20'>
@@ -492,18 +498,9 @@ const Home = () => {
                     </h5>
 
                     {/* Header with Live Data */}
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <h4 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-800'>Find a Trip</h4>
-                            <p className="text-xs sm:text-sm text-gray-600">Choose your destination and get started</p>
-                        </div>
-                        <div className="text-right">
-                            <div className="flex items-center gap-2 text-xs text-gray-600">
-                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                <span>Live pricing</span>
-                            </div>
-                            <p className="text-xs text-green-600 font-medium">Surge: Normal</p>
-                        </div>
+                    <div className="mb-4">
+                        <h4 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-800'>Find a Trip</h4>
+                        <p className="text-xs sm:text-sm text-gray-600">Choose your destination and get started</p>
                     </div>
 
                     {/* Recent Destinations */}
@@ -627,8 +624,8 @@ const Home = () => {
                         onClick={findTrip}
                         disabled={!pickup || !destination}
                         className={`w-full py-4 sm:py-4.5 md:py-5 rounded-2xl mt-4 sm:mt-5 md:mt-6 font-bold hover:shadow-lg disabled:cursor-not-allowed transition-all duration-300 text-sm sm:text-base md:text-lg flex items-center justify-center gap-3 ${pickup && destination
-                                ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 text-white hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 transform hover:scale-[1.02] shadow-lg'
-                                : 'bg-gray-300 text-gray-500'
+                            ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 text-white hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 transform hover:scale-[1.02] shadow-lg'
+                            : 'bg-gray-300 text-gray-500'
                             }`}>
                         {pickup && destination ? (
                             <>
@@ -643,22 +640,6 @@ const Home = () => {
                             </>
                         )}
                     </button>
-
-                    {/* Additional Features */}
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors">
-                            <i className="ri-calendar-line"></i>
-                            <span>Schedule ride</span>
-                        </button>
-                        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors">
-                            <i className="ri-share-line"></i>
-                            <span>Share trip</span>
-                        </button>
-                        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors">
-                            <i className="ri-coupon-line"></i>
-                            <span>Promo codes</span>
-                        </button>
-                    </div>
                 </div>
 
                 <div ref={panelOpenRef} className='bg-white h-0 rounded-t-3xl overflow-hidden max-h-[85vh] z-30 relative'>
