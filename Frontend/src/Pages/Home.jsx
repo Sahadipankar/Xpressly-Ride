@@ -444,7 +444,7 @@ const Home = () => {
             </div>
 
             {/* Enhanced Map Section with Short Height */}
-            <div className='h-[40vh] sm:h-[45vh] md:h-[50vh] w-screen pt-12 sm:pt-14 md:pt-16 lg:pt-20 relative'>
+            <div className='h-[52vh] sm:h-[45vh] md:h-[50vh] w-screen pt-12 sm:pt-14 md:pt-16 lg:pt-20 relative'>
                 <LiveTracking />
 
                 {/* Map Overlay Features - Hidden when panel is open */}

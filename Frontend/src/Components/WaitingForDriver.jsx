@@ -2,83 +2,159 @@ import React from 'react'
 
 const WaitingForDriver = (props) => {
     const vehicleImages = {
-        Car: "https://www.svgrepo.com/show/408292/car-white.svg",
-        Moto: "https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png",
-        Auto: "https://clipart-library.com/2023/Uber_Auto_312x208_pixels_Mobile.png"
+        XpressGo: "https://www.svgrepo.com/show/408292/car-white.svg",
+        XpressMoto: "https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png",
+        XpressAuto: "https://clipart-library.com/2023/Uber_Auto_312x208_pixels_Mobile.png"
     };
 
     return (
-        <div className="p-4 h-full flex flex-col">
-            <h5 className='p-1 text-center w-[93%] absolute top-0'
-                onClick={() => {
-                    props.setWaitingForDriver(false);
-                }}><i className="text-2xl text-gray-500 ri-arrow-down-wide-line"></i></h5>
+        <div className="p-4 h-full flex flex-col bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+            {/* Enhanced Header */}
+            <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                <button
+                    className='p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105'
+                    onClick={() => props.setWaitingForDriver(false)}
+                >
+                    <i className="text-xl text-gray-600 ri-arrow-down-line"></i>
+                </button>
 
-            <div className="flex items-center justify-between mb-6 flex-shrink-0">
-                <img
-                    className='h-16 md:h-20'
-                    src={vehicleImages[props.ride?.captain?.vehicle?.vehicleType] || vehicleImages.Car}
-                    alt="Vehicle"
-                />
+                <div className="flex-1 text-center">
+                    <h3 className='text-xl font-bold text-gray-800'>Driver Found!</h3>
+                    <p className="text-sm text-green-600 font-medium">On the way to pickup</p>
+                </div>
 
-                <div className="text-right flex-1 min-w-0 ml-4">
-                    <h2 className='text-lg md:text-xl font-medium capitalize truncate'>
-                        {props.ride?.captain?.fullname?.firstname} {props.ride?.captain?.fullname?.lastname}
-                    </h2>
-                    <h4 className='text-xl md:text-2xl font-semibold -mt-1 -mb-1 truncate'>
-                        {props.ride?.captain?.vehicle?.plate || 'Loading...'}
-                    </h4>
-                    <p className='text-sm text-gray-600 capitalize truncate'>
-                        {props.ride?.captain?.vehicle?.vehicleType || 'Vehicle'}
-                    </p>
-                    <div className="mt-2 bg-green-100 text-green-800 px-3 py-1 rounded-full inline-block">
-                        <h1 className='text-lg font-semibold'>OTP: {props.ride?.otp || '****'}</h1>
+                <div className="w-12"></div> {/* Spacer for centering */}
+            </div>
+
+            {/* Enhanced Driver Card */}
+            <div className="bg-white rounded-2xl shadow-xl p-5 mb-4 flex-shrink-0">
+                <div className="flex items-center gap-4">
+                    {/* Driver Avatar */}
+                    <div className="relative">
+                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                            {props.ride?.captain?.fullname?.firstname?.charAt(0)?.toUpperCase() || 'D'}
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
+                            <i className="ri-check-line text-white text-xs"></i>
+                        </div>
+                    </div>
+
+                    {/* Driver Info */}
+                    <div className="flex-1 min-w-0">
+                        <h4 className='text-lg font-bold text-gray-800 truncate'>
+                            {props.ride?.captain?.fullname?.firstname} {props.ride?.captain?.fullname?.lastname}
+                        </h4>
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className='text-xl font-bold text-gray-900'>
+                                {props.ride?.captain?.vehicle?.plate || 'Loading...'}
+                            </span>
+                            <span className='text-sm text-gray-500 capitalize'>
+                                {props.ride?.captain?.vehicle?.vehicleType || 'Vehicle'}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="flex text-yellow-400">
+                                <i className="ri-star-fill text-sm"></i>
+                                <i className="ri-star-fill text-sm"></i>
+                                <i className="ri-star-fill text-sm"></i>
+                                <i className="ri-star-fill text-sm"></i>
+                                <i className="ri-star-fill text-sm"></i>
+                            </div>
+                            <span className="text-xs text-gray-600">4.9 • 2,543 trips</span>
+                        </div>
+                    </div>
+
+                    {/* Vehicle Image */}
+                    <div className="flex-shrink-0">
+                        <img
+                            className='h-12 w-12 object-contain'
+                            src={vehicleImages[props.ride?.captain?.vehicle?.vehicleType] || vehicleImages.XpressGo}
+                            alt="Vehicle"
+                        />
+                    </div>
+                </div>
+
+                {/* OTP Section */}
+                <div className="mt-4 p-4 bg-gradient-to-r from-green-100 to-emerald-100 rounded-xl border border-green-200">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-green-800 font-medium">Your OTP</p>
+                            <p className="text-xs text-green-600">Share with driver to start trip</p>
+                        </div>
+                        <div className="bg-white px-4 py-2 rounded-lg shadow-sm">
+                            <span className='text-2xl font-bold text-green-800 tracking-wider'>
+                                {props.ride?.otp || '****'}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className='flex flex-col gap-4 justify-between items-center flex-1 overflow-y-auto'>
+            {/* Enhanced Trip Details */}
+            <div className='bg-white rounded-2xl shadow-xl p-4 flex-1 overflow-y-auto'>
+                <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i className="ri-route-line text-green-600"></i>
+                    Trip Details
+                </h4>
 
-                <div className='w-full space-y-3 flex-1 overflow-y-auto'>
-
-                    <div className='flex items-start gap-3 sm:gap-5 p-3 border-gray-200 border-b-2'>
-                        <div className="flex-shrink-0">
-                            <i className="text-lg ri-map-pin-user-fill text-green-600"></i>
+                <div className='space-y-4'>
+                    <div className='flex items-start gap-4 p-4 bg-green-50 rounded-xl border-l-4 border-green-500'>
+                        <div className="flex-shrink-0 bg-green-500 rounded-full p-2">
+                            <i className="text-sm ri-map-pin-user-fill text-white"></i>
                         </div>
                         <div className="flex-1 min-w-0">
-                            <h3 className='text-lg font-medium mb-1'>Pickup Location</h3>
-                            <p className='text-sm text-gray-600 address-text'>{props.ride?.pickup || 'Loading pickup location...'}</p>
+                            <h5 className='text-sm font-semibold text-green-800 mb-1'>Pickup Location</h5>
+                            <p className='text-sm text-gray-700 leading-relaxed'>{props.ride?.pickup || 'Loading pickup location...'}</p>
                         </div>
                     </div>
 
-                    <div className='flex items-start gap-3 sm:gap-5 p-3 border-gray-200 border-b-2'>
-                        <div className="flex-shrink-0">
-                            <i className="text-lg ri-map-pin-fill text-red-600"></i>
+                    <div className='flex items-start gap-4 p-4 bg-red-50 rounded-xl border-l-4 border-red-500'>
+                        <div className="flex-shrink-0 bg-red-500 rounded-full p-2">
+                            <i className="text-sm ri-map-pin-fill text-white"></i>
                         </div>
                         <div className="flex-1 min-w-0">
-                            <h3 className='text-lg font-medium mb-1'>Destination</h3>
-                            <p className='text-sm text-gray-600 address-text'>{props.ride?.destination || 'Loading destination...'}</p>
+                            <h5 className='text-sm font-semibold text-red-800 mb-1'>Destination</h5>
+                            <p className='text-sm text-gray-700 leading-relaxed'>{props.ride?.destination || 'Loading destination...'}</p>
                         </div>
                     </div>
 
-                    <div className='flex items-center gap-3 sm:gap-5 p-3'>
-                        <div className="flex-shrink-0">
-                            <i className="text-lg ri-cash-line text-green-600"></i>
+                    <div className='flex items-center gap-4 p-4 bg-blue-50 rounded-xl border-l-4 border-blue-500'>
+                        <div className="flex-shrink-0 bg-blue-500 rounded-full p-2">
+                            <i className="text-sm ri-money-rupee-circle-fill text-white"></i>
                         </div>
                         <div className="flex-1">
-                            <h3 className='text-lg font-medium'>₹{props.ride?.fare || 'Calculating...'}</h3>
-                            <p className='text-sm text-gray-600'>Cash Payment</p>
+                            <h5 className='text-sm font-semibold text-blue-800 mb-1'>Trip Fare</h5>
+                            <div className="flex items-center gap-2">
+                                <span className='text-lg font-bold text-gray-800'>₹{props.ride?.fare || 'Calculating...'}</span>
+                                <span className='text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full'>Cash Payment</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="mt-4 w-full flex-shrink-0">
-                    <div className="bg-blue-50 p-4 rounded-lg text-center">
-                        <p className="text-blue-800 font-medium">Driver is on the way!</p>
-                        <p className="text-blue-600 text-sm mt-1">Please wait at the pickup location</p>
+                {/* Action Buttons */}
+                <div className="mt-6 space-y-3">
+                    <div className="bg-green-50 p-4 rounded-xl border border-green-200">
+                        <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                            <div>
+                                <p className="text-green-800 font-semibold text-sm">Driver is on the way!</p>
+                                <p className="text-green-600 text-xs mt-1">Please wait at the pickup location</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <button className="flex-1 bg-white border-2 border-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                            <i className="ri-phone-line text-lg"></i>
+                            Call Driver
+                        </button>
+                        <button className="flex-1 bg-white border-2 border-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                            <i className="ri-message-2-line text-lg"></i>
+                            Message
+                        </button>
                     </div>
                 </div>
-
             </div>
         </div>
     )

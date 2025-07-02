@@ -2,55 +2,137 @@ import React from 'react'
 
 const VehiclePanel = (props) => {
     return (
-        <div className="p-4 h-full flex flex-col">
-            <h5 className='absolute top-3 left-1/2 transform -translate-x-1/2 cursor-pointer hover:text-gray-700 transition-colors'
-                onClick={() => {
-                    props.setVehiclePanel(false);
-                }}><i className="text-2xl text-gray-500 ri-arrow-down-wide-line"></i></h5>
+        <div className="relative h-full flex flex-col bg-gradient-to-b from-gray-50 to-white">
+            {/* Header with close button */}
+            <div className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-gray-100 px-6 py-4 z-10">
+                <button
+                    className='absolute top-4 left-1/2 transform -translate-x-1/2 p-2 rounded-full hover:bg-gray-100 transition-all duration-200'
+                    onClick={() => {
+                        props.setVehiclePanel(false);
+                    }}
+                >
+                    <i className="text-2xl text-gray-400 hover:text-gray-600 ri-arrow-down-wide-line"></i>
+                </button>
+                <h3 className='text-2xl font-bold text-gray-800 text-center mt-8'>Choose Your Ride</h3>
+                <p className='text-sm text-gray-500 text-center mt-1'>Select the perfect vehicle for your journey</p>
+            </div>
 
-            <h3 className='text-xl md:text-2xl font-semibold mb-5 text-center'>Choose a Vehicle</h3>
-
-            <div className="space-y-3 flex-1 overflow-y-auto">
+            {/* Vehicle Options */}
+            <div className="flex-1 px-4 py-6 space-y-4 overflow-y-auto">
                 {/* Car Option */}
                 <div onClick={() => {
                     props.setConfirmRidePanel(true);
                     props.selectVehicle('Car')
-                }} className='flex border-2 border-gray-200 hover:border-black active:border-black mb-2 rounded-xl w-full p-3 md:p-4 items-center justify-between cursor-pointer transition-all duration-200 hover:shadow-md'>
-                    <img className='h-12 md:h-16 flex-shrink-0' src="https://www.svgrepo.com/show/408292/car-white.svg" alt="Car" />
-                    <div className='flex-1 px-3 min-w-0'>
-                        <h4 className='font-medium text-base md:text-lg'>XpressGo <span className="text-gray-600"><i className="ri-user-3-fill"></i>4</span></h4>
-                        <h5 className='font-medium text-sm text-green-600'>2 mins away</h5>
-                        <p className='font-normal text-gray-600 text-xs md:text-sm'>Affordable, compact rides</p>
+                }} className='group relative bg-white rounded-2xl border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden'>
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className='relative flex items-center p-5'>
+                        <div className="flex-shrink-0 mr-4">
+                            <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <img className='h-10 w-auto' src="https://www.svgrepo.com/show/408292/car-white.svg" alt="Car" />
+                            </div>
+                        </div>
+                        <div className='flex-1 min-w-0'>
+                            <div className="flex items-center gap-2 mb-1">
+                                <h4 className='font-bold text-lg text-gray-800'>XpressGo</h4>
+                                <div className="flex items-center text-gray-500 text-sm">
+                                    <i className="ri-user-3-fill mr-1"></i>
+                                    <span>4 seats</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <span className='inline-flex items-center px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full'>
+                                    <i className="ri-time-line mr-1"></i>
+                                    2 mins away
+                                </span>
+                                <span className='text-xs text-gray-500'>• Eco-friendly</span>
+                            </div>
+                            <p className='text-sm text-gray-600'>Comfortable rides for daily commutes</p>
+                        </div>
+                        <div className="flex-shrink-0 text-right">
+                            <div className='text-2xl font-bold text-gray-800'>₹{props.fare?.Car || '---'}</div>
+                            <div className='text-xs text-gray-500'>Estimated fare</div>
+                        </div>
                     </div>
-                    <h2 className='text-lg md:text-xl font-semibold flex-shrink-0'>₹{props.fare?.Car || 'N/A'}</h2>
                 </div>
 
                 {/* Moto Option */}
                 <div onClick={() => {
                     props.setConfirmRidePanel(true);
                     props.selectVehicle('Moto')
-                }} className='flex border-2 border-gray-200 hover:border-black active:border-black mb-2 rounded-xl w-full p-3 md:p-4 items-center justify-between cursor-pointer transition-all duration-200 hover:shadow-md'>
-                    <img className='h-8 md:h-10 flex-shrink-0' src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png" alt="Moto" />
-                    <div className='flex-1 px-3 min-w-0'>
-                        <h4 className='font-medium text-base md:text-lg'>XpressMoto <span className="text-gray-600"><i className="ri-user-3-fill"></i>1</span></h4>
-                        <h5 className='font-medium text-sm text-green-600'>3 mins away</h5>
-                        <p className='font-normal text-gray-600 text-xs md:text-sm'>Affordable motorcycle rides</p>
+                }} className='group relative bg-white rounded-2xl border border-gray-200 hover:border-orange-300 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden'>
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className='relative flex items-center p-5'>
+                        <div className="flex-shrink-0 mr-4">
+                            <div className="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <img className='h-8 w-auto' src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png" alt="Moto" />
+                            </div>
+                        </div>
+                        <div className='flex-1 min-w-0'>
+                            <div className="flex items-center gap-2 mb-1">
+                                <h4 className='font-bold text-lg text-gray-800'>XpressMoto</h4>
+                                <div className="flex items-center text-gray-500 text-sm">
+                                    <i className="ri-user-3-fill mr-1"></i>
+                                    <span>1 seat</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <span className='inline-flex items-center px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full'>
+                                    <i className="ri-time-line mr-1"></i>
+                                    3 mins away
+                                </span>
+                                <span className='text-xs text-gray-500'>• Fastest</span>
+                            </div>
+                            <p className='text-sm text-gray-600'>Quick rides through traffic</p>
+                        </div>
+                        <div className="flex-shrink-0 text-right">
+                            <div className='text-2xl font-bold text-gray-800'>₹{props.fare?.Moto || '---'}</div>
+                            <div className='text-xs text-gray-500'>Estimated fare</div>
+                        </div>
                     </div>
-                    <h2 className='text-lg md:text-xl font-semibold flex-shrink-0'>₹{props.fare?.Moto || 'N/A'}</h2>
                 </div>
 
                 {/* Auto Option */}
                 <div onClick={() => {
                     props.setConfirmRidePanel(true);
                     props.selectVehicle('Auto')
-                }} className='flex border-2 border-gray-200 hover:border-black active:border-black mb-2 rounded-xl w-full p-3 md:p-4 items-center justify-between cursor-pointer transition-all duration-200 hover:shadow-md'>
-                    <img className='h-8 md:h-9 flex-shrink-0' src="https://clipart-library.com/2023/Uber_Auto_312x208_pixels_Mobile.png" alt="Auto" />
-                    <div className='flex-1 px-3 min-w-0'>
-                        <h4 className='font-medium text-base md:text-lg'>XpressAuto <span className="text-gray-600"><i className="ri-user-3-fill"></i>3</span></h4>
-                        <h5 className='font-medium text-sm text-green-600'>4 mins away</h5>
-                        <p className='font-normal text-gray-600 text-xs md:text-sm'>Affordable auto rides</p>
+                }} className='group relative bg-white rounded-2xl border border-gray-200 hover:border-yellow-300 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden'>
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className='relative flex items-center p-5'>
+                        <div className="flex-shrink-0 mr-4">
+                            <div className="w-16 h-16 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <img className='h-8 w-auto' src="https://clipart-library.com/2023/Uber_Auto_312x208_pixels_Mobile.png" alt="Auto" />
+                            </div>
+                        </div>
+                        <div className='flex-1 min-w-0'>
+                            <div className="flex items-center gap-2 mb-1">
+                                <h4 className='font-bold text-lg text-gray-800'>XpressAuto</h4>
+                                <div className="flex items-center text-gray-500 text-sm">
+                                    <i className="ri-user-3-fill mr-1"></i>
+                                    <span>3 seats</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <span className='inline-flex items-center px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full'>
+                                    <i className="ri-time-line mr-1"></i>
+                                    4 mins away
+                                </span>
+                                <span className='text-xs text-gray-500'>• Budget-friendly</span>
+                            </div>
+                            <p className='text-sm text-gray-600'>Affordable three-wheeler rides</p>
+                        </div>
+                        <div className="flex-shrink-0 text-right">
+                            <div className='text-2xl font-bold text-gray-800'>₹{props.fare?.Auto || '---'}</div>
+                            <div className='text-xs text-gray-500'>Estimated fare</div>
+                        </div>
                     </div>
-                    <h2 className='text-lg md:text-xl font-semibold flex-shrink-0'>₹{props.fare?.Auto || 'N/A'}</h2>
+                </div>
+            </div>
+
+            {/* Footer tip */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                <div className="flex items-center justify-center text-sm text-gray-500">
+                    <i className="ri-information-line mr-2"></i>
+                    Tap any vehicle to continue with booking
                 </div>
             </div>
         </div>
