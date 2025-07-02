@@ -201,30 +201,6 @@ const Riding = () => {
                     })
                 }
 
-                // High-speed adventure alerts - increased frequency
-                if (currentSpeed > 50 && trafficCondition === 'light') { // Lowered threshold
-                    const adventureAlerts = [
-                        'High-speed zone - enjoying the ride! 🏎️',
-                        'Clear roads ahead - smooth sailing!',
-                        'Express route activated - fast journey!',
-                        'Highway mode - cruising at high speed!',
-                        'Speed boost activated - hold tight! 🚀',
-                        'Racing mode engaged - feel the rush! ⚡'
-                    ]
-
-                    if (Math.random() > 0.75) { // 25% chance when at high speed (increased)
-                        setTrafficAlerts(prev => {
-                            const newAlert = {
-                                id: Date.now(),
-                                message: adventureAlerts[Math.floor(Math.random() * adventureAlerts.length)],
-                                type: 'adventure',
-                                timestamp: new Date()
-                            }
-                            return [...prev.slice(-2), newAlert]
-                        })
-                    }
-                }
-
                 // Store current speed for average calculation
                 const currentSpeedForCalc = currentSpeed
 
@@ -602,30 +578,21 @@ const Riding = () => {
 
                 {/* Progress Overlay - Traffic Status Removed */}
 
-                {/* Live Traffic Alerts */}
-                {trafficAlerts.length > 0 && (
+                {/* Live Traffic Alerts - Filtered to exclude adventure/speed alerts */}
+                {trafficAlerts.filter(alert => alert.type !== 'adventure').length > 0 && (
                     <div className="absolute top-20 left-4 right-4 z-10">
-                        {trafficAlerts.slice(-1).map((alert) => (
+                        {trafficAlerts.filter(alert => alert.type !== 'adventure').slice(-1).map((alert) => (
                             <div
                                 key={alert.id}
-                                className={`${alert.type === 'adventure'
-                                    ? 'bg-green-100 border-l-4 border-green-500 text-green-700'
-                                    : 'bg-orange-100 border-l-4 border-orange-500 text-orange-700'
-                                    } p-3 rounded-r shadow-lg animate-pulse`}
+                                className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-3 rounded-r shadow-lg animate-pulse"
                                 onClick={() => setTrafficAlerts(prev => prev.filter(a => a.id !== alert.id))}
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <i className={`${alert.type === 'adventure'
-                                            ? 'ri-rocket-line'
-                                            : 'ri-alert-line'
-                                            } text-lg`}></i>
+                                        <i className="ri-alert-line text-lg"></i>
                                         <span className="text-sm font-medium">{alert.message}</span>
                                     </div>
-                                    <button className={`${alert.type === 'adventure'
-                                        ? 'text-green-600 hover:text-green-800'
-                                        : 'text-orange-600 hover:text-orange-800'
-                                        }`}>
+                                    <button className="text-orange-600 hover:text-orange-800">
                                         <i className="ri-close-line"></i>
                                     </button>
                                 </div>
