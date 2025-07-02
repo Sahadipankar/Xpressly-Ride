@@ -401,23 +401,137 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className='h-screen w-screen pt-12 sm:pt-14 md:pt-16 lg:pt-20'>
+            {/* Enhanced Map Section with Short Height */}
+            <div className='h-[40vh] sm:h-[45vh] md:h-[50vh] w-screen pt-12 sm:pt-14 md:pt-16 lg:pt-20 relative'>
                 <LiveTracking />
+
+                {/* Map Overlay Features - Hidden when panel is open */}
+                <div className={`absolute top-16 sm:top-18 md:top-20 lg:top-24 left-4 right-4 flex justify-between items-start z-10 transition-opacity duration-300 ${panelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                    {/* Weather Widget */}
+                    <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-white/20">
+                        <div className="flex items-center gap-2">
+                            <i className="ri-sun-line text-yellow-500 text-lg"></i>
+                            <div>
+                                <p className="text-xs font-medium text-gray-800">28°C</p>
+                                <p className="text-xs text-gray-600">Clear</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Traffic Status */}
+                    <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-white/20">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <p className="text-xs font-medium text-gray-800">Light Traffic</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Map Controls - Hidden when panel is open */}
+                <div className={`absolute bottom-4 right-4 flex flex-col gap-2 z-10 transition-opacity duration-300 ${panelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                    <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-all">
+                        <i className="ri-add-line text-lg text-gray-700"></i>
+                    </button>
+                    <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-all">
+                        <i className="ri-subtract-line text-lg text-gray-700"></i>
+                    </button>
+                    <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-all">
+                        <i className="ri-crosshair-line text-lg text-blue-600"></i>
+                    </button>
+                </div>
+
+                {/* Nearby Places Indicator - Hidden when panel is open */}
+                <div className={`absolute bottom-4 left-4 z-10 transition-opacity duration-300 ${panelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                    <div className="bg-white/90 backdrop-blur-sm rounded-xl p-2 shadow-lg border border-white/20">
+                        <div className="flex items-center gap-1">
+                            <i className="ri-map-pin-line text-sm text-blue-600"></i>
+                            <p className="text-xs font-medium text-gray-800">5 nearby</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div className='flex flex-col justify-end h-screen absolute top-0 w-full pt-12 sm:pt-14 md:pt-16 lg:pt-20'>
-                <div className='h-[35%] sm:h-[32%] md:h-[30%] bg-white p-3 sm:p-4 md:p-6 relative rounded-t-3xl shadow-2xl'>
+                {/* Quick Actions Bar - Hidden when panel is open */}
+                <div className={`px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 border-t border-gray-200 transition-opacity duration-300 ${panelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                    <div className="flex justify-between items-center max-w-6xl mx-auto">
+                        <div className="flex gap-4 overflow-x-auto scrollbar-hide">
+                            <button className="flex flex-col items-center gap-1 px-3 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all whitespace-nowrap">
+                                <i className="ri-hospital-line text-red-500 text-lg"></i>
+                                <span className="text-xs font-medium text-gray-700">Hospital</span>
+                            </button>
+                            <button className="flex flex-col items-center gap-1 px-3 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all whitespace-nowrap">
+                                <i className="ri-plane-line text-blue-500 text-lg"></i>
+                                <span className="text-xs font-medium text-gray-700">Airport</span>
+                            </button>
+                            <button className="flex flex-col items-center gap-1 px-3 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all whitespace-nowrap">
+                                <i className="ri-shopping-bag-line text-green-500 text-lg"></i>
+                                <span className="text-xs font-medium text-gray-700">Mall</span>
+                            </button>
+                            <button className="flex flex-col items-center gap-1 px-3 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all whitespace-nowrap">
+                                <i className="ri-train-line text-purple-500 text-lg"></i>
+                                <span className="text-xs font-medium text-gray-700">Station</span>
+                            </button>
+                            <button className="flex flex-col items-center gap-1 px-3 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all whitespace-nowrap">
+                                <i className="ri-building-line text-orange-500 text-lg"></i>
+                                <span className="text-xs font-medium text-gray-700">Office</span>
+                            </button>
+                        </div>
+                        <button className="ml-3 flex-shrink-0 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+                            <i className="ri-more-line text-gray-600 text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Enhanced Ride Booking Section */}
+                <div className='bg-white p-3 sm:p-4 md:p-6 relative rounded-t-3xl shadow-2xl border-t border-gray-100'>
                     <h5 ref={panelCloseRef}
                         onClick={() => setPanelOpen(false)}
                         className='absolute opacity-0 right-3 sm:right-4 md:right-6 top-3 sm:top-4 md:top-6 text-xl sm:text-2xl cursor-pointer hover:text-gray-600 transition-colors'>
                         <i className="ri-arrow-down-wide-line"></i>
                     </h5>
-                    <h4 className='text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4'>Find a Trip</h4>
+
+                    {/* Header with Live Data */}
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <h4 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-800'>Find a Trip</h4>
+                            <p className="text-xs sm:text-sm text-gray-600">Choose your destination and get started</p>
+                        </div>
+                        <div className="text-right">
+                            <div className="flex items-center gap-2 text-xs text-gray-600">
+                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <span>Live pricing</span>
+                            </div>
+                            <p className="text-xs text-green-600 font-medium">Surge: Normal</p>
+                        </div>
+                    </div>
+
+                    {/* Recent Destinations */}
+                    <div className="mb-4">
+                        <h5 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <i className="ri-time-line text-gray-500"></i>
+                            Recent Destinations
+                        </h5>
+                        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                            <button className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all whitespace-nowrap">
+                                <i className="ri-home-line text-blue-500 text-sm"></i>
+                                <span className="text-xs font-medium text-gray-700">Home</span>
+                            </button>
+                            <button className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all whitespace-nowrap">
+                                <i className="ri-building-line text-orange-500 text-sm"></i>
+                                <span className="text-xs font-medium text-gray-700">Work</span>
+                            </button>
+                            <button className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all whitespace-nowrap">
+                                <i className="ri-shopping-cart-line text-green-500 text-sm"></i>
+                                <span className="text-xs font-medium text-gray-700">Mall</span>
+                            </button>
+                        </div>
+                    </div>
 
                     <form className='relative' onSubmit={(e) => {
                         submitHandler(e)
                     }}>
-                        {/* Pickup Input */}
+                        {/* Enhanced Pickup Input */}
                         <div className="relative mt-3 sm:mt-4 md:mt-5">
                             <div className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 z-10">
                                 <i className="ri-map-pin-user-fill text-base sm:text-lg text-green-600"></i>
@@ -429,24 +543,24 @@ const Home = () => {
                                 }}
                                 value={pickup}
                                 onChange={handlePickupChange}
-                                className='bg-gray-100 pl-10 sm:pl-12 pr-16 sm:pr-20 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base md:text-lg rounded-xl w-full border-2 border-transparent focus:outline-none focus:border-green-500 focus:bg-white transition-all duration-200'
+                                className='bg-gradient-to-r from-green-50 to-green-100 pl-10 sm:pl-12 pr-16 sm:pr-20 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base md:text-lg rounded-2xl w-full border-2 border-green-200 focus:outline-none focus:border-green-500 focus:from-white focus:to-white transition-all duration-300 shadow-sm hover:shadow-md'
                                 type="text"
                                 placeholder="Add a pick-up location"
                             />
-                            {/* Current Location Icon */}
+                            {/* Enhanced Current Location Icon */}
                             <div
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleCurrentLocationAsPickup();
                                 }}
-                                className={`absolute right-10 sm:right-12 top-1/2 transform -translate-y-1/2 z-10 cursor-pointer transition-all duration-300 ${gettingCurrentLocation
+                                className={`absolute right-12 sm:right-14 top-1/2 transform -translate-y-1/2 z-10 cursor-pointer transition-all duration-300 ${gettingCurrentLocation
                                     ? 'text-gray-400 cursor-not-allowed'
                                     : 'text-green-600 hover:text-green-700 hover:scale-110'
                                     }`}
                                 title="Use my current location"
                             >
                                 {gettingCurrentLocation ? (
-                                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-green-600 border-t-transparent"></div>
+                                    <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-green-600 border-t-transparent"></div>
                                 ) : (
                                     <i className="ri-crosshair-line text-base sm:text-lg"></i>
                                 )}
@@ -458,15 +572,15 @@ const Home = () => {
                                         setPickup('');
                                         setPickupSuggestions([]);
                                     }}
-                                    className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 z-10 text-gray-500 hover:text-gray-700 transition-colors"
+                                    className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 z-10 text-gray-500 hover:text-gray-700 transition-colors bg-white rounded-full p-1"
                                 >
-                                    <i className="ri-close-line text-base sm:text-lg"></i>
+                                    <i className="ri-close-line text-sm sm:text-base"></i>
                                 </button>
                             )}
                         </div>
 
-                        {/* Destination Input */}
-                        <div className="relative mt-2 sm:mt-3">
+                        {/* Enhanced Destination Input */}
+                        <div className="relative mt-3 sm:mt-4">
                             <div className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 z-10">
                                 <i className="ri-map-pin-fill text-base sm:text-lg text-red-600"></i>
                             </div>
@@ -477,7 +591,7 @@ const Home = () => {
                                 }}
                                 value={destination}
                                 onChange={handleDestinationChange}
-                                className='bg-gray-100 pl-10 sm:pl-12 pr-10 sm:pr-12 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base md:text-lg rounded-xl w-full border-2 border-transparent focus:outline-none focus:border-red-500 focus:bg-white transition-all duration-200'
+                                className='bg-gradient-to-r from-red-50 to-red-100 pl-10 sm:pl-12 pr-12 sm:pr-14 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base md:text-lg rounded-2xl w-full border-2 border-red-200 focus:outline-none focus:border-red-500 focus:from-white focus:to-white transition-all duration-300 shadow-sm hover:shadow-md'
                                 type="text"
                                 placeholder="Enter your destination"
                             />
@@ -488,22 +602,66 @@ const Home = () => {
                                         setDestination('');
                                         setDestinationSuggestions([]);
                                     }}
-                                    className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 z-10 text-gray-500 hover:text-gray-700 transition-colors"
+                                    className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 z-10 text-gray-500 hover:text-gray-700 transition-colors bg-white rounded-full p-1"
                                 >
-                                    <i className="ri-close-line text-base sm:text-lg"></i>
+                                    <i className="ri-close-line text-sm sm:text-base"></i>
                                 </button>
                             )}
                         </div>
+
+                        {/* Route Options */}
+                        {pickup && destination && (
+                            <div className="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200">
+                                <div className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <i className="ri-route-line text-blue-600"></i>
+                                        <span className="text-gray-700 font-medium">Route options available</span>
+                                    </div>
+                                    <span className="text-blue-600 font-semibold">3 routes</span>
+                                </div>
+                            </div>
+                        )}
                     </form>
+                    {/* Enhanced CTA Button */}
                     <button
                         onClick={findTrip}
                         disabled={!pickup || !destination}
-                        className='bg-black text-white px-4 py-2 sm:py-2.5 md:py-3 rounded-xl mt-2 sm:mt-3 md:mt-4 w-full font-semibold hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 text-xs sm:text-sm md:text-base'>
-                        {pickup && destination ? 'Find Trip' : 'Enter pickup and destination'}
+                        className={`w-full py-4 sm:py-4.5 md:py-5 rounded-2xl mt-4 sm:mt-5 md:mt-6 font-bold hover:shadow-lg disabled:cursor-not-allowed transition-all duration-300 text-sm sm:text-base md:text-lg flex items-center justify-center gap-3 ${pickup && destination
+                                ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 text-white hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 transform hover:scale-[1.02] shadow-lg'
+                                : 'bg-gray-300 text-gray-500'
+                            }`}>
+                        {pickup && destination ? (
+                            <>
+                                <i className="ri-map-line text-lg"></i>
+                                <span>Find Trip</span>
+                                <i className="ri-arrow-right-line text-lg"></i>
+                            </>
+                        ) : (
+                            <>
+                                <i className="ri-map-pin-line text-lg"></i>
+                                <span>Enter pickup and destination</span>
+                            </>
+                        )}
                     </button>
+
+                    {/* Additional Features */}
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                            <i className="ri-calendar-line"></i>
+                            <span>Schedule ride</span>
+                        </button>
+                        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                            <i className="ri-share-line"></i>
+                            <span>Share trip</span>
+                        </button>
+                        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                            <i className="ri-coupon-line"></i>
+                            <span>Promo codes</span>
+                        </button>
+                    </div>
                 </div>
 
-                <div ref={panelOpenRef} className='bg-white h-0 rounded-t-3xl overflow-hidden max-h-[85vh]'>
+                <div ref={panelOpenRef} className='bg-white h-0 rounded-t-3xl overflow-hidden max-h-[85vh] z-30 relative'>
                     <LocationSearchPanel
                         suggestions={activeField === 'pickup' ? pickupSuggestions : destinationSuggestions}
                         setPanelOpen={setPanelOpen}
@@ -516,7 +674,7 @@ const Home = () => {
 
             </div>
 
-            <div ref={vehiclePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-10 pt-8 sm:pt-10 md:pt-12 rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto'>
+            <div ref={vehiclePanelRef} className='fixed w-full z-40 bottom-0 translate-y-full bg-white px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-10 pt-8 sm:pt-10 md:pt-12 rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto'>
                 <VehiclePanel
                     selectVehicle={setVehicleType}
                     fare={fare}
@@ -525,7 +683,7 @@ const Home = () => {
                 />
             </div>
 
-            <div ref={confirmRidePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 sm:px-4 md:px-6 py-4 sm:py-5 md:py-6 pt-8 sm:pt-10 md:pt-12 rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto'>
+            <div ref={confirmRidePanelRef} className='fixed w-full z-40 bottom-0 translate-y-full bg-white px-3 sm:px-4 md:px-6 py-4 sm:py-5 md:py-6 pt-8 sm:pt-10 md:pt-12 rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto'>
                 <ConfirmRide
                     createRide={createRide}
                     pickup={pickup}
@@ -537,7 +695,7 @@ const Home = () => {
                 />
             </div>
 
-            <div ref={vehicleFoundRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 sm:px-4 md:px-6 py-4 sm:py-5 md:py-6 pt-8 sm:pt-10 md:pt-12 rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto'>
+            <div ref={vehicleFoundRef} className='fixed w-full z-40 bottom-0 translate-y-full bg-white px-3 sm:px-4 md:px-6 py-4 sm:py-5 md:py-6 pt-8 sm:pt-10 md:pt-12 rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto'>
                 <LookingForDriver
                     createRide={createRide}
                     pickup={pickup}
@@ -548,7 +706,7 @@ const Home = () => {
                 />
             </div>
 
-            <div ref={waitingForDriverRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 sm:px-4 md:px-6 py-4 sm:py-5 md:py-6 pt-8 sm:pt-10 md:pt-12 rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto'>
+            <div ref={waitingForDriverRef} className='fixed w-full z-40 bottom-0 translate-y-full bg-white px-3 sm:px-4 md:px-6 py-4 sm:py-5 md:py-6 pt-8 sm:pt-10 md:pt-12 rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto'>
                 <WaitingForDriver
                     waitingForDriver={waitingForDriver}
                     ride={ride}

@@ -548,13 +548,19 @@ const Riding = () => {
 
     return (
         <div className='h-screen bg-gray-50'>
-            {/* Header */}
-            <div className="bg-white shadow-sm p-4 flex items-center justify-between">
+            {/* Enhanced Header with Live Trip Info */}
+            <div className="bg-white/95 backdrop-blur-md shadow-lg p-4 flex items-center justify-between border-b border-gray-200">
                 <div className="flex items-center gap-3">
                     <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                    <h1 className="text-lg font-semibold text-gray-800">Riding</h1>
-                    <span className="text-sm text-gray-500">• {getRideDuration()}</span>
-                    <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded-md">
+                    <div>
+                        <h1 className="text-lg font-bold text-gray-800">On the way</h1>
+                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                            <span>Trip duration: {getRideDuration()}</span>
+                            <span>•</span>
+                            <span>Live tracking</span>
+                        </div>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border">
                         <i className={`ri-speed-line ${getCurrentSpeed() > 80 ? 'text-green-600 animate-pulse' :
                             getCurrentSpeed() > 50 ? 'text-blue-600' :
                                 tripData.trafficCondition === 'heavy' || tripData.trafficCondition === 'severe' ? 'text-red-600' : 'text-gray-600'
@@ -576,10 +582,13 @@ const Riding = () => {
                         )}
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="flex items-center justify-center gap-1 text-sm text-gray-600 bg-blue-50 px-3 py-2 rounded-lg border shadow-sm">
-                        <i className="ri-time-line flex-shrink-0" style={{ lineHeight: '1' }}></i>
-                        <span className="font-medium" style={{ lineHeight: '1' }}>{getEstimatedArrival()}</span>
+                <div className="flex items-center gap-3">
+                    {/* ETA Card */}
+                    <div className="bg-gradient-to-r from-blue-50 to-green-50 px-4 py-2 rounded-xl border border-blue-200">
+                        <div className="text-center">
+                            <div className="text-lg font-bold text-gray-800">{getEstimatedArrival()}</div>
+                            <p className="text-xs text-gray-600">ETA</p>
+                        </div>
                     </div>
                     <Link to='/home' className="h-10 w-10 bg-gray-100 hover:bg-gray-200 flex items-center justify-center rounded-full transition-colors">
                         <i className="text-lg font-medium ri-home-5-line text-gray-600"></i>
@@ -587,13 +596,94 @@ const Riding = () => {
                 </div>
             </div>
 
-            <div className="h-[45%] relative">
+            {/* Compact Map Section with Enhanced Overlays */}
+            <div className="h-[40vh] relative">
                 <LiveTracking />
 
-                {/* Live Traffic Alerts Overlay */}
+                {/* Speed and Progress Overlay */}
+                <div className="absolute top-4 left-4 right-4 z-10">
+                    <div className="flex justify-between items-start">
+                        {/* Speed Indicator */}
+                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+                            <div className="text-center">
+                                <div className="text-2xl font-bold text-blue-600">
+                                    {isLoadingTripData ? '--' : Math.round(tripData.currentSpeed)}
+                                </div>
+                                <p className="text-xs text-gray-600">km/h</p>
+                                <div className="flex justify-center mt-1">
+                                    {getCurrentSpeed() > 80 ? (
+                                        <div className="flex items-center gap-1">
+                                            <i className="ri-rocket-line text-green-500 text-xs animate-bounce"></i>
+                                            <span className="text-xs text-green-600 font-medium">Fast</span>
+                                        </div>
+                                    ) : getCurrentSpeed() > 50 ? (
+                                        <div className="flex items-center gap-1">
+                                            <i className="ri-flashlight-line text-blue-500 text-xs"></i>
+                                            <span className="text-xs text-blue-600 font-medium">Good</span>
+                                        </div>
+                                    ) : (
+                                        <span className="text-xs text-gray-500">Normal</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Traffic Status */}
+                        {tripData.trafficCondition !== 'normal' && (
+                            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg max-w-[180px]">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <i className={`ri-alert-line text-sm ${tripData.trafficCondition === 'heavy' || tripData.trafficCondition === 'severe'
+                                            ? 'text-red-500' : tripData.trafficCondition === 'light' ? 'text-green-500' : 'text-yellow-500'
+                                        }`}></i>
+                                    <span className="text-xs font-medium text-gray-800">
+                                        {tripData.trafficCondition === 'light' ? 'Clear roads' :
+                                            tripData.trafficCondition === 'moderate' ? 'Moderate traffic' :
+                                                tripData.trafficCondition === 'heavy' ? 'Heavy traffic' :
+                                                    'Severe congestion'}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-gray-600">
+                                    {tripData.trafficCondition === 'light' ? 'Good speed ahead' :
+                                        tripData.trafficCondition === 'moderate' ? 'Minor delays' :
+                                            'Significant delays'}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Route Progress Bar */}
+                <div className="absolute bottom-4 left-4 right-4 z-10">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-medium text-gray-700">Trip Progress</span>
+                            <div className="flex items-center gap-2 text-xs text-gray-600">
+                                <i className="ri-route-line"></i>
+                                <span>{isLoadingTripData ? 'Loading...' : tripData.remainingDistance} remaining</span>
+                            </div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                            <div
+                                className="bg-gradient-to-r from-blue-500 via-green-500 to-purple-500 h-2.5 rounded-full transition-all duration-1000 relative overflow-hidden"
+                                style={{
+                                    width: `${Math.min(Math.round(((currentTime - rideStartTime) / (tripData.originalDuration * 1000)) * 100), 95)}%`
+                                }}
+                            >
+                                <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
+                            </div>
+                        </div>
+                        <div className="flex justify-between text-xs text-gray-600 mt-1">
+                            <span>Started</span>
+                            <span>{Math.round(((currentTime - rideStartTime) / (tripData.originalDuration * 1000)) * 100)}% complete</span>
+                            <span>Destination</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Live Traffic Alerts */}
                 {trafficAlerts.length > 0 && (
-                    <div className="absolute top-4 left-4 right-4 z-10">
-                        {trafficAlerts.slice(-1).map((alert) => ( // Show only the latest alert
+                    <div className="absolute top-20 left-4 right-4 z-10">
+                        {trafficAlerts.slice(-1).map((alert) => (
                             <div
                                 key={alert.id}
                                 className={`${alert.type === 'adventure'
@@ -617,8 +707,7 @@ const Riding = () => {
                                         <i className="ri-close-line"></i>
                                     </button>
                                 </div>
-                                <p className={`text-xs ${alert.type === 'adventure' ? 'text-green-600' : 'text-orange-600'
-                                    } mt-1`}>
+                                <p className="text-xs opacity-70 mt-1">
                                     {alert.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </p>
                             </div>
@@ -627,30 +716,47 @@ const Riding = () => {
                 )}
             </div>
 
-            <div className="h-[55%] bg-white rounded-t-3xl shadow-lg overflow-y-auto">
-                {/* Driver Info Card */}
-                <div className="p-4 border-b border-gray-100">
+            {/* Enhanced Bottom Section with Driver Info and Trip Details */}
+            <div className="h-[60vh] bg-white rounded-t-3xl shadow-xl overflow-y-auto">
+                {/* Driver Info Card - Enhanced */}
+                <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-4">
                             <div className="relative">
                                 <img
-                                    className='h-16 w-16 rounded-full object-cover border-3 border-green-200'
+                                    className='h-16 w-16 rounded-full object-cover border-3 border-green-300 shadow-lg'
                                     src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKAjn0EsJc3E-9hgTU6GxsMuCioyJbeeRK4A&s"
                                     alt="Driver"
                                 />
-                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
+                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                                    <i className="ri-check-line text-white text-xs"></i>
+                                </div>
                             </div>
                             <div>
-                                <h2 className='text-xl font-semibold capitalize text-gray-800'>
+                                <h2 className='text-xl font-bold capitalize text-gray-800'>
                                     {ride?.captain?.fullname?.firstname} {ride?.captain?.fullname?.lastname}
                                 </h2>
-                                <div className="flex items-center gap-2 mt-1">
-                                    <span className="text-yellow-500">
-                                        <i className="ri-star-fill text-sm"></i>
-                                        4.8
-                                    </span>
+                                <div className="flex items-center gap-3 mt-1">
+                                    <div className="flex items-center gap-1">
+                                        <span className="text-yellow-500">
+                                            <i className="ri-star-fill text-sm"></i>
+                                        </span>
+                                        <span className="text-sm font-semibold text-gray-700">4.8</span>
+                                        <span className="text-xs text-gray-500">(234 trips)</span>
+                                    </div>
                                     <span className="text-gray-400">•</span>
-                                    <span className="text-sm text-gray-600">5 years experience</span>
+                                    <div className="flex items-center gap-1">
+                                        <i className="ri-timer-line text-green-600 text-xs"></i>
+                                        <span className="text-xs text-gray-600">5 years exp</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                                        ✓ Verified Driver
+                                    </span>
+                                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                                        🛡️ Safe Driver
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -664,27 +770,31 @@ const Riding = () => {
                                 />
                             </div>
                             <div className="text-center">
-                                <h4 className='text-lg font-bold text-gray-800'>{ride?.captain?.vehicle?.plate || 'Loading...'}</h4>
-                                <p className='text-xs text-gray-500 capitalize'>
-                                    {ride?.captain?.vehicle?.vehicleType || 'Vehicle'} • {ride?.captain?.vehicle?.color || 'Blue'}
+                                <h4 className='text-lg font-bold text-gray-800'>{ride?.captain?.vehicle?.plate || 'KA-01-HH-1234'}</h4>
+                                <p className='text-xs text-gray-600 capitalize'>
+                                    {ride?.captain?.vehicle?.vehicleType || 'Car'} • {ride?.captain?.vehicle?.color || 'Blue'}
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Quick Actions */}
-                    <div className="flex gap-3">
-                        <button className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
-                            <i className="ri-phone-line"></i>
-                            <span className="text-sm font-medium">Call</span>
+                    {/* Enhanced Quick Actions */}
+                    <div className="grid grid-cols-4 gap-2">
+                        <button className="bg-blue-100 hover:bg-blue-200 text-blue-700 py-3 px-3 rounded-xl flex flex-col items-center gap-1 transition-all hover:scale-105">
+                            <i className="ri-phone-line text-lg"></i>
+                            <span className="text-xs font-medium">Call</span>
                         </button>
-                        <button className="flex-1 bg-green-50 hover:bg-green-100 text-green-700 py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
-                            <i className="ri-message-3-line"></i>
-                            <span className="text-sm font-medium">Message</span>
+                        <button className="bg-green-100 hover:bg-green-200 text-green-700 py-3 px-3 rounded-xl flex flex-col items-center gap-1 transition-all hover:scale-105">
+                            <i className="ri-message-3-line text-lg"></i>
+                            <span className="text-xs font-medium">Chat</span>
                         </button>
-                        <button className="flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700 py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
-                            <i className="ri-share-line"></i>
-                            <span className="text-sm font-medium">Share</span>
+                        <button className="bg-purple-100 hover:bg-purple-200 text-purple-700 py-3 px-3 rounded-xl flex flex-col items-center gap-1 transition-all hover:scale-105">
+                            <i className="ri-share-line text-lg"></i>
+                            <span className="text-xs font-medium">Share</span>
+                        </button>
+                        <button className="bg-orange-100 hover:bg-orange-200 text-orange-700 py-3 px-3 rounded-xl flex flex-col items-center gap-1 transition-all hover:scale-105">
+                            <i className="ri-shield-line text-lg"></i>
+                            <span className="text-xs font-medium">Safety</span>
                         </button>
                     </div>
                 </div>
