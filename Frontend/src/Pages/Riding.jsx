@@ -573,7 +573,7 @@ const Riding = () => {
             </div>
 
             {/* Compact Map Section with Enhanced Overlays */}
-            <div className="h-[40vh] relative">
+            <div className="h-[31vh] relative">
                 <LiveTracking />
 
                 {/* Progress Overlay - Traffic Status Removed */}

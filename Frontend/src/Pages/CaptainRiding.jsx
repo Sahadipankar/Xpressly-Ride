@@ -92,17 +92,17 @@ const CaptainRiding = () => {
             </header>
 
             {/* Map Section - Increased size */}
-            <div className="pt-20 h-[64vh] md:h-[70vh]">
+            <div className="pt-20 h-[47vh] md:h-[70vh]">
                 <div className="relative h-full">
                     {/* Replace static image with LiveTracking component */}
                     <LiveTracking />
                 </div>
             </div>
 
-            {/* Enhanced Trip Control Panel - Moved upwards for better space management */}
+            {/* Enhanced Trip Control Panel - Fixed and properly arranged */}
             <div className="flex-1 flex flex-col justify-end">
                 <div
-                    className="bg-gradient-to-r from-blue-600 to-green-600 text-white p-4 md:p-6 mx-4 mb-6 rounded-3xl shadow-2xl cursor-pointer transform transition-all duration-200 hover:scale-[1.01]"
+                    className="bg-gradient-to-r from-blue-300 to-green-300 text-blue-950 p-4 md:p-6 mx-3 md:mx-4 mb-4 md:mb-6 rounded-3xl shadow-2xl cursor-pointer transform transition-all duration-200 hover:scale-[1.01] font-semibold text-m"
                     onClick={() => setFinishRidePanel(true)}
                 >
                     {/* Handle */}
@@ -110,58 +110,94 @@ const CaptainRiding = () => {
                         <div className="w-12 h-1 bg-white/50 rounded-full"></div>
                     </div>
 
-                    {/* Main Layout - Rearranged */}
-                    <div className="space-y-4">
-                        {/* Top Section: Passenger Info + Complete Button */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4 flex-1">
-                                <img
-                                    className='w-16 h-16 rounded-full object-cover border-3 border-white shadow-lg'
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKAjn0EsJc3E-9hgTU6GxsMuCioyJbeeRK4A&s"
-                                    alt="Passenger"
-                                />
-                                <div className="flex-1">
-                                    <h4 className="text-lg font-bold mb-1">
-                                        {rideData?.user?.fullname?.firstname} {rideData?.user?.fullname?.lastname}
-                                    </h4>
-                                    <p className="text-sm opacity-90 mb-2">Passenger • ⭐ 4.8</p>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm bg-white/25 px-3 py-1 rounded-full font-medium">
-                                            💰 ₹{rideData?.fare || '85'}
+                    {/* Main Layout - Improved Structure */}
+                    <div className="space-y-5">
+                        {/* User Details Section - Fixed and Reorganized */}
+                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 space-y-4">
+                            {/* User Info Header */}
+                            <div className="flex items-start gap-4">
+                                <div className="relative">
+                                    <img
+                                        className='w-16 h-16 md:w-18 md:h-18 rounded-full object-cover border-3 border-white shadow-lg'
+                                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKAjn0EsJc3E-9hgTU6GxsMuCioyJbeeRK4A&s"
+                                        alt="Passenger"
+                                    />
+                                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full flex items-center justify-center">
+                                        <i className="ri-check-line text-xs text-white"></i>
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h4 className="text-lg md:text-xl font-bold truncate">
+                                            {rideData?.user?.fullname?.firstname} {rideData?.user?.fullname?.lastname}
+                                        </h4>
+                                        <div className="flex items-center gap-1 bg-yellow-400/20 px-2 py-1 rounded-full">
+                                            <i className="ri-star-fill text-yellow-300 text-sm"></i>
+                                            <span className="text-sm font-medium">4.8</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="text-sm opacity-90">Passenger</span>
+                                        <span className="w-1 h-1 bg-white/50 rounded-full"></span>
+                                        <span className="text-sm opacity-90">
+                                            {rideData?.user?.email?.substring(0, 20)}...
                                         </span>
-                                        <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
-                                            💵 Cash
-                                        </span>
+                                    </div>
+
+                                    {/* Fare and Payment Info */}
+                                    <div className="flex items-center gap-3 flex-wrap">
+                                        <div className="flex items-center gap-2 bg-green-500/20 px-3 py-2 rounded-xl">
+                                            <i className="ri-money-rupee-circle-line text-lg"></i>
+                                            <span className="font-bold text-lg">₹{rideData?.fare || '85'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-xl">
+                                            <i className="ri-wallet-line"></i>
+                                            <span className="text-sm font-medium">Cash Payment</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Complete Ride Button - Moved to right side */}
-                            <div className="ml-4">
-                                <button className='bg-white text-green-600 font-bold py-3 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2'>
-                                    <i className="ri-flag-line text-lg"></i>
-                                    <span>Complete Ride</span>
-                                </button>
-                                <p className="text-xs opacity-75 mt-2 text-center">Tap when arrived</p>
+                            {/* Trip Status Info */}
+                            <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/20">
+                                <div className="text-center">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <i className="ri-map-pin-line text-sm"></i>
+                                        <span className="text-xs opacity-75">Distance Left</span>
+                                    </div>
+                                    <span className="font-bold text-sm">{distanceRemaining}</span>
+                                </div>
+                                <div className="text-center">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <i className="ri-time-line text-sm"></i>
+                                        <span className="text-xs opacity-75">ETA</span>
+                                    </div>
+                                    <span className="font-bold text-sm">{estimatedTime}</span>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Divider */}
-                        <div className="border-t border-white/20"></div>
+                        {/* Complete Ride Button - Full Width */}
+                        <button className='w-full bg-white text-green-600 font-bold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-3'>
+                            <i className="ri-flag-line text-xl"></i>
+                            <span className="text-lg">Complete Ride</span>
+                        </button>
 
-                        {/* Bottom Section: Quick Actions */}
-                        <div className="flex gap-3">
-                            <button className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl py-3 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2">
-                                <i className="ri-phone-line text-lg"></i>
+                        {/* Quick Actions */}
+                        <div className="grid grid-cols-3 gap-3">
+                            <button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl py-3 px-2 text-sm font-medium transition-all duration-200 flex flex-col items-center gap-2">
+                                <i className="ri-phone-line text-xl"></i>
                                 <span>Call</span>
                             </button>
-                            <button className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl py-3 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2">
-                                <i className="ri-message-2-line text-lg"></i>
+                            <button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl py-3 px-2 text-sm font-medium transition-all duration-200 flex flex-col items-center gap-2">
+                                <i className="ri-message-2-line text-xl"></i>
                                 <span>Message</span>
                             </button>
-                            <button className="flex-1 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl py-3 px-4 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2">
-                                <i className="ri-customer-service-line text-lg"></i>
-                                <span>Support</span>
+                            <button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl py-3 px-2 text-sm font-medium transition-all duration-200 flex flex-col items-center gap-2">
+                                <i className="ri-navigation-line text-xl"></i>
+                                <span>Navigate</span>
                             </button>
                         </div>
                     </div>
