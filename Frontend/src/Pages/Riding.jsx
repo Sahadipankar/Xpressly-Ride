@@ -600,85 +600,7 @@ const Riding = () => {
             <div className="h-[40vh] relative">
                 <LiveTracking />
 
-                {/* Speed and Progress Overlay */}
-                <div className="absolute top-4 left-4 right-4 z-10">
-                    <div className="flex justify-between items-start">
-                        {/* Speed Indicator */}
-                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
-                            <div className="text-center">
-                                <div className="text-2xl font-bold text-blue-600">
-                                    {isLoadingTripData ? '--' : Math.round(tripData.currentSpeed)}
-                                </div>
-                                <p className="text-xs text-gray-600">km/h</p>
-                                <div className="flex justify-center mt-1">
-                                    {getCurrentSpeed() > 80 ? (
-                                        <div className="flex items-center gap-1">
-                                            <i className="ri-rocket-line text-green-500 text-xs animate-bounce"></i>
-                                            <span className="text-xs text-green-600 font-medium">Fast</span>
-                                        </div>
-                                    ) : getCurrentSpeed() > 50 ? (
-                                        <div className="flex items-center gap-1">
-                                            <i className="ri-flashlight-line text-blue-500 text-xs"></i>
-                                            <span className="text-xs text-blue-600 font-medium">Good</span>
-                                        </div>
-                                    ) : (
-                                        <span className="text-xs text-gray-500">Normal</span>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Traffic Status */}
-                        {tripData.trafficCondition !== 'normal' && (
-                            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg max-w-[180px]">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <i className={`ri-alert-line text-sm ${tripData.trafficCondition === 'heavy' || tripData.trafficCondition === 'severe'
-                                            ? 'text-red-500' : tripData.trafficCondition === 'light' ? 'text-green-500' : 'text-yellow-500'
-                                        }`}></i>
-                                    <span className="text-xs font-medium text-gray-800">
-                                        {tripData.trafficCondition === 'light' ? 'Clear roads' :
-                                            tripData.trafficCondition === 'moderate' ? 'Moderate traffic' :
-                                                tripData.trafficCondition === 'heavy' ? 'Heavy traffic' :
-                                                    'Severe congestion'}
-                                    </span>
-                                </div>
-                                <p className="text-xs text-gray-600">
-                                    {tripData.trafficCondition === 'light' ? 'Good speed ahead' :
-                                        tripData.trafficCondition === 'moderate' ? 'Minor delays' :
-                                            'Significant delays'}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Route Progress Bar */}
-                <div className="absolute bottom-4 left-4 right-4 z-10">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-medium text-gray-700">Trip Progress</span>
-                            <div className="flex items-center gap-2 text-xs text-gray-600">
-                                <i className="ri-route-line"></i>
-                                <span>{isLoadingTripData ? 'Loading...' : tripData.remainingDistance} remaining</span>
-                            </div>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5">
-                            <div
-                                className="bg-gradient-to-r from-blue-500 via-green-500 to-purple-500 h-2.5 rounded-full transition-all duration-1000 relative overflow-hidden"
-                                style={{
-                                    width: `${Math.min(Math.round(((currentTime - rideStartTime) / (tripData.originalDuration * 1000)) * 100), 95)}%`
-                                }}
-                            >
-                                <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
-                            </div>
-                        </div>
-                        <div className="flex justify-between text-xs text-gray-600 mt-1">
-                            <span>Started</span>
-                            <span>{Math.round(((currentTime - rideStartTime) / (tripData.originalDuration * 1000)) * 100)}% complete</span>
-                            <span>Destination</span>
-                        </div>
-                    </div>
-                </div>
+                {/* Progress Overlay - Traffic Status Removed */}
 
                 {/* Live Traffic Alerts */}
                 {trafficAlerts.length > 0 && (
@@ -975,21 +897,30 @@ const Riding = () => {
                                             </span>
                                         </p>
                                     </div>
-                                    <div className="mt-3 bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
-                                        <div
-                                            className="bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 h-full transition-all duration-2000 ease-out relative"
-                                            style={{
-                                                width: `${Math.min((currentTime - rideStartTime) / (tripData.originalDuration * 1000) * 100, 100)}%`
-                                            }}
-                                        >
-                                            <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/30 rounded-full animate-pulse"></div>
+
+                                    {/* Trip Progress Bar */}
+                                    <div className="mt-4 p-3 bg-white/80 rounded-lg border border-gray-200">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-xs font-medium text-gray-700">Trip Progress</span>
+                                            <span className="text-xs font-semibold text-gray-700">
+                                                {Math.min(Math.round((currentTime - rideStartTime) / (tripData.originalDuration * 1000) * 100), 100)}% Complete
+                                            </span>
                                         </div>
-                                    </div>
-                                    <div className="flex justify-between items-center mt-2">
-                                        <p className="text-xs text-gray-500">Trip Progress</p>
-                                        <p className="text-xs font-semibold text-gray-700">
-                                            {Math.min(Math.round((currentTime - rideStartTime) / (tripData.originalDuration * 1000) * 100), 100)}% Complete
-                                        </p>
+                                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                            <div
+                                                className="bg-gradient-to-r from-blue-500 via-green-500 to-purple-500 h-2.5 rounded-full transition-all duration-1000 relative overflow-hidden"
+                                                style={{
+                                                    width: `${Math.min(Math.round(((currentTime - rideStartTime) / (tripData.originalDuration * 1000)) * 100), 95)}%`
+                                                }}
+                                            >
+                                                <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between text-xs text-gray-600 mt-1">
+                                            <span>Started</span>
+                                            <span>{Math.round(((currentTime - rideStartTime) / (tripData.originalDuration * 1000)) * 100)}% complete</span>
+                                            <span>Destination</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
