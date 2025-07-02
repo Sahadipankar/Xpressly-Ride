@@ -1,8 +1,19 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 const RidePopUp = (props) => {
     const [timeLeft, setTimeLeft] = useState(30) // 30 seconds to respond
     const [estimatedTime, setEstimatedTime] = useState('5-8 min')
+    const rideIdRef = useRef(null)
+
+    useEffect(() => {
+        // Check if this is a new ride
+        const currentRideId = props.ride?._id;
+        if (currentRideId && currentRideId !== rideIdRef.current) {
+            // New ride detected, reset timer
+            rideIdRef.current = currentRideId;
+            setTimeLeft(30);
+        }
+    }, [props.ride?._id]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -19,7 +30,7 @@ const RidePopUp = (props) => {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [props]);
+    }, []); // Remove props dependency to prevent timer reset
 
     return (
         <div className="relative">
@@ -45,18 +56,18 @@ const RidePopUp = (props) => {
                 {/* Enhanced Timer */}
                 <div className="flex items-center justify-center gap-3 mb-4">
                     <div className={`relative w-16 h-16 rounded-full border-4 ${timeLeft > 15 ? 'border-green-500 bg-green-50' :
-                            timeLeft > 5 ? 'border-yellow-500 bg-yellow-50' :
-                                'border-red-500 bg-red-50'
+                        timeLeft > 5 ? 'border-yellow-500 bg-yellow-50' :
+                            'border-red-500 bg-red-50'
                         } flex items-center justify-center transition-all duration-300`}>
                         <span className={`text-xl font-bold ${timeLeft > 15 ? 'text-green-600' :
-                                timeLeft > 5 ? 'text-yellow-600' :
-                                    'text-red-600'
+                            timeLeft > 5 ? 'text-yellow-600' :
+                                'text-red-600'
                             }`}>
                             {timeLeft}
                         </span>
                         <div className={`absolute inset-0 rounded-full ${timeLeft > 15 ? 'border-green-400' :
-                                timeLeft > 5 ? 'border-yellow-400' :
-                                    'border-red-400'
+                            timeLeft > 5 ? 'border-yellow-400' :
+                                'border-red-400'
                             } border-2 animate-pulse`}></div>
                     </div>
                     <div className="text-center">

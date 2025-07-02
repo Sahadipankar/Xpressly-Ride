@@ -2,9 +2,9 @@ import React from 'react'
 
 const LookingForDriver = (props) => {
     const vehicleImages = {
-        XpressGo: "https://www.svgrepo.com/show/408292/car-white.svg",
-        XpressMoto: "https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png",
-        XpressAuto: "https://clipart-library.com/2023/Uber_Auto_312x208_pixels_Mobile.png"
+        Car: "https://www.svgrepo.com/show/408292/car-white.svg",
+        Moto: "https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png",
+        Auto: "https://clipart-library.com/2023/Uber_Auto_312x208_pixels_Mobile.png"
     };
 
     return (
@@ -34,13 +34,17 @@ const LookingForDriver = (props) => {
                     <div className="relative bg-white rounded-full p-6 shadow-2xl">
                         <img
                             className='h-16 w-16 object-contain'
-                            src={vehicleImages[props.vehicleType] || vehicleImages.XpressGo}
+                            src={vehicleImages[props.vehicleType] || vehicleImages.Car}
                             alt={props.vehicleType || "Vehicle"}
                         />
                     </div>
                 </div>
                 <div className="text-center mt-4">
-                    <h4 className="text-lg font-semibold text-gray-800 capitalize mb-2">{props.vehicleType || 'XpressGo'}</h4>
+                    <h4 className="text-lg font-semibold text-gray-800 capitalize mb-2">
+                        {props.vehicleType === 'Car' ? 'XpressGo' :
+                            props.vehicleType === 'Moto' ? 'XpressMoto' :
+                                props.vehicleType === 'Auto' ? 'XpressAuto' : 'XpressGo'}
+                    </h4>
                     <div className="flex items-center justify-center gap-1">
                         <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
