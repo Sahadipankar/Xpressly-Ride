@@ -28,14 +28,83 @@
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Ensure buttons are always accessible */
-    .sticky-button {
-        position: sticky;
-        bottom: 0;
-        background: white;
-        z-index: 10;
-        padding: 1rem;
-        border-top: 1px solid rgb(229, 231, 235);
+    /* Enhanced Login Page Animations */
+    @keyframes blob {
+        0% {
+            transform: translate(0px, 0px) scale(1);
+        }
+
+        33% {
+            transform: translate(30px, -50px) scale(1.1);
+        }
+
+        66% {
+            transform: translate(-20px, 20px) scale(0.9);
+        }
+
+        100% {
+            transform: translate(0px, 0px) scale(1);
+        }
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px) rotate(0deg);
+            opacity: 0.1;
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(180deg);
+            opacity: 0.3;
+        }
+    }
+
+    .animate-blob {
+        animation: blob 7s infinite;
+    }
+
+    .animation-delay-2000 {
+        animation-delay: 2s;
+    }
+
+    .animation-delay-4000 {
+        animation-delay: 4s;
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-float-delay-1 {
+        animation: float 6s ease-in-out infinite;
+        animation-delay: 2s;
+    }
+
+    .animate-float-delay-2 {
+        animation: float 6s ease-in-out infinite;
+        animation-delay: 4s;
+    }
+
+    /* Glassmorphism effects */
+    .glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .glass-dark {
+        background: rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glassmorphism {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
     }
 
     /* Loading skeleton animation */
