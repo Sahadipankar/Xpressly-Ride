@@ -1,78 +1,96 @@
+/**
+ * Ride Service
+ * 
+ * Business logic layer for ride operations including fare calculation,
+ * ride lifecycle management, and OTP generation for security.
+ * Handles complex fare calculations with dynamic pricing and surge factors.
+ */
+
 const rideModel = require('../Models/ride.model');
 const mapService = require('./maps.service');
-const bcrypt = require('bcrypt');   // For hashing passwords, if needed in the future
-const crypto = require('crypto');   // For generating OTPs
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
-
-
+/**
+ * Calculate fare for different vehicle types based on distance and time
+ * Implements dynamic pricing with surge factors and minimum fare guarantees
+ * @param {string} pickup - Pickup location address
+ * @param {string} destination - Destination address
+ * @returns {Object} Comprehensive fare structure for all vehicle types
+ */
 async function getFare(pickup, destination) {
-
     if (!pickup || !destination) {
         throw new Error('Pickup and destination are required');
     }
 
+    // Get distance and time data from maps service
     const distanceTime = await mapService.getDistanceTime(pickup, destination);
 
-    // More realistic base fares (Indian market pricing)
+    // Base fare structure for Indian market pricing
     const baseFare = {
-        Car: 50,    // Base fare for cars (like XpressGo)
-        Auto: 25,   // Base fare for auto-rickshaws
-        Moto: 15    // Base fare for motorcycles (like XpressMoto)
+        Car: 50,    // Premium comfort rides
+        Auto: 25,   // Standard auto-rickshaw rides
+        Moto: 15    // Quick motorcycle rides
     };
 
-    // Per kilometer rates (more realistic pricing)
+    // Per kilometer pricing rates
     const perKmRate = {
-        Car: 12,    // ₹12 per km for cars
-        Auto: 10,   // ₹10 per km for autos
-        Moto: 6     // ₹6 per km for motorcycles
+        Car: 12,    // Higher rate for cars
+        Auto: 10,   // Moderate rate for autos
+        Moto: 6     // Economical rate for motorcycles
     };
 
-    // Per minute rates for time-based charging
+    // Time-based charging per minute
     const perMinuteRate = {
-        Car: 2.5,   // ₹2.5 per minute for cars
-        Auto: 2,    // ₹2 per minute for autos  
-        Moto: 1.5   // ₹1.5 per minute for motorcycles
+        Car: 2.5,   // Premium time rate
+        Auto: 2,    // Standard time rate
+        Moto: 1.5   // Budget time rate
     };
 
-    // Surge pricing factors (can be dynamic based on demand)
+    // Dynamic surge pricing factors (adjustable based on demand)
     const surgePricing = {
         Car: 1.0,   // No surge by default
         Auto: 1.0,
         Moto: 1.0
     };
 
-    // Distance in kilometers and duration in minutes
+    // Convert distance and time to appropriate units
     const distanceKm = distanceTime.distance.value / 1000;
     const durationMinutes = distanceTime.duration.value / 60;
 
-    // Calculate fare for each vehicle type
+    /**
+     * Calculate fare for specific vehicle type
+     * @param {string} vehicleType - Type of vehicle (Car/Auto/Moto)
+     * @returns {number} Final fare amount
+     */
     const calculateVehicleFare = (vehicleType) => {
         const base = baseFare[vehicleType];
         const distanceFare = distanceKm * perKmRate[vehicleType];
         const timeFare = durationMinutes * perMinuteRate[vehicleType];
         const surgeFactor = surgePricing[vehicleType];
 
-        // Total before surge
+        // Calculate base total before surge
         const baseTotalFare = base + distanceFare + timeFare;
 
-        // Apply surge pricing
+        // Apply dynamic surge pricing
         const fareWithSurge = baseTotalFare * surgeFactor;
 
-        // Minimum fare guarantee
+        // Minimum fare guarantees for service quality
         const minimumFare = {
-            Car: 80,   // Minimum ₹80 for cars
-            Auto: 40,  // Minimum ₹40 for autos
-            Moto: 25   // Minimum ₹25 for motorcycles
+            Car: 80,   // Minimum viable fare for cars
+            Auto: 40,  // Minimum fare for autos
+            Moto: 25   // Minimum fare for motorcycles
         };
 
         return Math.max(Math.round(fareWithSurge), minimumFare[vehicleType]);
     };
 
+    // Generate comprehensive fare structure
     const fare = {
         Auto: calculateVehicleFare('Auto'),
         Car: calculateVehicleFare('Car'),
         Moto: calculateVehicleFare('Moto'),
-        // Additional fare breakdown for transparency
+        // Trip details for transparency
         distance: {
             value: distanceTime.distance.value,
             text: distanceTime.distance.text
@@ -81,6 +99,7 @@ async function getFare(pickup, destination) {
             value: distanceTime.duration.value,
             text: distanceTime.duration.text
         },
+        // Detailed fare breakdown for user understanding
         breakdown: {
             Auto: {
                 baseFare: baseFare.Auto,
@@ -108,7 +127,12 @@ async function getFare(pickup, destination) {
 
 module.exports.getFare = getFare;
 
-
+/**
+ * Generate secure OTP for ride verification
+ * Creates cryptographically secure random number
+ * @param {number} num - Number of digits for OTP
+ * @returns {string} Generated OTP string
+ */
 function getOtp(num) {
     function generateOtp(num) {
         const otp = crypto.randomInt(Math.pow(10, num - 1), Math.pow(10, num)).toString();
@@ -117,8 +141,16 @@ function getOtp(num) {
     return generateOtp(num);
 }
 
-
-
+/**
+ * Create a new ride request
+ * Generates ride record with fare calculation and OTP
+ * @param {Object} rideData - Ride creation data
+ * @param {string} rideData.user - User ID requesting the ride
+ * @param {string} rideData.pickup - Pickup location
+ * @param {string} rideData.destination - Destination location
+ * @param {string} rideData.vehicleType - Selected vehicle type
+ * @returns {Object} Created ride object
+ */
 module.exports.createRide = async ({
     user, pickup, destination, vehicleType
 }) => {
@@ -126,28 +158,35 @@ module.exports.createRide = async ({
         throw new Error('All fields are required');
     }
 
+    // Calculate fare for the selected route
     const fare = await getFare(pickup, destination);
 
-
-
+    // Create ride record with all necessary data
     const ride = rideModel.create({
         user,
         pickup,
         destination,
-        otp: getOtp(6),
-        fare: fare[vehicleType]
+        otp: getOtp(6), // 6-digit security OTP
+        fare: fare[vehicleType] // Fare for selected vehicle type
     })
 
     return ride;
 }
 
-
-
+/**
+ * Confirm ride by captain
+ * Updates ride status and assigns captain
+ * @param {Object} confirmData - Ride confirmation data
+ * @param {string} confirmData.rideId - ID of ride to confirm
+ * @param {Object} confirmData.captain - Captain accepting the ride
+ * @returns {Object} Updated ride with captain and user data
+ */
 module.exports.confirmRide = async ({ rideId, captain }) => {
     if (!rideId) {
         throw new Error('Ride id is required');
     }
 
+    // Update ride status to accepted and assign captain
     await rideModel.findOneAndUpdate({
         _id: rideId
     }, {
@@ -155,6 +194,7 @@ module.exports.confirmRide = async ({ rideId, captain }) => {
         captain: captain._id
     })
 
+    // Retrieve complete ride data with populated references
     const ride = await rideModel.findOne({
         _id: rideId
     }).populate('user').populate('captain').select('+otp');
@@ -165,12 +205,21 @@ module.exports.confirmRide = async ({ rideId, captain }) => {
     return ride;
 }
 
-
+/**
+ * Start ride journey after OTP verification
+ * Validates OTP and updates ride status to ongoing
+ * @param {Object} startData - Ride start data
+ * @param {string} startData.rideId - ID of ride to start
+ * @param {string} startData.otp - OTP for verification
+ * @param {Object} startData.captain - Captain starting the ride
+ * @returns {Object} Updated ride object
+ */
 module.exports.startRide = async ({ rideId, otp, captain }) => {
     if (!rideId || !otp) {
         throw new Error('Ride id and OTP are required');
     }
 
+    // Find ride with complete data including OTP
     const ride = await rideModel.findOne({
         _id: rideId
     }).populate('user').populate('captain').select('+otp');
@@ -183,10 +232,12 @@ module.exports.startRide = async ({ rideId, otp, captain }) => {
         throw new Error('Ride not accepted');
     }
 
+    // Verify OTP for security
     if (ride.otp !== otp) {
         throw new Error('Invalid OTP');
     }
 
+    // Update ride status to ongoing
     await rideModel.findOneAndUpdate({
         _id: rideId
     }, {
@@ -196,13 +247,20 @@ module.exports.startRide = async ({ rideId, otp, captain }) => {
     return ride;
 }
 
-
-
+/**
+ * End ride journey
+ * Completes the ride and updates status
+ * @param {Object} endData - Ride completion data
+ * @param {string} endData.rideId - ID of ride to end
+ * @param {Object} endData.captain - Captain ending the ride
+ * @returns {Object} Completed ride object
+ */
 module.exports.endRide = async ({ rideId, captain }) => {
     if (!rideId) {
         throw new Error('Ride id is required');
     }
 
+    // Find ride assigned to specific captain
     const ride = await rideModel.findOne({
         _id: rideId,
         captain: captain._id
@@ -216,6 +274,7 @@ module.exports.endRide = async ({ rideId, captain }) => {
         throw new Error('Ride not ongoing');
     }
 
+    // Mark ride as completed
     await rideModel.findOneAndUpdate({
         _id: rideId
     }, {

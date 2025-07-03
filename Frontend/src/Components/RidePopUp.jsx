@@ -1,34 +1,46 @@
+/**
+ * RidePopUp Component
+ * 
+ * Modal popup that displays incoming ride requests to captains.
+ * Features countdown timer for response, ride details, and action buttons.
+ * Auto-closes when timer expires and provides accept/decline functionality.
+ */
+
 import React, { useState, useEffect, useRef } from 'react'
 
 const RidePopUp = (props) => {
-    const [timeLeft, setTimeLeft] = useState(30) // 30 seconds to respond
-    const [estimatedTime, setEstimatedTime] = useState('5-8 min')
-    const rideIdRef = useRef(null)
+    // Component state management
+    const [timeLeft, setTimeLeft] = useState(30) // Countdown timer: 30 seconds to respond
+    const [estimatedTime, setEstimatedTime] = useState('5-8 min') // Estimated pickup time
+    const rideIdRef = useRef(null) // Ref to track current ride ID for timer reset
 
+    // Effect to reset timer when new ride request arrives
     useEffect(() => {
-        // Check if this is a new ride
+        // Check if this is a new ride by comparing IDs
         const currentRideId = props.ride?._id;
         if (currentRideId && currentRideId !== rideIdRef.current) {
-            // New ride detected, reset timer
+            // New ride detected, reset timer to 30 seconds
             rideIdRef.current = currentRideId;
             setTimeLeft(30);
         }
     }, [props.ride?._id]);
 
+    // Effect to handle countdown timer
     useEffect(() => {
         const timer = setInterval(() => {
             setTimeLeft(prev => {
                 if (prev <= 1) {
-                    // Use setTimeout to avoid setState during render
+                    // Auto-close popup when timer expires
                     setTimeout(() => {
                         props.setRidePopUpPanel(false);
                     }, 0);
                     return 0;
                 }
-                return prev - 1;
+                return prev - 1; // Decrement timer
             });
         }, 1000);
 
+        // Cleanup timer on component unmount
         return () => clearInterval(timer);
     }, []); // Remove props dependency to prevent timer reset
 

@@ -1,3 +1,11 @@
+/**
+ * UserLogin Component
+ * 
+ * User authentication page with modern UI/UX for Xpressly ride-sharing app.
+ * Handles user login with email/password validation and automatic redirection.
+ * Features animated backgrounds and responsive design for optimal user experience.
+ */
+
 import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { UserDataContext } from '../Context/UserContext'
@@ -9,6 +17,7 @@ import XpresslyLogo from '../Components/XpresslyLogo'
 const UserLogin = () => {
     // This component renders a login form for users to log in to their accounts.
 
+    // Form state management for user credentials
     const [email, setEmail] = useState('')
     // useState hook is used to manage the email state of the input field.
     const [password, setPassword] = useState('')
@@ -20,14 +29,21 @@ const UserLogin = () => {
     const navigate = useNavigate() // Hook to programmatically navigate to different routes.
 
 
+    /**
+     * Form submission handler
+     * Authenticates user credentials and manages login flow
+     * @param {Event} e - Form submission event
+     */
     const submitHandler = async (e) => { // This function handles the form submission.
         e.preventDefault() // Prevents the default form submission behavior.
 
+        // Prepare login credentials for API request
         const userData = {
             email: email,
             password: password
         }
 
+        // Send authentication request to backend API
         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData) // Sending a POST request to the server to log in the user.
 
         if (response.status === 200) { // If the response is successful
@@ -43,14 +59,14 @@ const UserLogin = () => {
     }
     return (
         <div className='min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden'>
-            {/* Animated Background Elements */}
+            {/* Animated Background Elements - Creates visual depth with floating gradient orbs */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
                 <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
                 <div className="absolute top-40 left-40 w-80 h-80 bg-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
             </div>
 
-            {/* Floating Particles */}
+            {/* Floating Particles - Adds subtle movement and visual interest */}
             <div className="absolute inset-0">
                 {[...Array(20)].map((_, i) => (
                     <div
@@ -66,9 +82,10 @@ const UserLogin = () => {
                 ))}
             </div>
 
+            {/* Main Content Container */}
             <div className='relative z-10 flex flex-col justify-center min-h-screen px-6 py-12 lg:px-8'>
                 <div className='sm:mx-auto sm:w-full sm:max-w-md'>
-                    {/* Enhanced Branding Section */}
+                    {/* Enhanced Branding Section - Company logo and branding */}
                     <div className='flex flex-col items-center mb-10'>
                         <div className='relative mb-6'>
                             <div className='absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-green-500 rounded-full blur-lg opacity-75 animate-pulse'></div>
@@ -85,6 +102,8 @@ const UserLogin = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Company tagline and rating display */}
                         <div className='text-center'>
                             <p className="text-lg md:text-xl font-semibold text-white/90 italic tracking-wide">
                                 "Ride Smart. On Time. Every Time."
@@ -100,7 +119,7 @@ const UserLogin = () => {
                         </div>
                     </div>
 
-                    {/* Enhanced Login Form */}
+                    {/* Enhanced Login Form - Main authentication form */}
                     <div className='relative'>
                         <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-3xl blur-xl'></div>
                         <div className='relative bg-white/95 backdrop-blur-xl py-10 px-8 shadow-2xl rounded-3xl border border-white/20'>
@@ -114,6 +133,7 @@ const UserLogin = () => {
                             </div>
 
                             <form onSubmit={(e) => submitHandler(e)} className='space-y-6'>
+                                {/* Email Field - User email input with validation */}
                                 <div className='relative'>
                                     <label className='block text-sm font-bold text-gray-800 mb-3'>
                                         <i className="ri-mail-line mr-2 text-blue-600"></i>
@@ -134,6 +154,7 @@ const UserLogin = () => {
                                     </div>
                                 </div>
 
+                                {/* Password Field - Secure password input */}
                                 <div className='relative'>
                                     <label className='block text-sm font-bold text-gray-800 mb-3'>
                                         <i className="ri-lock-line mr-2 text-purple-600"></i>
@@ -154,6 +175,7 @@ const UserLogin = () => {
                                     </div>
                                 </div>
 
+                                {/* Form Options - Remember me and forgot password */}
                                 <div className='flex items-center justify-between text-sm'>
                                     <label className='flex items-center gap-2 cursor-pointer'>
                                         <input type="checkbox" className='rounded border-gray-300 text-blue-600 focus:ring-blue-500' />
@@ -164,6 +186,7 @@ const UserLogin = () => {
                                     </a>
                                 </div>
 
+                                {/* Submit Button - Login action button */}
                                 <button
                                     type='submit'
                                     className='relative w-full bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl group overflow-hidden'
@@ -176,6 +199,7 @@ const UserLogin = () => {
                                 </button>
                             </form>
 
+                            {/* Registration Link Section - Alternative signup option */}
                             <div className='mt-8'>
                                 <div className='relative'>
                                     <div className='absolute inset-0 flex items-center'>
@@ -195,7 +219,7 @@ const UserLogin = () => {
                         </div>
                     </div>
 
-                    {/* Enhanced Captain Login Link */}
+                    {/* Enhanced Captain Login Link - Driver access point */}
                     <div className='mt-8'>
                         <div className='relative'>
                             <div className='absolute inset-0 bg-gradient-to-r from-green-600/20 to-emerald-600/20 rounded-2xl blur-xl'></div>
@@ -208,9 +232,9 @@ const UserLogin = () => {
                                     <div className='p-2 bg-white/20 rounded-lg'>
                                         <i className="ri-steering-2-line text-xl"></i>
                                     </div>
-                                    <div className='text-left'>
-                                        <div className='font-bold text-lg'>Join as Captain</div>
-                                        <div className='text-sm opacity-90'>Start earning today</div>
+                                    <div>
+                                        <span className='block text-lg font-bold'>Join as Captain</span>
+                                        <span className='block text-sm text-green-100'>Start earning today</span>
                                     </div>
                                 </div>
                             </Link>

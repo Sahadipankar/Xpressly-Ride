@@ -1,17 +1,20 @@
+// Start Page - Landing page with premium branding and user/captain login options
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import XpresslyLogo from '../Components/XpresslyLogo'
 
 const Start = () => {
+    // State for managing page load animation
     const [isLoaded, setIsLoaded] = useState(false)
 
+    // Trigger load animation on component mount
     useEffect(() => {
         setIsLoaded(true)
     }, [])
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
-            {/* Royal Gold Overlay Pattern */}
+            {/* Premium gold overlay pattern for luxury branding */}
             <div className="absolute inset-0 opacity-20">
                 <div className="absolute inset-0" style={{
                     backgroundImage: `

@@ -1,3 +1,11 @@
+/**
+ * CaptainRiding Component
+ * 
+ * Main interface for captains during an active ride. Displays real-time trip information,
+ * passenger details, trip progress, and provides controls for completing the ride.
+ * Features live tracking, trip timer, and quick action buttons for communication.
+ */
+
 import React, { useRef, useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import FinishRide from '../Components/FinishRide'
@@ -7,39 +15,53 @@ import LiveTracking from '../Components/LiveTracking';
 
 
 const CaptainRiding = () => {
+    // Navigation and location hooks
     const navigate = useNavigate()
-    const [finishRidePanel, setFinishRidePanel] = useState(false)
-    const [currentTime, setCurrentTime] = useState(new Date())
-    const [tripDuration, setTripDuration] = useState(0)
-    const [distanceRemaining, setDistanceRemaining] = useState('4 km')
-    const [estimatedTime, setEstimatedTime] = useState('12 min')
-    const [rideStatus, setRideStatus] = useState('in-progress')
-
-    const finishRidePanelRef = useRef(null)
     const location = useLocation()
-    const rideData = location.state?.ride
+    const rideData = location.state?.ride // Ride data passed from previous page
 
+    // Component state management
+    const [finishRidePanel, setFinishRidePanel] = useState(false) // Controls finish ride modal visibility
+    const [currentTime, setCurrentTime] = useState(new Date()) // Current time for trip start display
+    const [tripDuration, setTripDuration] = useState(0) // Trip duration in seconds
+    const [distanceRemaining, setDistanceRemaining] = useState('4 km') // Remaining distance to destination
+    const [estimatedTime, setEstimatedTime] = useState('12 min') // Estimated time to arrival
+    const [rideStatus, setRideStatus] = useState('in-progress') // Current ride status
+
+    // Refs for animations
+    const finishRidePanelRef = useRef(null)
+
+    // Effect to handle trip timer - updates every second
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date())
-            setTripDuration(prev => prev + 1)
+            setTripDuration(prev => prev + 1) // Increment trip duration
         }, 1000)
+
+        // Cleanup timer on component unmount
         return () => clearInterval(timer)
     }, [])
 
+    /**
+     * Format duration from seconds to MM:SS format
+     * @param {number} seconds - Duration in seconds
+     * @returns {string} Formatted time string
+     */
     const formatDuration = (seconds) => {
         const mins = Math.floor(seconds / 60)
         const secs = seconds % 60
         return `${mins}:${secs.toString().padStart(2, '0')}`
     }
 
+    // GSAP animation for finish ride panel
     useGSAP(() => {
         if (finishRidePanel) {
+            // Slide panel up from bottom
             gsap.to(finishRidePanelRef.current, {
                 transform: 'translateY(0)',
             })
-        }
-        else {
+        } else {
+            // Hide panel by sliding down
             gsap.to(finishRidePanelRef.current, {
                 transform: 'translateY(100%)'
             })

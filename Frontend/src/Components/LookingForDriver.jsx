@@ -1,6 +1,15 @@
+/**
+ * LookingForDriver Component
+ * 
+ * Displays loading interface while searching for available drivers.
+ * Shows animated vehicle icon, trip details, and estimated wait time.
+ * Provides user feedback during driver matching process.
+ */
+
 import React from 'react'
 
 const LookingForDriver = (props) => {
+    // Vehicle image mappings for different ride types
     const vehicleImages = {
         Car: "https://www.svgrepo.com/show/408292/car-white.svg",
         Moto: "https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png",

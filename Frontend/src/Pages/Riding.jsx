@@ -1,52 +1,73 @@
+/**
+ * Riding Component
+ * 
+ * Active ride interface displaying real-time trip progress, driver tracking,
+ * and ride completion options. Manages live ride data, payment methods,
+ * and communication with driver during the journey.
+ */
+
 import React, { useState, useEffect, useContext } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { SocketContext } from '../Context/SocketContext'
 import LiveTracking from '../Components/LiveTracking'
 import axios from 'axios'
 
-
 const Riding = () => {
-    const location = useLocation()
+    const location = useLocation() // Get ride data from navigation state
     const { ride } = location.state || {}
-    const { socket } = useContext(SocketContext)
-    const navigate = useNavigate()
-    const [rideStartTime] = useState(new Date())
-    const [currentTime, setCurrentTime] = useState(new Date())
-    const [paymentMethod, setPaymentMethod] = useState('cash')
-    const [isRideCompleted, setIsRideCompleted] = useState(false)
-    const [isWaitingForDriver, setIsWaitingForDriver] = useState(false)
+    const { socket } = useContext(SocketContext) // Real-time communication
+    const navigate = useNavigate() // Navigation for ride completion
+
+    // Ride timing and progress state
+    const [rideStartTime] = useState(new Date()) // Fixed start time
+    const [currentTime, setCurrentTime] = useState(new Date()) // Live clock
+    const [paymentMethod, setPaymentMethod] = useState('cash') // Payment selection
+    const [isRideCompleted, setIsRideCompleted] = useState(false) // Completion status
+    const [isWaitingForDriver, setIsWaitingForDriver] = useState(false) // Driver response state
+
+    // Comprehensive trip data state
     const [tripData, setTripData] = useState({
-        remainingDistance: null,
-        estimatedArrival: null,
-        originalDistance: null,
-        originalDuration: null,
-        distanceInKm: null,
-        averageSpeed: null,
-        currentSpeed: null,
-        trafficCondition: 'normal',
-        trafficIncidents: [],
-        routeAlerts: [],
-        alternativeRoutes: 0,
-        trafficDelay: 0,
-        speedTrend: 'stable'
+        remainingDistance: null, // Distance left to destination
+        estimatedArrival: null, // Calculated arrival time
+        originalDistance: null, // Total trip distance
+        originalDuration: null, // Total trip duration in seconds
+        distanceInKm: null, // Distance in kilometers
+        averageSpeed: null, // Average speed calculation
+        currentSpeed: null, // Real-time speed
+        trafficCondition: 'normal', // Current traffic status
+        trafficIncidents: [], // Traffic incidents array
+        routeAlerts: [], // Route-specific alerts
+        alternativeRoutes: 0, // Number of alternative routes
+        trafficDelay: 0, // Traffic-caused delays
+        speedTrend: 'stable' // Speed trend analysis
     })
-    const [isLoadingTripData, setIsLoadingTripData] = useState(true)
-    const [trafficAlerts, setTrafficAlerts] = useState([])
-    const [showTrafficDetails, setShowTrafficDetails] = useState(true)
-    const [lastUpdate, setLastUpdate] = useState(Date.now())
+
+    // UI state management
+    const [isLoadingTripData, setIsLoadingTripData] = useState(true) // Loading state
+    const [trafficAlerts, setTrafficAlerts] = useState([]) // Traffic notifications
+    const [showTrafficDetails, setShowTrafficDetails] = useState(true) // Traffic panel visibility
+    const [lastUpdate, setLastUpdate] = useState(Date.now()) // Last data update timestamp
+
+    /**
+     * Fetch comprehensive trip data from backend
+     * Gets route information, calculates distances, and sets up trip tracking
+     */
     useEffect(() => {
         const fetchTripData = async () => {
             if (ride?.pickup && ride?.destination) {
                 try {
+                    // Get detailed route information from backend
                     const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/get-fare`, {
                         params: { pickup: ride.pickup, destination: ride.destination },
                         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                     })
 
+                    // Calculate trip metrics from API response
                     const distanceInKm = response.data.distance.value / 1000
                     const durationInSeconds = response.data.duration.value
                     const calculatedAvgSpeed = (distanceInKm / (durationInSeconds / 3600)).toFixed(1)
 
+                    // Set comprehensive trip data
                     setTripData({
                         remainingDistance: response.data.distance.text,
                         estimatedArrival: new Date(Date.now() + durationInSeconds * 1000),
@@ -61,6 +82,7 @@ const Riding = () => {
                         alternativeRoutes: Math.floor(Math.random() * 3) + 1
                     })
                 } catch (error) {
+                    // Fallback data for error scenarios
                     const fallbackDistance = 3.2
                     const fallbackDuration = 720
                     const fallbackAvgSpeed = (fallbackDistance / (fallbackDuration / 3600)).toFixed(1)
@@ -86,101 +108,127 @@ const Riding = () => {
         fetchTripData()
     }, [ride])
 
+    /**
+     * Initialize real-time clock for ride duration tracking
+     * Updates every second to show accurate ride time
+     */
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date())
         }, 1000)
 
-        return () => clearInterval(timer)
+        return () => clearInterval(timer) // Cleanup on unmount
     }, [])
+
+    /**
+     * Update trip progress based on elapsed time
+     * Calculates remaining distance and estimated arrival updates
+     */
     useEffect(() => {
         const updateTripProgress = () => {
             if (tripData.originalDuration && !isRideCompleted) {
-                const elapsedTime = (currentTime - rideStartTime) / 1000
-                const progressPercentage = Math.min(elapsedTime / tripData.originalDuration, 1)
+                // Calculate trip elapsed time and progress percentage
+                const elapsedTime = (currentTime - rideStartTime) / 1000 // Convert to seconds
+                const progressPercentage = Math.min(elapsedTime / tripData.originalDuration, 1) // Limit to 100%
 
-                const baseDistance = tripData.distanceInKm || 3.2
-                const remainingKm = Math.max(baseDistance * (1 - progressPercentage), 0.05)
+                // Calculate remaining distance based on progress
+                const baseDistance = tripData.distanceInKm || 3.2 // Default fallback distance
+                const remainingKm = Math.max(baseDistance * (1 - progressPercentage), 0.05) // Minimum 50m remaining
 
+                // Get dynamic traffic conditions for realistic simulation
                 const trafficMultiplier = simulateTrafficConditions()
 
+                // Set base speed based on vehicle type for realistic calculations
                 const vehicleType = ride?.captain?.vehicle?.vehicleType?.toLowerCase()
-                let baseSpeed = 25
+                let baseSpeed = 25 // Default speed in km/h
 
                 switch (vehicleType) {
                     case 'motorcycle':
                     case 'moto':
-                        baseSpeed = 35
+                        baseSpeed = 35 // Motorcycles are generally faster
                         break
                     case 'car':
-                        baseSpeed = 30
+                        baseSpeed = 30 // Standard car speed
                         break
                     case 'auto':
-                        baseSpeed = 20
+                        baseSpeed = 20 // Auto-rickshaws are slower
                         break
                 }
 
+                // Adjust speed based on traffic conditions
                 let adjustedSpeed = baseSpeed / trafficMultiplier
 
-                const isAdventureMode = Math.random() < 0.25
+                // Adventure mode: Occasionally provide high-speed scenarios
+                const isAdventureMode = Math.random() < 0.25 // 25% chance
                 if (isAdventureMode && trafficMultiplier < 1.0) {
-                    const adventureBoost = 2.0 + Math.random() * 1.5
+                    const adventureBoost = 2.0 + Math.random() * 1.5 // 2x to 3.5x speed boost
                     adjustedSpeed *= adventureBoost
                 }
 
-                const roadConditionFactor = 0.8 + (Math.random() * 0.4)
-                const driverBehaviorFactor = 0.9 + (Math.random() * 0.2)
-                const weatherFactor = Math.random() > 0.85 ? 0.7 : 1.0
+                // Apply realistic road and driving condition factors
+                const roadConditionFactor = 0.8 + (Math.random() * 0.4) // 80% to 120% variation
+                const driverBehaviorFactor = 0.9 + (Math.random() * 0.2) // 90% to 110% variation
+                const weatherFactor = Math.random() > 0.85 ? 0.7 : 1.0 // 15% chance of weather impact
 
                 let currentSpeed = adjustedSpeed * roadConditionFactor * driverBehaviorFactor * weatherFactor
 
-                let maxSpeedCap = 120
+                // Apply vehicle-specific speed limits for realism
+                let maxSpeedCap = 120 // Default maximum speed
                 switch (vehicleType) {
                     case 'motorcycle':
                     case 'moto':
-                        maxSpeedCap = 200
+                        maxSpeedCap = 200 // High speed capability
                         break
                     case 'car':
-                        maxSpeedCap = 180
+                        maxSpeedCap = 180 // Moderate high speed
                         break
                     case 'auto':
-                        maxSpeedCap = 100
+                        maxSpeedCap = 100 // Limited speed capability
                         break
                 }
 
+                // Ensure speed stays within realistic bounds
                 currentSpeed = Math.max(Math.min(currentSpeed, maxSpeedCap), 5)
 
-                const timeToDestination = (remainingKm / currentSpeed) * 3600
+                // Calculate estimated time to destination
+                const timeToDestination = (remainingKm / currentSpeed) * 3600 // Convert to seconds
 
+                // Calculate traffic-based delay buffers for ETA accuracy
                 let trafficDelayBuffer = 0
                 if (trafficMultiplier > 1.2) {
-                    trafficDelayBuffer = (trafficMultiplier - 1) * 200
+                    trafficDelayBuffer = (trafficMultiplier - 1) * 200 // Add delay for heavy traffic
                 } else if (trafficMultiplier < 0.8) {
-                    trafficDelayBuffer = -60
+                    trafficDelayBuffer = -60 // Reduce time for light traffic
                 }
 
-                const randomBuffer = Math.random() * 90 + 30
+                // Add random buffer for realistic ETA variations
+                const randomBuffer = Math.random() * 90 + 30 // 30-120 second buffer
                 const adjustedETA = Math.max(timeToDestination + trafficDelayBuffer + randomBuffer, 60)
 
+                // Determine traffic condition based on current speed
                 let trafficCondition = 'normal'
                 if (currentSpeed < 8) trafficCondition = 'severe'
                 else if (currentSpeed < 15) trafficCondition = 'heavy'
                 else if (currentSpeed < 25) trafficCondition = 'moderate'
                 else if (currentSpeed > 60) trafficCondition = 'light'
 
-                const tripElapsedTime = elapsedTime / 3600
+                // Calculate dynamic average speed for the trip
+                const tripElapsedTime = elapsedTime / 3600 // Convert to hours
                 const distanceTraveled = baseDistance - remainingKm
                 let dynamicAvgSpeed = tripElapsedTime > 0 ? (distanceTraveled / tripElapsedTime) : currentSpeed
 
+                // Smooth average speed calculation using weighted average
                 const previousAvgSpeed = parseFloat(tripData.averageSpeed) || currentSpeed
-                dynamicAvgSpeed = (previousAvgSpeed * 0.7) + (dynamicAvgSpeed * 0.3)
+                dynamicAvgSpeed = (previousAvgSpeed * 0.7) + (dynamicAvgSpeed * 0.3) // 70-30 weighting
 
-                const expectedSpeed = baseSpeed * 1.2
+                // Calculate traffic delay in minutes for user display
+                const expectedSpeed = baseSpeed * 1.2 // Expected optimal speed
                 const trafficDelay = Math.max(0, Math.round(((expectedSpeed - currentSpeed) / expectedSpeed) * 8))
 
+                // Calculate speed trend based on current vs previous speed
                 const speedTrend = tripData.currentSpeed ?
-                    (currentSpeed > tripData.currentSpeed ? 'increasing' :
-                        currentSpeed < tripData.currentSpeed ? 'decreasing' : 'stable') : 'stable'
+                    (currentSpeed > tripData.currentSpeed + 5 ? 'increasing' :
+                        currentSpeed < tripData.currentSpeed - 5 ? 'decreasing' : 'stable') : 'stable'
 
                 // Enhanced traffic alert generation with real-time sync
                 if (trafficCondition === 'heavy' || trafficCondition === 'severe') {
@@ -670,6 +718,10 @@ const Riding = () => {
                                     {ride?.captain?.fullname?.firstname} {ride?.captain?.fullname?.lastname}
                                 </h2>
                                 <div className="flex items-center gap-3 mt-1">
+                                    <div className="flex items-center gap-1 text-gray-600">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <span>Online</span>
+                                    </div>
                                     <div className="flex items-center gap-1">
                                         <span className="text-yellow-500">
                                             <i className="ri-star-fill text-sm"></i>

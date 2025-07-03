@@ -1,3 +1,11 @@
+/**
+ * FinishRide Component
+ * 
+ * Interface for captains to complete rides and confirm payment.
+ * Displays trip summary, payment confirmation, and completion actions.
+ * Handles ride ending API calls and navigation back to dashboard.
+ */
+
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
@@ -5,32 +13,44 @@ import { useNavigate } from 'react-router-dom'
 
 
 const FinishRide = (props) => {
+    // Navigation hook and component state
     const navigate = useNavigate()
-    const [isCompleting, setIsCompleting] = useState(false)
-    const [paymentConfirmed, setPaymentConfirmed] = useState(false)
+    const [isCompleting, setIsCompleting] = useState(false) // Loading state during ride completion
+    const [paymentConfirmed, setPaymentConfirmed] = useState(false) // Payment confirmation status
 
+    /**
+     * Handle ride completion process
+     * - Validates payment confirmation
+     * - Makes API call to end ride
+     * - Navigates back to captain dashboard
+     */
     async function endRide() {
+        // Ensure payment is confirmed before proceeding
         if (!paymentConfirmed) {
             alert('Please confirm that you have received the payment before finishing the ride.')
             return
         }
 
-        setIsCompleting(true)
+        setIsCompleting(true) // Show loading state
         try {
+            // API call to end the ride
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/end-ride`, {
-                rideId: props.ride._id
+                rideId: props.ride._id // Send ride ID for completion
             }, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    Authorization: `Bearer ${localStorage.getItem('token')}` // Auth token for API access
                 }
             })
 
+            // Handle successful ride completion
             if (response.status === 200) {
+                // Delay navigation to show completion animation
                 setTimeout(() => {
                     navigate('/captain-dashboard')
                 }, 1500)
             }
         } catch (error) {
+            // Handle errors during ride completion
             setIsCompleting(false)
             alert('Error finishing ride. Please try again.')
         }

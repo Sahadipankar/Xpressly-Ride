@@ -1,11 +1,18 @@
-const mongoose = require('mongoose');   // Import Mongoose for MongoDB object modeling
-const bcrypt = require('bcrypt');       // Import bcrypt for password hashing
-const jwt = require('jsonwebtoken');    // Import jsonwebtoken for creating JWTs
+/**
+ * Captain Model
+ * 
+ * Mongoose schema for captain (driver) authentication and profile management.
+ * Includes vehicle details, location tracking, status management, and security features.
+ * Used for driver registration, login, ride assignment, and location services.
+ */
 
+const mongoose = require('mongoose'); // MongoDB object modeling library
+const bcrypt = require('bcrypt'); // Password hashing utility
+const jwt = require('jsonwebtoken'); // JWT token creation and verification
 
-const captainSchema = new mongoose.Schema({     // Define the captain schema
-
-    fullname: {     // Nested schema for full name
+// Captain schema definition with comprehensive validation
+const captainSchema = new mongoose.Schema({
+    fullname: {
         firstname: {
             type: String,
             required: true,
@@ -16,28 +23,28 @@ const captainSchema = new mongoose.Schema({     // Define the captain schema
             minlength: [3, 'Last name must be at least 3 characters long'],
         }
     },
-    email: {        // Email field with validation
+    email: {
         type: String,
         required: true,
-        unique: true,
-        lowercase: true,
+        unique: true, // Ensure unique email addresses
+        lowercase: true, // Store emails in lowercase
         match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Please fill a valid email address'],
     },
-    password: {     // Password field with validation
+    password: {
         type: String,
         required: true,
-        select: false,
+        select: false, // Exclude password from queries by default for security
         minlength: [6, 'Password must be at least 6 characters long'],
     },
-    socketId: {     // Optional field for storing socket ID
-        type: String,
+    socketId: {
+        type: String, // Store real-time connection ID for live tracking
     },
-    status: {      // Status field with validation
+    status: {
         type: String,
-        enum: ['active', 'inactive'],
+        enum: ['active', 'inactive'], // Captain availability status
         default: 'inactive',
     },
-    vehicle: {      // Nested schema for vehicle details
+    vehicle: {
         color: {
             type: String,
             required: true,
@@ -47,47 +54,56 @@ const captainSchema = new mongoose.Schema({     // Define the captain schema
             type: String,
             required: true,
             minlength: [3, 'Plate must be at least 3 characters long'],
-            unique: true,
+            unique: true, // Ensure unique license plates
         },
         capacity: {
             type: Number,
             required: true,
-            min: [1, 'Capacity must be at least 1'],
+            min: [1, 'Capacity must be at least 1'], // Minimum passenger capacity
         },
         vehicleType: {
             type: String,
             required: true,
-            enum: ['Car', 'Auto', 'Moto'],
+            enum: ['Car', 'Auto', 'Moto'], // Supported vehicle types
         },
     },
-    location: {     // Nested schema for location details
+    location: {
         ltd: {
-            type: Number,
+            type: Number, // Latitude coordinate for GPS tracking
         },
         lng: {
-            type: Number,
+            type: Number, // Longitude coordinate for GPS tracking
         },
     }
 })
 
-
-captainSchema.methods.generateAuthToken = function () { // Method to generate JWT token for authentication
+/**
+ * Generate JWT authentication token for captain
+ * @returns {string} JWT token with 24-hour expiration
+ */
+captainSchema.methods.generateAuthToken = function () {
     const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     return token;
 };
 
-
-captainSchema.methods.comparePassword = async function (password) { // Method to compare password with hashed password
+/**
+ * Compare provided password with stored hashed password
+ * @param {string} password - Plain text password to verify
+ * @returns {boolean} True if password matches, false otherwise
+ */
+captainSchema.methods.comparePassword = async function (password) {
     return await bcrypt.compare(password, this.password);
 }
 
-
-captainSchema.statics.hashPassword = async function (password) {    // Static method to hash password
+/**
+ * Static method to hash password before storing
+ * @param {string} password - Plain text password to hash
+ * @returns {string} Hashed password with salt rounds of 10
+ */
+captainSchema.statics.hashPassword = async function (password) {
     return await bcrypt.hash(password, 10);
 }
 
-
-const captainModel = mongoose.model('captain', captainSchema);  // Create a Mongoose model for the captain schema
-
-
-module.exports = captainModel;  // Export the captain model for use in other files
+// Create and export captain model
+const captainModel = mongoose.model('captain', captainSchema);
+module.exports = captainModel;

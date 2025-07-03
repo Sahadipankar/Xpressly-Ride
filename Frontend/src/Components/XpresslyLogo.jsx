@@ -1,10 +1,19 @@
+/**
+ * XpresslyLogo Component
+ * 
+ * Customizable logo component for the Xpressly ride-sharing application.
+ * Supports different variants (default, text, icon) and styling options.
+ * Features gradient designs and animated elements for modern appearance.
+ */
+
 import React from 'react'
 
 const XpresslyLogo = ({
-    className = "w-10 h-10",
-    variant = "default",
-    showText = false
+    className = "w-10 h-10", // CSS classes for styling and sizing
+    variant = "default", // Logo variant: "default", "text", or "icon"
+    showText = false // Whether to display text alongside the logo
 }) => {
+    // Render logo with text variant
     if (variant === "text" || showText) {
         return (
             <div className={`flex items-center ${className}`}>

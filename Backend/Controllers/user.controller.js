@@ -1,23 +1,35 @@
+// User Controller - handles user authentication and account management
 const userModel = require('../Models/user.model');
 const userService = require('../Services/user.service');
 const { validationResult } = require('express-validator');
 const blackListTokenModel = require('../Models/blacklistToken.model');
 
+/**
+ * Register new user account
+ * @param {Object} req - Express request object containing user registration data
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
 module.exports.registerUser = async (req, res, next) => {
+    // Validate request data using express-validator
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
+
+    // Extract user data from request body
     const { fullname, email, password } = req.body;
 
+    // Check if user already exists with this email
     const isUserAlreadyExist = await userModel.findOne({ email });
-
     if (isUserAlreadyExist) {
         return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Hash password for security before storing
     const hashedPassword = await userModel.hashPassword(password);
 
+    // Create new user using service layer
     const user = await userService.createUser({
         firstname: fullname.firstname,
         lastname: fullname.lastname,
@@ -25,8 +37,10 @@ module.exports.registerUser = async (req, res, next) => {
         password: hashedPassword,
     });
 
+    // Generate JWT token for authentication
     const token = user.generateAuthToken();
 
+    // Return success response with token and user data
     res.status(201).json({ token, user });  // Return a 201 status with the token and user data
 }
 

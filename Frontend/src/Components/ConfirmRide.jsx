@@ -1,12 +1,32 @@
+/**
+ * ConfirmRide Component
+ * 
+ * Final ride confirmation interface displaying selected vehicle details,
+ * trip information, fare breakdown, and booking confirmation.
+ * Provides comprehensive ride summary before final booking submission.
+ */
+
 import React from 'react'
 
+/**
+ * Ride confirmation component
+ * @param {Object} props - Component props
+ * @param {Function} props.setConfirmRidePanel - Controls panel visibility
+ * @param {string} props.vehicleType - Selected vehicle type (Car/Moto/Auto)
+ * @param {string} props.pickup - Pickup location address
+ * @param {string} props.destination - Destination address
+ * @param {Object} props.fare - Fare information object
+ * @param {Function} props.createRide - Function to create ride booking
+ */
 const ConfirmRide = (props) => {
+    // Vehicle image mappings for different ride types
     const vehicleImages = {
         Car: "https://www.svgrepo.com/show/408292/car-white.svg",
         Moto: "https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png",
         Auto: "https://clipart-library.com/2023/Uber_Auto_312x208_pixels_Mobile.png"
     };
 
+    // Vehicle-specific color themes for UI consistency
     const vehicleColors = {
         Car: 'from-blue-50 to-blue-100',
         Moto: 'from-orange-50 to-orange-100',
@@ -15,12 +35,12 @@ const ConfirmRide = (props) => {
 
     return (
         <div className="relative h-full flex flex-col bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-            {/* Header with close button */}
+            {/* Header with close button - Panel navigation */}
             <div className="flex-shrink-0 bg-white/90 backdrop-blur-sm border-b border-gray-100 px-6 py-4 z-10">
                 <button
                     className='absolute top-4 left-1/2 transform -translate-x-1/2 p-2 rounded-full hover:bg-gray-100 transition-all duration-200'
                     onClick={() => {
-                        props.setConfirmRidePanel(false);
+                        props.setConfirmRidePanel(false); // Close confirmation panel
                     }}
                 >
                     <i className="text-2xl text-gray-400 hover:text-gray-600 ri-arrow-down-wide-line"></i>
@@ -29,8 +49,9 @@ const ConfirmRide = (props) => {
                 <p className='text-sm text-gray-500 text-center mt-1'>Review your trip details</p>
             </div>
 
+            {/* Main Content - Scrollable ride details */}
             <div className='flex-1 px-4 py-4 space-y-4 overflow-y-auto min-h-0'>
-                {/* Selected Vehicle Card */}
+                {/* Selected Vehicle Card - Shows chosen vehicle details */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-100">
                         <h4 className="text-lg font-semibold text-gray-800">Selected Vehicle</h4>
@@ -63,13 +84,13 @@ const ConfirmRide = (props) => {
                     </div>
                 </div>
 
-                {/* Trip Details Card */}
+                {/* Trip Details Card - Route information display */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-100">
                         <h4 className="text-lg font-semibold text-gray-800">Trip Details</h4>
                     </div>
                     <div className="p-6 space-y-4">
-                        {/* Pickup Location */}
+                        {/* Pickup Location - Starting point */}
                         <div className='flex items-start gap-4'>
                             <div className="flex-shrink-0 mt-1">
                                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -82,10 +103,10 @@ const ConfirmRide = (props) => {
                             </div>
                         </div>
 
-                        {/* Route Line */}
+                        {/* Route Line - Visual separator between pickup and destination */}
                         <div className="ml-5 border-l-2 border-dashed border-gray-300 h-6"></div>
 
-                        {/* Destination */}
+                        {/* Destination - End point */}
                         <div className='flex items-start gap-4'>
                             <div className="flex-shrink-0 mt-1">
                                 <div className="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -100,7 +121,7 @@ const ConfirmRide = (props) => {
                     </div>
                 </div>
 
-                {/* Fare & Payment Card */}
+                {/* Fare & Payment Card - Payment information and fare estimate */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="bg-gradient-to-r from-green-50 to-green-100 px-6 py-4 border-b border-green-200">
                         <h4 className="text-lg font-semibold text-green-800">Fare & Payment</h4>
@@ -127,7 +148,7 @@ const ConfirmRide = (props) => {
                 </div>
             </div>
 
-            {/* Confirm Button */}
+            {/* Confirm Button - Finalize ride booking */}
             <div className="flex-shrink-0 px-4 py-4 bg-white border-t border-gray-100">
                 <button
                     onClick={() => {

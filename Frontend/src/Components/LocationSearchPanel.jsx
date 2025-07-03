@@ -1,14 +1,27 @@
+// Location Search Panel - Handles location suggestions and recent locations for ride booking
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
+/**
+ * LocationSearchPanel Component
+ * @param {Array} suggestions - Array of location suggestions from API
+ * @param {Function} setVehiclePanel - Function to control vehicle panel visibility
+ * @param {Function} setPanelOpen - Function to control panel open state
+ * @param {Function} setPickup - Function to set pickup location
+ * @param {Function} setDestination - Function to set destination location  
+ * @param {String} activeField - Current active field ('pickup' or 'destination')
+ */
 const LocationSearchPanel = ({ suggestions, setVehiclePanel, setPanelOpen, setPickup, setDestination, activeField }) => {
+    // State for managing recent locations
     const [recentLocations, setRecentLocations] = useState([])
 
+    // Load recent locations from localStorage on component mount
     useEffect(() => {
         const savedLocations = localStorage.getItem('recentLocations')
         if (savedLocations) {
             setRecentLocations(JSON.parse(savedLocations))
         } else {
+            // Set default recent locations if none exist
             setRecentLocations([
                 "Brainware University",
                 "Baguiati, VIP Road, Kolkata",
@@ -18,18 +31,23 @@ const LocationSearchPanel = ({ suggestions, setVehiclePanel, setPanelOpen, setPi
         }
     }, [])
 
+    // Handle selection of a location suggestion
     const handleSuggestionClick = (suggestion) => {
+        // Set the selected location to appropriate field based on activeField
         if (activeField === 'pickup') {
             setPickup(suggestion)
         } else if (activeField === 'destination') {
             setDestination(suggestion)
         }
+        // Add to recent locations and close panel
         addToRecentLocations(suggestion)
         setPanelOpen(false)
     }
 
+    // Add location to recent locations list and persist to localStorage
     const addToRecentLocations = (location) => {
-        const updatedLocations = [location, ...recentLocations.filter(loc => loc !== location)].slice(0, 2)
+        // Remove duplicates and limit to 3 recent locations
+        const updatedLocations = [location, ...recentLocations.filter(loc => loc !== location)].slice(0, 3)
         setRecentLocations(updatedLocations)
         localStorage.setItem('recentLocations', JSON.stringify(updatedLocations))
     }

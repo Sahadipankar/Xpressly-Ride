@@ -1,3 +1,11 @@
+/**
+ * ConfirmRidePopUp Component
+ * 
+ * Modal for captains to confirm and start accepted rides using OTP verification.
+ * Displays passenger details, ride information, and OTP input form.
+ * Handles ride start API call and navigation to active ride screen.
+ */
+
 import React from 'react'
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -6,27 +14,33 @@ import { useNavigate } from 'react-router-dom'
 
 
 const ConfirmRidePopUp = (props) => {
-
-    const [otp, setOtp] = useState('')
+    // Component state and navigation
+    const [otp, setOtp] = useState('') // OTP entered by captain
     const navigate = useNavigate()
 
+    /**
+     * Handle ride start with OTP verification
+     * @param {Event} e - Form submit event
+     */
     const submitHandler = async (e) => {
         e.preventDefault()
 
+        // API call to start ride with OTP verification
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/start-ride`, {
             params: {
-                rideId: props.ride._id,
-                otp: otp
+                rideId: props.ride._id, // Current ride ID
+                otp: otp // OTP for verification
             },
             headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
+                Authorization: `Bearer ${localStorage.getItem('token')}` // Auth token
             }
         })
 
+        // Handle successful ride start
         if (response.status === 200) {
-            props.setConfirmRidePopUpPanel(false)
-            props.setRidePopUpPanel(false)
-            navigate('/captain-riding', { state: { ride: props.ride } })
+            props.setConfirmRidePopUpPanel(false) // Close confirmation popup
+            props.setRidePopUpPanel(false) // Close ride popup
+            navigate('/captain-riding', { state: { ride: props.ride } }) // Navigate to active ride screen
         }
     }
 

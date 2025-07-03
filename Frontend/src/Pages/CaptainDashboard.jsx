@@ -1,3 +1,11 @@
+/**
+ * CaptainDashboard Component
+ * 
+ * Main dashboard interface for captain/driver operations in Xpressly.
+ * Manages real-time location tracking, ride requests, status updates,
+ * and provides comprehensive captain tools and information display.
+ */
+
 import React, { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import CaptainDetails from '../Components/CaptainDetails'
@@ -15,28 +23,40 @@ import axios from 'axios'
 
 
 const CaptainDashboard = () => {
-    const navigate = useNavigate()
-    const [ridePopUpPanel, setRidePopUpPanel] = useState(false);
-    const [confirmRidePopUpPanel, setConfirmRidePopUpPanel] = useState(false);
-    const [isOnline, setIsOnline] = useState(true);
-    const [currentTime, setCurrentTime] = useState(new Date());
-    const [refreshing, setRefreshing] = useState(false);
+    const navigate = useNavigate() // Navigation hook for route management
 
+    // State management for dashboard functionality
+    const [ridePopUpPanel, setRidePopUpPanel] = useState(false); // Controls ride request popup
+    const [confirmRidePopUpPanel, setConfirmRidePopUpPanel] = useState(false); // Controls ride confirmation popup
+    const [isOnline, setIsOnline] = useState(true); // Captain online/offline status
+    const [currentTime, setCurrentTime] = useState(new Date()); // Real-time clock display
+    const [refreshing, setRefreshing] = useState(false); // Dashboard refresh state
+
+    // Refs for popup panel animations
     const ridePopUpPanelRef = useRef(null)
     const confirmRidePopUpPanelRef = useRef(null)
-    const [ride, setRide] = useState(null)
+    const [ride, setRide] = useState(null) // Current ride request data
 
-    const { socket } = useContext(SocketContext)
-    const { captain } = useContext(CaptainDataContext)
+    // Context hooks for global state access
+    const { socket } = useContext(SocketContext) // Real-time communication
+    const { captain } = useContext(CaptainDataContext) // Captain profile data
 
+    /**
+     * Initialize real-time clock update
+     * Updates dashboard time display every second
+     */
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date())
         }, 1000)
 
-        return () => clearInterval(timer)
+        return () => clearInterval(timer) // Cleanup on unmount
     }, [])
 
+    /**
+     * Handle dashboard refresh with loading animation
+     * Provides visual feedback during page reload
+     */
     const handleRefresh = () => {
         setRefreshing(true)
         setTimeout(() => {
@@ -45,20 +65,33 @@ const CaptainDashboard = () => {
         }, 1000)
     }
 
+    /**
+     * Handle captain logout
+     * Clears authentication token and redirects to login
+     */
     const handleLogout = () => {
         localStorage.removeItem('token')
         navigate('/captain-login')
     }
 
+    /**
+     * Initialize socket connection and location tracking
+     * Sets up real-time communication and GPS updates
+     */
     useEffect(() => {
+        // Join captain to socket room for targeted messaging
         socket.emit('join', {
             userId: captain._id,
             userType: 'captain'
         })
+
+        /**
+         * Location update function
+         * Sends captain's current GPS coordinates to server
+         */
         const updateLocation = () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
-
                     socket.emit('update-location-captain', {
                         userId: captain._id,
                         location: {
@@ -70,19 +103,31 @@ const CaptainDashboard = () => {
             }
         }
 
+        // Update location every 10 seconds for real-time tracking
         const locationInterval = setInterval(updateLocation, 10000)
-        updateLocation()
+        updateLocation() // Initial location update
+
+        return () => clearInterval(locationInterval) // Cleanup on unmount
     }, [])
 
+    /**
+     * Listen for new ride requests
+     * Handles incoming ride notifications from users
+     */
     socket.on('new-ride', (data) => {
 
-        setRide(data)
-        setRidePopUpPanel(true)
+        setRide(data) // Store ride request data
+        setRidePopUpPanel(true) // Show ride request popup
     })
 
 
+    /**
+     * Confirm ride acceptance
+     * Sends confirmation to backend and updates UI state
+     */
     async function confirmRide() {
 
+        // Send ride confirmation to backend API
         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm`, {
 
             rideId: ride._id,
@@ -95,6 +140,7 @@ const CaptainDashboard = () => {
             }
         })
 
+        // Update UI state after successful confirmation
         setRidePopUpPanel(false)
         setConfirmRidePopUpPanel(true)
 

@@ -1,25 +1,44 @@
+/**
+ * CaptainDetails Component
+ * 
+ * Comprehensive dashboard displaying captain's profile, real-time statistics,
+ * earnings data, and operational status. Features dynamic stats generation,
+ * notification system, and toggle for online/offline status.
+ */
+
 import React, { useContext, useState, useEffect, useMemo } from 'react'
 import { CaptainDataContext } from '../Context/CaptainContext'
 
-const CaptainDetails = ({ isOnline = true, setIsOnline, isConnected = true, locationError = null }) => {
+const CaptainDetails = ({
+    isOnline = true, // Captain's online status
+    setIsOnline, // Function to toggle online status
+    isConnected = true, // Network connection status
+    locationError = null // Any location-related errors
+}) => {
+    // Context and state management
+    const { captain } = useContext(CaptainDataContext) // Captain data from context
+    const [currentTime, setCurrentTime] = useState(new Date()) // Current time for dashboard
+    const [sessionStats, setSessionStats] = useState(null) // Session statistics
 
-    const { captain } = useContext(CaptainDataContext)
-    const [currentTime, setCurrentTime] = useState(new Date())
-    const [sessionStats, setSessionStats] = useState(null)
+    // Notification system for captain updates
     const [notifications, setNotifications] = useState([
         { id: 1, type: 'earnings', message: 'Daily goal 80% complete!', time: '2 min ago', icon: 'ri-award-line' },
         { id: 2, type: 'info', message: 'Peak hours starting soon', time: '5 min ago', icon: 'ri-time-line' }
     ])
 
+    // Effect to update current time every second
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date())
         }, 1000)
 
+        // Cleanup timer on component unmount
         return () => clearInterval(timer)
     }, [])
 
+    // Memoized dynamic statistics generation for realistic dashboard data
     const dynamicStats = useMemo(() => {
+        // Generate realistic random statistics
         const baseEarnings = Math.floor(Math.random() * 500) + 600;
         const hoursOnline = (Math.random() * 6 + 2).toFixed(1);
         const totalRides = Math.floor(Math.random() * 15) + 8;
@@ -42,7 +61,7 @@ const CaptainDetails = ({ isOnline = true, setIsOnline, isConnected = true, loca
         }
     }, [])
 
-    // Set stats on component mount
+    // Effect to set initial statistics on component mount
     useEffect(() => {
         if (!sessionStats) {
             setSessionStats(dynamicStats)

@@ -1,3 +1,4 @@
+// Home Page - Main user dashboard for ride booking and management
 import React, { useEffect, useRef, useState, useContext } from 'react'
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -14,33 +15,36 @@ import { UserDataContext } from '../Context/UserContext';
 import { useNavigate, Link } from 'react-router-dom';
 import LiveTracking from '../Components/LiveTracking';
 
-
-
-
 const Home = () => {
-
+    // Location and ride booking state
     const [pickup, setPickup] = useState("");
     const [destination, setDestination] = useState("");
     const [panelOpen, setPanelOpen] = useState(false);
+
+    // Refs for GSAP panel animations
     const vehiclePanelRef = useRef(null)
     const confirmRidePanelRef = useRef(null);
     const vehicleFoundRef = useRef(null);
     const waitingForDriverRef = useRef(null);
-
     const panelOpenRef = useRef(null);
     const panelCloseRef = useRef(null);
+
+    // Panel visibility states
     const [vehiclePanel, setVehiclePanel] = useState(false)
     const [confirmRidePanel, setConfirmRidePanel] = useState(false)
-
     const [vehicleFound, setVehicleFound] = useState(false)
     const [waitingForDriver, setWaitingForDriver] = useState(false)
 
-
+    // Suggestions and active field state
     const [pickupSuggestions, setPickupSuggestions] = useState([])
     const [destinationSuggestions, setDestinationSuggestions] = useState([])
     const [activeField, setActiveField] = useState(null)
+
+    // Fare and vehicle type state
     const [fare, setFare] = useState({})
     const [vehicleType, setVehicleType] = useState(null)
+
+    // Ride and location state
     const [ride, setRide] = useState(null)
     const [gettingCurrentLocation, setGettingCurrentLocation] = useState(false)
     const [refreshing, setRefreshing] = useState(false)
@@ -179,6 +183,7 @@ const Home = () => {
         e.preventDefault();
     }
 
+    // GSAP animations for panel transitions
     useGSAP(() => {
         if (panelOpen) {
             gsap.to(panelOpenRef.current, {
@@ -347,7 +352,7 @@ const Home = () => {
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                     e.target.onerror = null;
-                                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM5Q0E3RjQiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHlsZT0idHJhbnNmb3JtOiB0cmFuc2xhdGUoOHB4LCA4cHgpOyI+CjxwYXRoIGQ9Ik0xMiAyQzEzLjEgMiAxNCAyLjkgMTQgNEMxNCA1LjEgMTMuMSA2IDEyIDZDMTAuOSA2IDEwIDUuMSAxMCA0QzEwIDIuOSAxMC45IDIgMTIgMloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMSAyMlYyMEMxOSAxNi45IDE2IDE1IDEyIDE1QzggMTUgNSAxNi45IDMgMjBWMjJIMjFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+';
+                                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM5Q0E3RjQiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHlsZT0idHJhbnNmb3JtOiB0cmFuc2xhdGUoOHB4LCA4cHgpOyI+CjxwYXRoIGQ9Ik0xMiAyQzEzLjEgMiAxNCAyLjkgMTQgNEMxNCA1LjEgMTMuMSA2IDEyIDZDMTAuOSA2IDEwIDUuMSAxMCA0QzEwIDIuOSAxMC45IDIgMTIgMloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMSAyMlYyMEMxOSAxNi45IDE2IDE1IDEyIDE1QzggMTUgNSAxNi45IDMgMjBWMjJIMjFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+';
                                 }}
                             />
                         </div>

@@ -1,14 +1,31 @@
+/**
+ * VehiclePanel Component
+ * 
+ * Interactive vehicle selection panel for ride booking.
+ * Displays available vehicle types (Car, Moto, Auto) with pricing,
+ * estimated arrival times, and detailed vehicle information.
+ * Handles vehicle selection and proceeds to ride confirmation.
+ */
+
 import React from 'react'
 
+/**
+ * Vehicle selection panel component
+ * @param {Object} props - Component props
+ * @param {Function} props.setVehiclePanel - Controls panel visibility
+ * @param {Function} props.setConfirmRidePanel - Opens ride confirmation panel
+ * @param {Function} props.selectVehicle - Handles vehicle selection
+ * @param {Object} props.fare - Contains fare information for different vehicle types
+ */
 const VehiclePanel = (props) => {
     return (
         <div className="relative h-full flex flex-col bg-gradient-to-b from-gray-50 to-white">
-            {/* Header with close button */}
+            {/* Header with close button - Panel navigation controls */}
             <div className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-gray-100 px-6 py-4 z-10">
                 <button
                     className='absolute top-4 left-1/2 transform -translate-x-1/2 p-2 rounded-full hover:bg-gray-100 transition-all duration-200'
                     onClick={() => {
-                        props.setVehiclePanel(false);
+                        props.setVehiclePanel(false); // Close vehicle selection panel
                     }}
                 >
                     <i className="text-2xl text-gray-400 hover:text-gray-600 ri-arrow-down-wide-line"></i>
@@ -17,12 +34,12 @@ const VehiclePanel = (props) => {
                 <p className='text-sm text-gray-500 text-center mt-1'>Select the perfect vehicle for your journey</p>
             </div>
 
-            {/* Vehicle Options */}
+            {/* Vehicle Options - Available ride types with details */}
             <div className="flex-1 px-4 py-6 space-y-4 overflow-y-auto">
-                {/* Car Option */}
+                {/* Car Option - Premium vehicle choice */}
                 <div onClick={() => {
-                    props.setConfirmRidePanel(true);
-                    props.selectVehicle('Car')
+                    props.setConfirmRidePanel(true); // Open confirmation panel
+                    props.selectVehicle('Car') // Set selected vehicle type
                 }} className='group relative bg-white rounded-2xl border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden'>
                     <div className="absolute inset-0 bg-gradient-to-r from-green-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className='relative flex items-center p-5'>
@@ -55,7 +72,7 @@ const VehiclePanel = (props) => {
                     </div>
                 </div>
 
-                {/* Moto Option */}
+                {/* Moto Option - Quick transportation choice */}
                 <div onClick={() => {
                     props.setConfirmRidePanel(true);
                     props.selectVehicle('Moto')
@@ -91,7 +108,7 @@ const VehiclePanel = (props) => {
                     </div>
                 </div>
 
-                {/* Auto Option */}
+                {/* Auto Option - Budget-friendly choice */}
                 <div onClick={() => {
                     props.setConfirmRidePanel(true);
                     props.selectVehicle('Auto')
@@ -128,7 +145,7 @@ const VehiclePanel = (props) => {
                 </div>
             </div>
 
-            {/* Footer tip */}
+            {/* Footer tip - User guidance information */}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
                 <div className="flex items-center justify-center text-sm text-gray-500">
                     <i className="ri-information-line mr-2"></i>

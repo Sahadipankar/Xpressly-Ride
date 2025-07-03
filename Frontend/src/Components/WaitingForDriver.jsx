@@ -1,6 +1,21 @@
+/**
+ * WaitingForDriver Component
+ * 
+ * Displays driver information and trip details while user waits for pickup.
+ * Shows driver profile, vehicle details, OTP for verification, and real-time
+ * trip information. Provides communication options and trip tracking.
+ */
+
 import React from 'react'
 
+/**
+ * Driver waiting screen component
+ * @param {Object} props - Component props
+ * @param {Function} props.setWaitingForDriver - Controls component visibility
+ * @param {Object} props.ride - Complete ride information including captain and trip details
+ */
 const WaitingForDriver = (props) => {
+    // Vehicle image mappings for different ride types
     const vehicleImages = {
         XpressGo: "https://www.svgrepo.com/show/408292/car-white.svg",
         XpressMoto: "https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_956,h_638/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png",
@@ -9,11 +24,11 @@ const WaitingForDriver = (props) => {
 
     return (
         <div className="p-4 h-full flex flex-col bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-            {/* Enhanced Header */}
+            {/* Enhanced Header - Navigation and status display */}
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
                 <button
                     className='p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105'
-                    onClick={() => props.setWaitingForDriver(false)}
+                    onClick={() => props.setWaitingForDriver(false)} // Close waiting screen
                 >
                     <i className="text-xl text-gray-600 ri-arrow-down-line"></i>
                 </button>
@@ -23,13 +38,13 @@ const WaitingForDriver = (props) => {
                     <p className="text-sm text-green-600 font-medium">On the way to pickup</p>
                 </div>
 
-                <div className="w-12"></div> {/* Spacer for centering */}
+                <div className="w-12"></div> {/* Spacer for header centering */}
             </div>
 
-            {/* Enhanced Driver Card */}
+            {/* Enhanced Driver Card - Complete driver and vehicle information */}
             <div className="bg-white rounded-2xl shadow-xl p-5 mb-4 flex-shrink-0">
                 <div className="flex items-center gap-4">
-                    {/* Driver Avatar */}
+                    {/* Driver Avatar - Profile picture with verification badge */}
                     <div className="relative">
                         <img
                             className='w-16 h-16 rounded-full object-cover border-2 border-green-400 shadow-lg'
@@ -41,7 +56,7 @@ const WaitingForDriver = (props) => {
                         </div>
                     </div>
 
-                    {/* Driver Info */}
+                    {/* Driver Info - Name, vehicle, and rating details */}
                     <div className="flex-1 min-w-0">
                         <h4 className='text-lg font-bold text-gray-800 truncate'>
                             {props.ride?.captain?.fullname?.firstname} {props.ride?.captain?.fullname?.lastname}
@@ -66,7 +81,7 @@ const WaitingForDriver = (props) => {
                         </div>
                     </div>
 
-                    {/* Vehicle Image */}
+                    {/* Vehicle Image - Visual representation of vehicle type */}
                     <div className="flex-shrink-0">
                         <img
                             className='h-12 w-12 object-contain'
@@ -76,7 +91,7 @@ const WaitingForDriver = (props) => {
                     </div>
                 </div>
 
-                {/* OTP Section */}
+                {/* OTP Section - Security verification code for ride start */}
                 <div className="mt-4 p-4 bg-gradient-to-r from-green-100 to-emerald-100 rounded-xl border border-green-200">
                     <div className="flex items-center justify-between">
                         <div>
@@ -92,7 +107,7 @@ const WaitingForDriver = (props) => {
                 </div>
             </div>
 
-            {/* Enhanced Trip Details */}
+            {/* Enhanced Trip Details - Comprehensive trip information */}
             <div className='bg-white rounded-2xl shadow-xl p-4 flex-1 overflow-y-auto'>
                 <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <i className="ri-route-line text-green-600"></i>
@@ -134,7 +149,7 @@ const WaitingForDriver = (props) => {
                     </div>
                 </div>
 
-                {/* Action Buttons */}
+                {/* Action Buttons - Driver communication and trip options */}
                 <div className="mt-6 space-y-3">
                     <div className="bg-green-50 p-4 rounded-xl border border-green-200">
                         <div className="flex items-center gap-3">

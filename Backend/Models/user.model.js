@@ -1,10 +1,17 @@
-const mongoose = require('mongoose');   // Import Mongoose for MongoDB object modeling
-const bcrypt = require('bcrypt');     // Import bcrypt for password hashing   
-const jwt = require('jsonwebtoken');    // Import jsonwebtoken for creating JWTs
+/**
+ * User Model
+ * 
+ * Mongoose schema for user authentication and profile management.
+ * Includes password hashing, JWT token generation, and user validation.
+ * Used for passenger registration, login, and session management.
+ */
 
+const mongoose = require('mongoose'); // MongoDB object modeling library
+const bcrypt = require('bcrypt'); // Password hashing utility
+const jwt = require('jsonwebtoken'); // JWT token creation and verification
 
-
-const userSchema = new mongoose.Schema({    // Define the user schema
+// User schema definition with validation rules
+const userSchema = new mongoose.Schema({
     fullname: {
         firstname: {
             type: String,
@@ -19,35 +26,46 @@ const userSchema = new mongoose.Schema({    // Define the user schema
     email: {
         type: String,
         required: true,
-        unique: true,
+        unique: true, // Ensure unique email addresses
         minlength: [5, "Email must be at least 5 characters long"],
     },
     password: {
         type: String,
         required: true,
-        select: false,  // Exclude password from queries by default
+        select: false, // Exclude password from queries by default for security
     },
-    socketId: {  // Optional field for storing socket ID
-        type: String,
+    socketId: {
+        type: String, // Store real-time connection ID for live features
     },
 });
 
-
-userSchema.methods.generateAuthToken = function () {    // Method to generate JWT token
+/**
+ * Generate JWT authentication token for user
+ * @returns {string} JWT token with 24-hour expiration
+ */
+userSchema.methods.generateAuthToken = function () {
     const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     return token;
 }
 
-userSchema.methods.comparePassword = async function (password) {  // Method to compare password with hashed password
-    return await bcrypt.compare(password, this.password);  
+/**
+ * Compare provided password with stored hashed password
+ * @param {string} password - Plain text password to verify
+ * @returns {boolean} True if password matches, false otherwise
+ */
+userSchema.methods.comparePassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
 }
 
-userSchema.statics.hashPassword = async function (password) {  // Static method to hash password
-    return await bcrypt.hash(password, 10);  // Hash the password with a salt rounds of 10
+/**
+ * Static method to hash password before storing
+ * @param {string} password - Plain text password to hash
+ * @returns {string} Hashed password with salt rounds of 10
+ */
+userSchema.statics.hashPassword = async function (password) {
+    return await bcrypt.hash(password, 10);
 }
 
-
-const userModel = mongoose.model('user', userSchema);  // Create a Mongoose model for the user schema
-
-
-module.exports = userModel;  // Export the user model for use in other files
+// Create and export user model
+const userModel = mongoose.model('user', userSchema);
+module.exports = userModel;

@@ -1,62 +1,92 @@
-const userModel = require('../Models/user.model');  // Import the user model
-const bcrypt = require('bcrypt');  // Import bcrypt for password hashing
-const jwt = require('jsonwebtoken');  // Import jsonwebtoken for token generation
-const captainModel = require('../Models/captain.model');  // Import the captain model
-const blackListTokenModel = require('../Models/blacklistToken.model');  // Import the blacklist token model
+/**
+ * Authentication Middleware
+ * 
+ * Provides authentication and authorization middleware for protecting routes.
+ * Handles JWT token verification, blacklist checking, and user/captain validation.
+ * Ensures secure access to protected endpoints with role-based authentication.
+ */
 
-module.exports.authUser = async (req, res, next) => {  // Middleware to authenticate user
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];  // Get the token from cookies or headers
+const userModel = require('../Models/user.model');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const captainModel = require('../Models/captain.model');
+const blackListTokenModel = require('../Models/blacklistToken.model');
 
-    if (!token) {  // If no token is provided
-        return res.status(401).json({ message: 'Unauthorized' });  // Return a 401 status with an error message
+/**
+ * User authentication middleware
+ * Verifies JWT token and validates user access to protected routes
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
+module.exports.authUser = async (req, res, next) => {
+    // Extract token from cookies or authorization header
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const isBlacklisted = await blackListTokenModel.findOne({ token: token });  // Check if the token is blacklisted in the database
+    // Check if token is blacklisted (logged out/invalidated)
+    const isBlacklisted = await blackListTokenModel.findOne({ token: token });
 
-    if (isBlacklisted) {  // If the token is blacklisted
-        return res.status(401).json({ message: 'Unauthorized' });  // Return a 401 status with an error message
+    if (isBlacklisted) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);  // Verify the token using the secret key
-        const user = await userModel.findById(decoded._id);  // Find the user by ID from the decoded token
+        // Verify JWT token and decode payload
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        req.user = user;  // Attach the user to the request object
+        // Find user by ID from token payload
+        const user = await userModel.findById(decoded._id);
 
-        return next();  // Call the next middleware or route handler
+        // Attach authenticated user to request object
+        req.user = user;
+
+        return next(); // Proceed to next middleware/route handler
     }
-    
-    catch (err) {  // If there is an error during verification
-        return res.status(401).json({ message: 'Unauthorized' });  // Return a 401 status with an error message
+    catch (err) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 }
 
+/**
+ * Captain authentication middleware
+ * Verifies JWT token and validates captain access to protected routes
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
+module.exports.authCaptain = async (req, res, next) => {
+    // Extract token from cookies or authorization header
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
-module.exports.authCaptain = async (req, res, next) => {  // Middleware to authenticate captain
-    
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];  // Get the token from cookies or headers
-
-    if (!token) {  // If no token is provided
-        return res.status(401).json({ message: 'Unauthorized' });  // Return a 401 status with an error message
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const isBlacklisted = await blackListTokenModel.findOne({ token: token });  // Check if the token is blacklisted in the database
+    // Check if token is blacklisted (logged out/invalidated)
+    const isBlacklisted = await blackListTokenModel.findOne({ token: token });
 
-    if (isBlacklisted) {  // If the token is blacklisted
-        return res.status(401).json({ message: 'Unauthorized' });  // Return a 401 status with an error message
+    if (isBlacklisted) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    try {   
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);  // Verify the token using the secret key
-        const captain = await captainModel.findById(decoded._id);  // Find the captain by ID from the decoded token
+    try {
+        // Verify JWT token and decode payload
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        req.captain = captain;  // Attach the captain to the request object
+        // Find captain by ID from token payload
+        const captain = await captainModel.findById(decoded._id);
 
-        return next();  // Call the next middleware or route handler
+        // Attach authenticated captain to request object
+        req.captain = captain;
+
+        return next(); // Proceed to next middleware/route handler
     }
-    
-    catch (err) {  // If there is an error during verification
-        return res.status(401).json({ message: 'Unauthorized' });  // Return a 401 status with an error message
+    catch (err) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 }
 

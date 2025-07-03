@@ -1,3 +1,11 @@
+/**
+ * CaptainLogin Component
+ * 
+ * Captain/Driver authentication page for Xpressly ride-sharing app.
+ * Provides secure login portal for drivers with specialized captain theming.
+ * Handles captain authentication and redirects to driver dashboard upon success.
+ */
+
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
@@ -6,30 +14,38 @@ import { CaptainDataContext } from '../Context/CaptainContext'
 import XpresslyLogo from '../Components/XpresslyLogo'
 
 const CaptainLogin = () => {
+    // Form state management for captain credentials
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const { captain, setCaptain } = React.useContext(CaptainDataContext)
-    const navigate = useNavigate()
+    const { captain, setCaptain } = React.useContext(CaptainDataContext) // Global captain state
+    const navigate = useNavigate() // Navigation hook for route management
 
+    /**
+     * Captain login form submission handler
+     * Authenticates captain credentials and manages login flow
+     * @param {Event} e - Form submission event
+     */
     const submitHandler = async (e) => {
-        e.preventDefault()
+        e.preventDefault() // Prevent default form submission
 
+        // Prepare captain login credentials
         const captain = {
             email: email,
             password: password
         }
 
+        // Send captain authentication request to backend
         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, captain)
 
         if (response.status === 200) {
             const data = response.data
-
-            setCaptain(data.captain)
-            localStorage.setItem('token', data.token)
-            navigate('/captain-dashboard')
+            setCaptain(data.captain) // Update global captain context
+            localStorage.setItem('token', data.token) // Store authentication token
+            navigate('/captain-dashboard') // Redirect to captain dashboard
         }
 
+        // Reset form fields after submission
         setEmail('')
         setPassword('')
     }

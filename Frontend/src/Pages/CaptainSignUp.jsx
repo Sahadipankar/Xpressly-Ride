@@ -1,3 +1,11 @@
+/**
+ * CaptainSignUp Component
+ * 
+ * Captain/Driver registration page for Xpressly ride-sharing app.
+ * Handles comprehensive driver onboarding including personal and vehicle information.
+ * Features specialized UI design for captain registration with vehicle details validation.
+ */
+
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
@@ -7,22 +15,31 @@ import axios from 'axios'
 import XpresslyLogo from '../Components/XpresslyLogo'
 
 const CaptainSignUp = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate() // Navigation hook for route management
 
+    // Form state management for captain registration
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+
+    // Vehicle information state management
     const [vehicleColor, setVehicleColor] = useState('')
     const [vehiclePlate, setVehiclePlate] = useState('')
     const [vehicleCapacity, setVehicleCapacity] = useState('')
     const [vehicleType, setVehicleType] = useState('')
 
-    const { captain, setCaptain } = React.useContext(CaptainDataContext)
+    const { captain, setCaptain } = React.useContext(CaptainDataContext) // Global captain state
 
+    /**
+     * Captain registration form submission handler
+     * Processes both personal and vehicle information for driver onboarding
+     * @param {Event} e - Form submission event
+     */
     const submitHandler = async (e) => {
-        e.preventDefault()
+        e.preventDefault() // Prevent default form submission
 
+        // Prepare comprehensive captain data object
         const captainData = {
             fullname: {
                 firstname: firstName,
@@ -38,15 +55,17 @@ const CaptainSignUp = () => {
             }
         }
 
+        // Send captain registration request to backend
         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, captainData)
 
         if (response.status === 201) {
             const data = response.data
-            setCaptain(data.captain)
-            localStorage.setItem('token', data.token)
-            navigate('/captain-dashboard')
+            setCaptain(data.captain) // Update global captain context
+            localStorage.setItem('token', data.token) // Store authentication token
+            navigate('/captain-dashboard') // Redirect to captain dashboard
         }
 
+        // Reset all form fields after successful submission
         setFirstName('')
         setLastName('')
         setEmail('')
@@ -59,14 +78,14 @@ const CaptainSignUp = () => {
 
     return (
         <div className='min-h-screen bg-gradient-to-br from-emerald-900 via-green-900 to-teal-900 relative overflow-hidden'>
-            {/* Animated Background Elements */}
+            {/* Animated Background Elements - Captain-themed gradient orbs */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
                 <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-emerald-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
                 <div className="absolute top-40 left-40 w-80 h-80 bg-teal-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
             </div>
 
-            {/* Floating Car Icons */}
+            {/* Floating Car Icons - Transportation themed decorative elements */}
             <div className="absolute inset-0">
                 {[...Array(15)].map((_, i) => (
                     <div
@@ -84,9 +103,10 @@ const CaptainSignUp = () => {
                 ))}
             </div>
 
+            {/* Main Content Container */}
             <div className='relative z-10 flex flex-col justify-center min-h-screen px-6 py-8 lg:px-8'>
                 <div className='sm:mx-auto sm:w-full sm:max-w-lg'>
-                    {/* Enhanced Captain Branding Section */}
+                    {/* Enhanced Captain Branding Section - Specialized for drivers */}
                     <div className='flex flex-col items-center mb-8'>
                         <div className='relative mb-6'>
                             <div className='absolute inset-0 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 rounded-full blur-lg opacity-75 animate-pulse'></div>
