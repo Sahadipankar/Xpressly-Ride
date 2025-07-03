@@ -26,11 +26,14 @@ const Riding = () => {
         trafficCondition: 'normal',
         trafficIncidents: [],
         routeAlerts: [],
-        alternativeRoutes: 0
+        alternativeRoutes: 0,
+        trafficDelay: 0,
+        speedTrend: 'stable'
     })
     const [isLoadingTripData, setIsLoadingTripData] = useState(true)
     const [trafficAlerts, setTrafficAlerts] = useState([])
-    const [showTrafficDetails, setShowTrafficDetails] = useState(true)    // Fetch initial trip data
+    const [showTrafficDetails, setShowTrafficDetails] = useState(true)
+    const [lastUpdate, setLastUpdate] = useState(Date.now())    // Fetch initial trip data
     useEffect(() => {
         const fetchTripData = async () => {
             if (ride?.pickup && ride?.destination) {
@@ -53,8 +56,8 @@ const Riding = () => {
                         averageSpeed: calculatedAvgSpeed,
                         currentSpeed: parseFloat(calculatedAvgSpeed), // Initialize current speed
                         trafficCondition: determineTrafficCondition(durationInSeconds, distanceInKm),
-                        trafficIncidents: generateTrafficIncidents(),
-                        routeAlerts: generateRouteAlerts(),
+                        trafficIncidents: generateTrafficIncidents(determineTrafficCondition(durationInSeconds, distanceInKm)),
+                        routeAlerts: generateRouteAlerts(determineTrafficCondition(durationInSeconds, distanceInKm)),
                         alternativeRoutes: Math.floor(Math.random() * 3) + 1
                     })
                 } catch (error) {
@@ -72,8 +75,8 @@ const Riding = () => {
                         averageSpeed: fallbackAvgSpeed,
                         currentSpeed: parseFloat(fallbackAvgSpeed), // Initialize current speed
                         trafficCondition: 'normal',
-                        trafficIncidents: generateTrafficIncidents(),
-                        routeAlerts: generateRouteAlerts(),
+                        trafficIncidents: generateTrafficIncidents('normal'),
+                        routeAlerts: generateRouteAlerts('normal'),
                         alternativeRoutes: 2
                     })
                 }
@@ -188,21 +191,50 @@ const Riding = () => {
                 const previousAvgSpeed = parseFloat(tripData.averageSpeed) || currentSpeed
                 dynamicAvgSpeed = (previousAvgSpeed * 0.7) + (dynamicAvgSpeed * 0.3) // 70-30 smoothing
 
-                // Update traffic alerts based on conditions
+                // Calculate dynamic traffic delay
+                const expectedSpeed = baseSpeed * 1.2
+                const trafficDelay = Math.max(0, Math.round(((expectedSpeed - currentSpeed) / expectedSpeed) * 8))
+
+                // Determine speed trend
+                const speedTrend = tripData.currentSpeed ?
+                    (currentSpeed > tripData.currentSpeed ? 'increasing' :
+                        currentSpeed < tripData.currentSpeed ? 'decreasing' : 'stable') : 'stable'
+
+                // Enhanced traffic alert generation with real-time sync
                 if (trafficCondition === 'heavy' || trafficCondition === 'severe') {
                     setTrafficAlerts(prev => {
                         const newAlert = {
                             id: Date.now(),
-                            message: `${trafficCondition === 'severe' ? 'Severe' : 'Heavy'} traffic detected - ETA updated`,
+                            message: `${trafficCondition === 'severe' ? 'Severe' : 'Heavy'} traffic detected - ETA updated (+${trafficDelay} min)`,
                             type: 'warning',
-                            timestamp: new Date()
+                            timestamp: new Date(),
+                            autoRemove: true,
+                            trafficSync: true // Mark as traffic-synced alert
                         }
-                        return [...prev.slice(-2), newAlert] // Keep last 3 alerts
+                        return [...prev.slice(-2), newAlert]
                     })
+                } else if (trafficCondition === 'light' && currentSpeed > 70) {
+                    // Add positive alerts for high-speed conditions
+                    if (Math.random() > 0.8) {
+                        setTrafficAlerts(prev => {
+                            const newAlert = {
+                                id: Date.now(),
+                                message: `Great driving conditions - ${currentSpeed} km/h! ETA improved`,
+                                type: 'success',
+                                timestamp: new Date(),
+                                autoRemove: true,
+                                trafficSync: true
+                            }
+                            return [...prev.slice(-2), newAlert]
+                        })
+                    }
                 }
 
-                // Store current speed for average calculation
-                const currentSpeedForCalc = currentSpeed
+                // Force update incidents when traffic condition changes significantly
+                const shouldForceUpdate = !tripData.trafficCondition ||
+                    (tripData.trafficCondition !== trafficCondition &&
+                        Math.abs(['severe', 'heavy', 'moderate', 'normal', 'light'].indexOf(trafficCondition) -
+                            ['severe', 'heavy', 'moderate', 'normal', 'light'].indexOf(tripData.trafficCondition)) > 0)
 
                 setTripData(prev => ({
                     ...prev,
@@ -210,17 +242,23 @@ const Riding = () => {
                     estimatedArrival: new Date(Date.now() + adjustedETA * 1000),
                     averageSpeed: dynamicAvgSpeed.toFixed(1),
                     trafficCondition: trafficCondition,
-                    currentSpeed: currentSpeedForCalc, // Store current speed in state
-                    // Occasionally update incidents and alerts
-                    ...(Math.random() > 0.8 && {
-                        trafficIncidents: generateTrafficIncidents(),
-                        routeAlerts: generateRouteAlerts()
-                    })
+                    currentSpeed: Math.round(currentSpeed),
+                    trafficDelay: trafficDelay,
+                    speedTrend: speedTrend,
+                    // Force update incidents when traffic condition changes or random update
+                    ...(shouldForceUpdate || Math.random() > 0.5 ? {
+                        trafficIncidents: generateTrafficIncidents(trafficCondition),
+                        routeAlerts: generateRouteAlerts(trafficCondition)
+                    } : {}),
+                    // Always update last sync timestamp for better coordination
+                    lastSync: Date.now()
                 }))
+
+                setLastUpdate(Date.now())
             }
         }
 
-        const intervalId = setInterval(updateTripProgress, 3000) // Update every 3 seconds for more dynamic feel
+        const intervalId = setInterval(updateTripProgress, 2500) // Faster updates for more dynamic feel
         return () => clearInterval(intervalId)
     }, [currentTime, rideStartTime, tripData.originalDuration, tripData.distanceInKm, isRideCompleted, ride])
 
@@ -241,6 +279,16 @@ const Riding = () => {
         }
     }, [socket, navigate])
 
+    // Auto-remove traffic alerts
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTrafficAlerts(prev => prev.filter(alert =>
+                !alert.autoRemove || (new Date() - alert.timestamp) < 8000
+            ))
+        }, 3000)
+        return () => clearInterval(timer)
+    }, [])
+
     // Handle complete ride button click
     const handleCompleteRide = async () => {
         try {
@@ -257,8 +305,8 @@ const Riding = () => {
         }
     }
 
-    // Generate realistic traffic incidents
-    const generateTrafficIncidents = () => {
+    // Generate realistic traffic incidents with condition-based logic
+    const generateTrafficIncidents = (currentCondition = 'normal') => {
         const incidents = [
             { type: 'construction', message: 'Road work ahead - expect delays', severity: 'moderate', icon: 'ri-hammer-line' },
             { type: 'accident', message: 'Minor accident cleared - traffic resuming', severity: 'light', icon: 'ri-alarm-warning-line' },
@@ -270,34 +318,32 @@ const Riding = () => {
             { type: 'scenic', message: 'Beautiful scenic route - enjoy the journey', severity: 'adventure', icon: 'ri-landscape-line' }
         ]
 
-        // Higher chance of positive incidents when traffic is light
-        const adventureWeight = tripData.trafficCondition === 'light' ? 3 : 0.5
+        // Strict condition-based incident selection for perfect sync
+        let selectedIncidents = []
 
-        // Randomly select 0-2 incidents
-        const numIncidents = Math.random() > 0.7 ? Math.floor(Math.random() * 2) + 1 : 0
-        const selectedIncidents = []
-
-        for (let i = 0; i < numIncidents; i++) {
-            let randomIncident
-
-            // Favor adventure incidents when traffic is light
-            if (tripData.trafficCondition === 'light' && Math.random() > 0.6) {
-                const adventureIncidents = incidents.filter(inc => inc.severity === 'adventure')
-                randomIncident = adventureIncidents[Math.floor(Math.random() * adventureIncidents.length)]
-            } else {
-                randomIncident = incidents[Math.floor(Math.random() * incidents.length)]
-            }
-
-            if (!selectedIncidents.find(inc => inc.type === randomIncident.type)) {
-                selectedIncidents.push(randomIncident)
-            }
+        if (currentCondition === 'severe') {
+            // Only show severe traffic incidents
+            selectedIncidents = incidents.filter(inc => inc.severity === 'heavy').slice(0, 2)
+        } else if (currentCondition === 'heavy') {
+            // Show heavy and moderate traffic incidents
+            selectedIncidents = incidents.filter(inc => inc.severity === 'heavy' || inc.severity === 'moderate').slice(0, Math.floor(Math.random() * 2) + 1)
+        } else if (currentCondition === 'moderate') {
+            // Show moderate traffic incidents
+            selectedIncidents = incidents.filter(inc => inc.severity === 'moderate').slice(0, 1)
+        } else if (currentCondition === 'light') {
+            // Only show adventure/positive incidents for light traffic
+            selectedIncidents = incidents.filter(inc => inc.severity === 'adventure').slice(0, Math.floor(Math.random() * 2) + 1)
+        } else {
+            // Normal traffic - show light incidents or none
+            const lightIncidents = incidents.filter(inc => inc.severity === 'light')
+            selectedIncidents = Math.random() > 0.6 ? [lightIncidents[Math.floor(Math.random() * lightIncidents.length)]] : []
         }
 
         return selectedIncidents
     }
 
-    // Generate route alerts
-    const generateRouteAlerts = () => {
+    // Generate route alerts with condition-based logic
+    const generateRouteAlerts = (currentCondition = 'normal') => {
         const alerts = [
             { type: 'faster_route', message: 'Faster route available - save 3 min', icon: 'ri-direction-line', action: 'Switch Route' },
             { type: 'toll', message: 'Toll road ahead - ₹25', icon: 'ri-coin-line', action: 'View Details' },
@@ -307,12 +353,26 @@ const Riding = () => {
             { type: 'speed', message: 'High-speed zone ahead - buckle up!', icon: 'ri-rocket-line', action: 'Continue' }
         ]
 
-        // 30% chance of having an alert, higher chance for adventure routes
-        const chanceMultiplier = tripData.trafficCondition === 'light' ? 1.5 : 1.0
-        if (Math.random() > (0.7 / chanceMultiplier)) {
-            return [alerts[Math.floor(Math.random() * alerts.length)]]
+        // Condition-based alert selection for better sync
+        let selectedAlerts = []
+
+        if (currentCondition === 'heavy' || currentCondition === 'severe') {
+            // Show alternative route options during heavy traffic
+            const trafficAlerts = alerts.filter(alert => alert.type === 'faster_route' || alert.type === 'express')
+            selectedAlerts = Math.random() > 0.4 ? [trafficAlerts[Math.floor(Math.random() * trafficAlerts.length)]] : []
+        } else if (currentCondition === 'light') {
+            // Show adventure/speed alerts during light traffic
+            const lightTrafficAlerts = alerts.filter(alert => alert.type === 'adventure' || alert.type === 'speed')
+            selectedAlerts = Math.random() > 0.3 ? [lightTrafficAlerts[Math.floor(Math.random() * lightTrafficAlerts.length)]] : []
+        } else {
+            // Random selection for normal traffic with condition awareness
+            const chanceMultiplier = currentCondition === 'moderate' ? 0.8 : 1.0
+            if (Math.random() > (0.7 / chanceMultiplier)) {
+                selectedAlerts = [alerts[Math.floor(Math.random() * alerts.length)]]
+            }
         }
-        return []
+
+        return selectedAlerts
     }
 
     // Enhanced traffic simulation with real-world factors and adventure scenarios
@@ -580,27 +640,29 @@ const Riding = () => {
 
                 {/* Live Traffic Alerts - Filtered to exclude adventure/speed alerts */}
                 {trafficAlerts.filter(alert => alert.type !== 'adventure').length > 0 && (
-                    <div className="absolute top-20 left-4 right-4 z-10">
-                        {trafficAlerts.filter(alert => alert.type !== 'adventure').slice(-1).map((alert) => (
-                            <div
-                                key={alert.id}
-                                className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-3 rounded-r shadow-lg animate-pulse"
-                                onClick={() => setTrafficAlerts(prev => prev.filter(a => a.id !== alert.id))}
-                            >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <i className="ri-alert-line text-lg"></i>
-                                        <span className="text-sm font-medium">{alert.message}</span>
-                                    </div>
-                                    <button className="text-orange-600 hover:text-orange-800">
-                                        <i className="ri-close-line"></i>
-                                    </button>
+                    <div className="absolute top-20 left-4 right-4 z-10">                                {trafficAlerts.filter(alert => alert.type !== 'adventure').slice(-1).map((alert) => (
+                        <div
+                            key={alert.id}
+                            className={`${alert.type === 'success' ? 'bg-green-100 border-l-4 border-green-500 text-green-700' :
+                                'bg-orange-100 border-l-4 border-orange-500 text-orange-700'} p-3 rounded-r shadow-lg animate-pulse`}
+                            onClick={() => setTrafficAlerts(prev => prev.filter(a => a.id !== alert.id))}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <i className={`${alert.type === 'success' ? 'ri-checkbox-circle-line' : 'ri-alert-line'} text-lg`}></i>
+                                    <span className="text-sm font-medium">{alert.message}</span>
                                 </div>
-                                <p className="text-xs opacity-70 mt-1">
-                                    {alert.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </p>
+                                <button className={`${alert.type === 'success' ? 'text-green-600 hover:text-green-800' : 'text-orange-600 hover:text-orange-800'}`}>
+                                    <i className="ri-close-line"></i>
+                                </button>
                             </div>
-                        ))}
+                            <p className="text-xs opacity-70 mt-1 flex items-center gap-1">
+                                <i className="ri-time-line"></i>
+                                {alert.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                {alert.trafficSync && <span className="ml-2 px-1 bg-white/20 rounded text-xs">SYNC</span>}
+                            </p>
+                        </div>
+                    ))}
                     </div>
                 )}
             </div>
@@ -717,6 +779,11 @@ const Riding = () => {
                                 <div className="flex items-center gap-1 ml-auto">
                                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                                     <span className="text-xs text-green-600 font-medium">LIVE</span>
+                                    <span className="text-xs text-gray-500 ml-2">
+                                        {tripData.lastSync ?
+                                            `Updated ${Math.floor((Date.now() - tripData.lastSync) / 1000)}s ago` :
+                                            'Syncing...'}
+                                    </span>
                                 </div>
                             </h4>
 
@@ -759,18 +826,31 @@ const Riding = () => {
                                 </div>
                             )}
 
-                            {/* Traffic Stats */}
-                            <div className="grid grid-cols-2 gap-3 text-xs">
-                                <div className="bg-gray-50 p-2 rounded">
-                                    <p className="text-gray-500">Alternative Routes</p>
-                                    <p className="font-semibold text-gray-800">{tripData.alternativeRoutes || 1} available</p>
-                                </div>
+                            {/* Traffic Stats - Enhanced with real-time sync */}
+                            <div className="grid grid-cols-3 gap-3 text-xs">
                                 <div className="bg-gray-50 p-2 rounded">
                                     <p className="text-gray-500">Traffic Delay</p>
-                                    <p className="font-semibold text-gray-800">
-                                        {tripData.trafficCondition === 'heavy' || tripData.trafficCondition === 'severe' ? '+3-8 min' :
-                                            tripData.trafficCondition === 'moderate' ? '+1-3 min' : 'None'}
+                                    <p className={`font-semibold ${tripData.trafficDelay > 5 ? 'text-red-600' :
+                                        tripData.trafficDelay > 2 ? 'text-yellow-600' : 'text-green-600'}`}>
+                                        {tripData.trafficDelay > 0 ? `+${tripData.trafficDelay} min` : 'None'}
                                     </p>
+                                </div>
+                                <div className="bg-gray-50 p-2 rounded">
+                                    <p className="text-gray-500">Speed Trend</p>
+                                    <p className={`font-semibold flex items-center gap-1 ${tripData.speedTrend === 'increasing' ? 'text-green-600' :
+                                        tripData.speedTrend === 'decreasing' ? 'text-red-600' : 'text-blue-600'}`}>
+                                        {tripData.speedTrend === 'increasing' ? (
+                                            <>Improving <i className="ri-arrow-up-line"></i></>
+                                        ) : tripData.speedTrend === 'decreasing' ? (
+                                            <>Slowing <i className="ri-arrow-down-line"></i></>
+                                        ) : (
+                                            <>Stable <i className="ri-subtract-line"></i></>
+                                        )}
+                                    </p>
+                                </div>
+                                <div className="bg-gray-50 p-2 rounded">
+                                    <p className="text-gray-500">Alternatives</p>
+                                    <p className="font-semibold text-gray-800">{tripData.alternativeRoutes || 1} routes</p>
                                 </div>
                             </div>
 
