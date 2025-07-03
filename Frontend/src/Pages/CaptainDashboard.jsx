@@ -5,6 +5,7 @@ import RidePopUp from '../Components/RidePopUp'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import ConfirmRidePopUp from '../Components/ConfirmRidePopUp'
+import LiveTracking from '../Components/LiveTracking'
 
 import { useEffect, useContext } from 'react'
 import { SocketContext } from '../Context/SocketContext'
@@ -214,35 +215,8 @@ const CaptainDashboard = () => {
             <main className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
                 {/* Map Section */}
                 <div className="flex-1 relative">
-                    <div className="relative h-64 md:h-96 lg:h-full">
-                        <img
-                            className='h-full w-full object-cover'
-                            src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
-                            alt="Live Map"
-                        />
-
-                        {/* Map Overlay - Status Indicator */}
-                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                            <div className="flex items-center gap-2">
-                                <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
-                                <span className="text-sm font-medium">
-                                    {isOnline ? 'Available for rides' : 'Currently offline'}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Map Controls */}
-                        <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-                            <button className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
-                                <i className="ri-add-line text-lg"></i>
-                            </button>
-                            <button className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
-                                <i className="ri-subtract-line text-lg"></i>
-                            </button>
-                            <button className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
-                                <i className="ri-navigation-line text-lg"></i>
-                            </button>
-                        </div>
+                    <div className="relative h-85 md:h-96 lg:h-full">
+                        <LiveTracking />
                     </div>
                 </div>
 

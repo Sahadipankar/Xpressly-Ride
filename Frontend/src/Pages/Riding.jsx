@@ -30,7 +30,7 @@ const Riding = () => {
     })
     const [isLoadingTripData, setIsLoadingTripData] = useState(true)
     const [trafficAlerts, setTrafficAlerts] = useState([])
-    const [showTrafficDetails, setShowTrafficDetails] = useState(false)    // Fetch initial trip data
+    const [showTrafficDetails, setShowTrafficDetails] = useState(true)    // Fetch initial trip data
     useEffect(() => {
         const fetchTripData = async () => {
             if (ride?.pickup && ride?.destination) {
@@ -699,100 +699,102 @@ const Riding = () => {
                                     <span>Live</span>
                                 </div>
                                 <div
-                                    className={`flex items-center gap-2 ${getTrafficInfo().color} ${getTrafficInfo().bgColor} px-2 py-1 rounded-lg cursor-pointer transition-all hover:shadow-sm`}
-                                    onClick={() => setShowTrafficDetails(!showTrafficDetails)}
+                                    className={`flex items-center gap-2 ${getTrafficInfo().color} ${getTrafficInfo().bgColor} px-2 py-1 rounded-lg transition-all`}
                                 >
                                     <i className={`${getTrafficInfo().icon} text-sm`}></i>
                                     <span className="font-medium">{getTrafficInfo().text}</span>
                                     <span className="text-xs opacity-70">{getTrafficInfo().intensity}</span>
+                                    <i className="ri-information-line text-xs ml-1 opacity-60"></i>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Traffic Details Expandable Section */}
-                        {showTrafficDetails && (
-                            <div className="mb-4 p-3 bg-white/80 rounded-lg border border-gray-200">
-                                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                    <i className="ri-traffic-light-line"></i>
-                                    Traffic Information
-                                </h4>
-
-                                {/* Traffic Incidents */}
-                                {tripData.trafficIncidents && tripData.trafficIncidents.length > 0 && (
-                                    <div className="mb-3">
-                                        <p className="text-xs text-gray-600 mb-1">Current Incidents:</p>
-                                        {tripData.trafficIncidents.map((incident, index) => (
-                                            <div key={index} className="flex items-center gap-2 text-xs text-gray-700 mb-1">
-                                                <i className={`${incident.icon} ${incident.severity === 'adventure' ? 'text-green-600' :
-                                                    incident.severity === 'heavy' ? 'text-red-600' :
-                                                        incident.severity === 'moderate' ? 'text-yellow-600' : 'text-orange-600'
-                                                    }`}></i>
-                                                <span className={incident.severity === 'adventure' ? 'text-green-700 font-medium' : ''}>
-                                                    {incident.message}
-                                                </span>
-                                                {incident.severity === 'adventure' && (
-                                                    <i className="ri-sparkle-line text-green-500 text-xs animate-pulse"></i>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Route Alerts */}
-                                {tripData.routeAlerts && tripData.routeAlerts.length > 0 && (
-                                    <div className="mb-3">
-                                        <p className="text-xs text-gray-600 mb-1">Route Alerts:</p>
-                                        {tripData.routeAlerts.map((alert, index) => (
-                                            <div key={index} className="flex items-center justify-between text-xs bg-blue-50 p-2 rounded">
-                                                <div className="flex items-center gap-2">
-                                                    <i className={`${alert.icon} text-blue-600`}></i>
-                                                    <span className="text-gray-700">{alert.message}</span>
-                                                </div>
-                                                <button className="text-blue-600 font-medium hover:underline">
-                                                    {alert.action}
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Traffic Stats */}
-                                <div className="grid grid-cols-2 gap-3 text-xs">
-                                    <div className="bg-gray-50 p-2 rounded">
-                                        <p className="text-gray-500">Alternative Routes</p>
-                                        <p className="font-semibold text-gray-800">{tripData.alternativeRoutes || 1} available</p>
-                                    </div>
-                                    <div className="bg-gray-50 p-2 rounded">
-                                        <p className="text-gray-500">Traffic Delay</p>
-                                        <p className="font-semibold text-gray-800">
-                                            {tripData.trafficCondition === 'heavy' || tripData.trafficCondition === 'severe' ? '+3-8 min' :
-                                                tripData.trafficCondition === 'moderate' ? '+1-3 min' : 'None'}
-                                        </p>
-                                    </div>
+                        {/* Traffic Details Always Visible Section */}
+                        <div className="mb-4 p-3 bg-white/90 rounded-lg border border-gray-200 shadow-sm">
+                            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                <i className="ri-traffic-light-line text-orange-500"></i>
+                                Live Traffic Information
+                                <div className="flex items-center gap-1 ml-auto">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                    <span className="text-xs text-green-600 font-medium">LIVE</span>
                                 </div>
+                            </h4>
 
-                                {/* Speed Analysis */}
-                                <div className="mt-3 p-2 bg-blue-50 rounded-lg">
-                                    <div className="flex items-center justify-between text-xs">
-                                        <span className="text-gray-600">Speed Analysis:</span>
-                                        <div className="flex items-center gap-2">
-                                            <span className={`font-medium ${getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'text-green-600' :
-                                                getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'text-red-600' :
-                                                    'text-blue-600'
-                                                }`}>
-                                                {getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'Above Average' :
-                                                    getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'Below Average' :
-                                                        'Normal Speed'}
+                            {/* Traffic Incidents */}
+                            {tripData.trafficIncidents && tripData.trafficIncidents.length > 0 && (
+                                <div className="mb-3">
+                                    <p className="text-xs text-gray-600 mb-1">Current Incidents:</p>
+                                    {tripData.trafficIncidents.map((incident, index) => (
+                                        <div key={index} className="flex items-center gap-2 text-xs text-gray-700 mb-1">
+                                            <i className={`${incident.icon} ${incident.severity === 'adventure' ? 'text-green-600' :
+                                                incident.severity === 'heavy' ? 'text-red-600' :
+                                                    incident.severity === 'moderate' ? 'text-yellow-600' : 'text-orange-600'
+                                                }`}></i>
+                                            <span className={incident.severity === 'adventure' ? 'text-green-700 font-medium' : ''}>
+                                                {incident.message}
                                             </span>
-                                            <i className={`${getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'ri-arrow-up-line text-green-600' :
-                                                getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'ri-arrow-down-line text-red-600' :
-                                                    'ri-subtract-line text-blue-600'
-                                                } text-xs`}></i>
+                                            {incident.severity === 'adventure' && (
+                                                <i className="ri-sparkle-line text-green-500 text-xs animate-pulse"></i>
+                                            )}
                                         </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Route Alerts */}
+                            {tripData.routeAlerts && tripData.routeAlerts.length > 0 && (
+                                <div className="mb-3">
+                                    <p className="text-xs text-gray-600 mb-1">Route Alerts:</p>
+                                    {tripData.routeAlerts.map((alert, index) => (
+                                        <div key={index} className="flex items-center justify-between text-xs bg-blue-50 p-2 rounded">
+                                            <div className="flex items-center gap-2">
+                                                <i className={`${alert.icon} text-blue-600`}></i>
+                                                <span className="text-gray-700">{alert.message}</span>
+                                            </div>
+                                            <button className="text-blue-600 font-medium hover:underline">
+                                                {alert.action}
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Traffic Stats */}
+                            <div className="grid grid-cols-2 gap-3 text-xs">
+                                <div className="bg-gray-50 p-2 rounded">
+                                    <p className="text-gray-500">Alternative Routes</p>
+                                    <p className="font-semibold text-gray-800">{tripData.alternativeRoutes || 1} available</p>
+                                </div>
+                                <div className="bg-gray-50 p-2 rounded">
+                                    <p className="text-gray-500">Traffic Delay</p>
+                                    <p className="font-semibold text-gray-800">
+                                        {tripData.trafficCondition === 'heavy' || tripData.trafficCondition === 'severe' ? '+3-8 min' :
+                                            tripData.trafficCondition === 'moderate' ? '+1-3 min' : 'None'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Speed Analysis */}
+                            <div className="mt-3 p-2 bg-blue-50 rounded-lg">
+                                <div className="flex items-center justify-between text-xs">
+                                    <span className="text-gray-600">Speed Analysis:</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`font-medium ${getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'text-green-600' :
+                                            getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'text-red-600' :
+                                                'text-blue-600'
+                                            }`}>
+                                            {getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'Above Average' :
+                                                getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'Below Average' :
+                                                    'Normal Speed'}
+                                        </span>
+                                        <i className={`${getCurrentSpeed() > parseFloat(getTripAverageSpeed()) ? 'ri-arrow-up-line text-green-600' :
+                                            getCurrentSpeed() < parseFloat(getTripAverageSpeed()) * 0.7 ? 'ri-arrow-down-line text-red-600' :
+                                                'ri-subtract-line text-blue-600'
+                                            } text-xs`}></i>
                                     </div>
                                 </div>
                             </div>
-                        )}
+                        </div>
 
                         <div className='space-y-3'>
                             <div className='flex items-start gap-4 p-3 bg-white/70 rounded-lg'>
