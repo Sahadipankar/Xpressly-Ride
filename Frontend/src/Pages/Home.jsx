@@ -415,13 +415,13 @@ const Home = () => {
             </div>
 
             {/* Enhanced Map Section with Short Height */}
-            <div className='h-[52vh] sm:h-[45vh] md:h-[50vh] w-screen pt-12 sm:pt-14 md:pt-16 lg:pt-20 relative'>
+            <div className='h-[52vh] sm:h-[45vh] md:h-[50vh] w-screen pt-17 sm:pt-14 md:pt-16 lg:pt-20 relative'>
                 <LiveTracking />
 
                 {/* Map Overlay Features - Hidden when panel is open */}
                 <div className={`absolute top-16 sm:top-18 md:top-20 lg:top-24 right-4 z-10 transition-opacity duration-300 ${panelOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                     {/* Weather Widget */}
-                    <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-white/20">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 mt-3 shadow-lg border border-white/20">
                         <div className="flex items-center gap-2">
                             <i className="ri-sun-line text-yellow-500 text-lg"></i>
                             <div>
@@ -471,7 +471,7 @@ const Home = () => {
                 <div className='bg-white p-3 sm:p-4 md:p-6 relative rounded-t-3xl shadow-2xl border-t border-gray-100'>
                     <h5 ref={panelCloseRef}
                         onClick={() => setPanelOpen(false)}
-                        className='absolute opacity-0 right-3 sm:right-4 md:right-6 top-3 sm:top-4 md:top-6 text-xl sm:text-2xl cursor-pointer hover:text-gray-600 transition-colors'>
+                        className='absolute opacity-0 right-5 sm:right-4 md:right-6 top-3 sm:top-4 md:top-6 text-xl sm:text-2xl cursor-pointer hover:text-gray-600 transition-colors'>
                         <i className="ri-arrow-down-wide-line"></i>
                     </h5>
 

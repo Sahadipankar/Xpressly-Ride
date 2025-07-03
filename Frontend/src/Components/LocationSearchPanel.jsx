@@ -10,11 +10,10 @@ const LocationSearchPanel = ({ suggestions, setVehiclePanel, setPanelOpen, setPi
             setRecentLocations(JSON.parse(savedLocations))
         } else {
             setRecentLocations([
-                "Brainware University, 398 Ramkrishnapur Road, Barasat Kazipara, Barasat, Kolkata, West Bengal 700125",
-                "Deshbandhu Nagar, Baguiati, Kolkata, West Bengal 700059",
-                "Kestopur Crossing, VIP Road, Kestopur, Kolkata, West Bengal 700102",
-                "Sealdah Railway Station, Acharya Prafulla Chandra Road, Sealdah, Raja Bazar, Kolkata, West Bengal 700009",
-                "Howrah Railway Station, Howrah Bridge, Howrah, West Bengal 711101"
+                "Brainware University",
+                "Baguiati, VIP Road, Kolkata",
+                "Sealdah Railway Station",
+                "Howrah Railway Station"
             ])
         }
     }, [])

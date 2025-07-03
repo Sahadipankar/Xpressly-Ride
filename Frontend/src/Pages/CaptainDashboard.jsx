@@ -215,7 +215,7 @@ const CaptainDashboard = () => {
             <main className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
                 {/* Map Section */}
                 <div className="flex-1 relative">
-                    <div className="relative h-85 md:h-96 lg:h-full">
+                    <div className="relative h-83 md:h-96 lg:h-full">
                         <LiveTracking />
                     </div>
                 </div>
