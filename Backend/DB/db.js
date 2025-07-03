@@ -8,9 +8,11 @@ const mongoose = require('mongoose');
 function connectToDB() {
     mongoose.connect(process.env.DB_CONNECT).then(() => {
         // Connection successful - no logging in production
+        console.log('Connected to MongoDB');
     })
         .catch(err => {
             // Connection failed - handle silently in production
+            console.error('Error connecting to MongoDB:', err);
         });
 }
 
