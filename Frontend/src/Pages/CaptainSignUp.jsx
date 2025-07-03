@@ -7,24 +7,21 @@ import axios from 'axios'
 import XpresslyLogo from '../Components/XpresslyLogo'
 
 const CaptainSignUp = () => {
-
-    const navigate = useNavigate() // Using useNavigate hook to programmatically navigate after form submission.
+    const navigate = useNavigate()
 
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-
     const [vehicleColor, setVehicleColor] = useState('')
     const [vehiclePlate, setVehiclePlate] = useState('')
     const [vehicleCapacity, setVehicleCapacity] = useState('')
     const [vehicleType, setVehicleType] = useState('')
 
+    const { captain, setCaptain } = React.useContext(CaptainDataContext)
 
-    const { captain, setCaptain } = React.useContext(CaptainDataContext) // Using the CaptainDataContext to access and set captain data.
-
-    const submitHandler = async (e) => { // This function handles the form submission.
-        e.preventDefault() // Prevents the default form submission behavior.
+    const submitHandler = async (e) => {
+        e.preventDefault()
 
         const captainData = {
             fullname: {
@@ -41,21 +38,19 @@ const CaptainSignUp = () => {
             }
         }
 
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, captainData) // Sending a POST request to the server with the captain data.
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, captainData)
 
-        if (response.status === 201) { // If the response status is 201, it means the captain was created successfully.
-            const data = response.data // Extracting the data from the response.
-            setCaptain(data.captain) // Setting the captain data in the context.
-            localStorage.setItem('token', data.token) // Storing the token in localStorage for authentication.
-            navigate('/captain-dashboard') // Navigating to the captain dashboard after successful registration.
+        if (response.status === 201) {
+            const data = response.data
+            setCaptain(data.captain)
+            localStorage.setItem('token', data.token)
+            navigate('/captain-dashboard')
         }
 
-        // Resetting the input fields after submission
         setFirstName('')
         setLastName('')
         setEmail('')
         setPassword('')
-
         setVehicleColor('')
         setVehiclePlate('')
         setVehicleCapacity('')

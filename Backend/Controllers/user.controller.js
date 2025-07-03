@@ -1,40 +1,39 @@
-const userModel = require('../Models/user.model');  // Import the user model
-const userService = require('../Services/user.service');  // Import the user service
-const { validationResult } = require('express-validator');  // Import express-validator for validation
-const blackListTokenModel = require('../Models/blacklistToken.model');  // Import the blacklist token model
+const userModel = require('../Models/user.model');
+const userService = require('../Services/user.service');
+const { validationResult } = require('express-validator');
+const blackListTokenModel = require('../Models/blacklistToken.model');
 
-
-module.exports.registerUser = async (req, res, next) => {  // Function to handle user registration
-    const errors = validationResult(req);  // Validate the request
-    if (!errors.isEmpty()) {  // If there are validation errors
-        return res.status(400).json({ errors: errors.array() });  // Return a 400 status with the errors
+module.exports.registerUser = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
     }
-    const { fullname, email, password } = req.body;  // Destructure the request body
+    const { fullname, email, password } = req.body;
 
-    const isUserAlreadyExist = await userModel.findOne({ email });  // Check if a user with the same email already exists
+    const isUserAlreadyExist = await userModel.findOne({ email });
 
-    if (isUserAlreadyExist) {  // If a user with the same email exists
-        return res.status(400).json({ message: 'User already exists' });  // Return a 400 status with an error message
+    if (isUserAlreadyExist) {
+        return res.status(400).json({ message: 'User already exists' });
     }
 
-    const hashedPassword = await userModel.hashPassword(password);  // Hash the password
+    const hashedPassword = await userModel.hashPassword(password);
 
-    const user = await userService.createUser({  // Create a new user using the service
+    const user = await userService.createUser({
         firstname: fullname.firstname,
         lastname: fullname.lastname,
         email,
-        password: hashedPassword,  // Use the hashed password
+        password: hashedPassword,
     });
 
-    const token = user.generateAuthToken();  // Generate a JWT token for the user
+    const token = user.generateAuthToken();
 
-    res.status(201).json({token, user});  // Return a 201 status with the token and user data
+    res.status(201).json({ token, user });  // Return a 201 status with the token and user data
 }
 
 
 
 module.exports.loginUser = async (req, res, next) => {  // Function to handle user login
-    
+
     const errors = validationResult(req);  // Validate the request
     if (!errors.isEmpty()) {  // If there are validation errors
         return res.status(400).json({ errors: errors.array() });  // Return a 400 status with the errors
@@ -71,7 +70,7 @@ module.exports.getUserProfile = async (req, res, next) => {  // Function to get 
 
 module.exports.logoutUser = async (req, res, next) => {  // Function to handle user logout
     res.clearCookie('token');  // Clear the token cookie from the response
-    
+
     const token = req.cookies.token || req.headers.authorization.split(' ')[1];  // Get the token from cookies or headers
 
     await blackListTokenModel.create({ token });  // Add the token to the blacklist

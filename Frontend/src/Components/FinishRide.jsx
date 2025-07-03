@@ -26,13 +26,11 @@ const FinishRide = (props) => {
             })
 
             if (response.status === 200) {
-                // Show success animation/message
                 setTimeout(() => {
                     navigate('/captain-dashboard')
                 }, 1500)
             }
         } catch (error) {
-            console.error('Error finishing ride:', error)
             setIsCompleting(false)
             alert('Error finishing ride. Please try again.')
         }

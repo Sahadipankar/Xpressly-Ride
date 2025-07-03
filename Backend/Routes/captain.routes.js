@@ -1,33 +1,23 @@
-const express = require('express');             // Import Express framework
-const router = express.Router();                // Create a new router instance
-const { body } = require('express-validator');  // Import express-validator for request validation
-const captainController = require('../Controllers/captain.controller'); // Import the captain controller
-const authMiddleware = require('../Middlewares/auth.middleware'); // Import authentication middleware
+const express = require('express');
+const router = express.Router();
+const { body } = require('express-validator');
+const captainController = require('../Controllers/captain.controller');
+const authMiddleware = require('../Middlewares/auth.middleware');
 
-
-
-router.post('/register', [ // Define a POST route for user registration
-    body('email').isEmail().withMessage('Please fill a valid email address'), // Validate email format
-
-    body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be at least 3 characters long'), // Validate first name length
-
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'), // Validate password length
-
-    body('vehicle.color').isLength({ min: 3 }).withMessage('Color must be at least 3 characters long'), // Validate vehicle color length
-
-    body('vehicle.plate').isLength({ min: 3 }).withMessage('Plate must be at least 3 characters long'), // Validate vehicle plate length
-
-    body('vehicle.capacity').isInt({ min: 1 }).withMessage('Capacity must be at least 1'), // Validate vehicle capacity
-
-    body('vehicle.vehicleType').isIn(['Car', 'Auto', 'Moto']).withMessage('Vehicle type must be either Car, Auto, or Moto') // Validate vehicle type
+router.post('/register', [
+    body('email').isEmail().withMessage('Please fill a valid email address'),
+    body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be at least 3 characters long'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+    body('vehicle.color').isLength({ min: 3 }).withMessage('Color must be at least 3 characters long'),
+    body('vehicle.plate').isLength({ min: 3 }).withMessage('Plate must be at least 3 characters long'),
+    body('vehicle.capacity').isInt({ min: 1 }).withMessage('Capacity must be at least 1'),
+    body('vehicle.vehicleType').isIn(['Car', 'Auto', 'Moto']).withMessage('Vehicle type must be either Car, Auto, or Moto')
 ],
-    captainController.registerCaptain); // Call the registerCaptain function from the controller
+    captainController.registerCaptain);
 
-
-
-router.post('/login', [ // Define a POST route for user login
-    body('email').isEmail().withMessage('Please fill a valid email address'), // Validate email format
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long') // Validate password length
+router.post('/login', [
+    body('email').isEmail().withMessage('Please fill a valid email address'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
 ],
     captainController.loginCaptain); // Call the loginCaptain function from the controller
 

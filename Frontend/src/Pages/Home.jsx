@@ -322,8 +322,6 @@ const Home = () => {
             window.location.reload()
 
         } catch (error) {
-            console.error('Refresh failed:', error)
-            // Fallback: still reload the page
             window.location.reload()
         } finally {
             setRefreshing(false)

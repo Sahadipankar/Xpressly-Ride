@@ -14,7 +14,7 @@ import CaptainLogout from './Pages/CaptainLogout'
 import Riding from './Pages/Riding'
 import CaptainRiding from './Pages/CaptainRiding'
 
-const App = () => { // This is the main App component that sets up the routes for the application
+const App = () => {
   return (
     <div>
       <Routes>

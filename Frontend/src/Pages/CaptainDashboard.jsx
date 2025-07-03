@@ -29,7 +29,6 @@ const CaptainDashboard = () => {
     const { socket } = useContext(SocketContext)
     const { captain } = useContext(CaptainDataContext)
 
-    // Update clock every second
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date())
@@ -38,7 +37,6 @@ const CaptainDashboard = () => {
         return () => clearInterval(timer)
     }, [])
 
-    // Handle refresh
     const handleRefresh = () => {
         setRefreshing(true)
         setTimeout(() => {
@@ -47,7 +45,6 @@ const CaptainDashboard = () => {
         }, 1000)
     }
 
-    // Handle logout
     const handleLogout = () => {
         localStorage.removeItem('token')
         navigate('/captain-login')
@@ -75,8 +72,6 @@ const CaptainDashboard = () => {
 
         const locationInterval = setInterval(updateLocation, 10000)
         updateLocation()
-
-        // return () => clearInterval(locationInterval)
     }, [])
 
     socket.on('new-ride', (data) => {

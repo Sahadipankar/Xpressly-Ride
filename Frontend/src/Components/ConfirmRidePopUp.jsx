@@ -192,7 +192,6 @@ const ConfirmRidePopUp = (props) => {
                                                 newOtp[index] = value;
                                                 setOtp(newOtp.join(''));
 
-                                                // Auto-focus next input
                                                 if (value && index < 5) {
                                                     const nextInput = e.target.parentElement.children[index + 1];
                                                     nextInput?.focus();
@@ -200,7 +199,6 @@ const ConfirmRidePopUp = (props) => {
                                             }
                                         }}
                                         onKeyDown={(e) => {
-                                            // Handle backspace
                                             if (e.key === 'Backspace' && !otp[index] && index > 0) {
                                                 const prevInput = e.target.parentElement.children[index - 1];
                                                 prevInput?.focus();
@@ -210,7 +208,6 @@ const ConfirmRidePopUp = (props) => {
                                             e.preventDefault();
                                             const pasteData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
                                             setOtp(pasteData);
-                                            // Focus the last filled input or the next empty one
                                             const nextIndex = Math.min(pasteData.length, 5);
                                             const targetInput = e.target.parentElement.children[nextIndex];
                                             targetInput?.focus();

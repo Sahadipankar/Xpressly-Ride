@@ -5,18 +5,16 @@ import axios from 'axios'
 import { CaptainDataContext } from '../Context/CaptainContext'
 import XpresslyLogo from '../Components/XpresslyLogo'
 
-const CaptainLogin = () => { // This component renders a login form for captains to log in to their accounts.
+const CaptainLogin = () => {
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
 
-    const [email, setEmail] = useState('') // useState hook is used to manage the email state of the input field.
-    const [password, setPassword] = useState('') // useState hook is used to manage the password state of the input field.
+    const { captain, setCaptain } = React.useContext(CaptainDataContext)
+    const navigate = useNavigate()
 
-    const { captain, setCaptain } = React.useContext(CaptainDataContext) // Using the CaptainDataContext to access and set captain data.
-    const navigate = useNavigate() // Using useNavigate hook to programmatically navigate after form submission.
+    const submitHandler = async (e) => {
+        e.preventDefault()
 
-    const submitHandler = async (e) => { // This function handles the form submission.
-        e.preventDefault() // Prevents the default form submission behavior.
-
-        // Collecting captain data from the input fields
         const captain = {
             email: email,
             password: password
@@ -29,10 +27,9 @@ const CaptainLogin = () => { // This component renders a login form for captains
 
             setCaptain(data.captain)
             localStorage.setItem('token', data.token)
-            navigate('/captain-dashboard') // Navigating to the captain dashboard after successful login.
+            navigate('/captain-dashboard')
         }
 
-        // Resetting the input fields after submission
         setEmail('')
         setPassword('')
     }

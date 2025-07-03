@@ -4,22 +4,22 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const CaptainProtectWrapper = ({
-    children // This component is a wrapper that protects routes for authenticated users.
+    children
 }) => {
 
-    const token = localStorage.getItem('token') // Retrieve the token from local storage.
-    const navigate = useNavigate() // Hook to programmatically navigate to different routes.
+    const token = localStorage.getItem('token')
+    const navigate = useNavigate()
     const { captain, setCaptain } = useContext(CaptainDataContext)
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        if (!token) { // If there is no token, redirect to the login page.
+        if (!token) {
             navigate('/captain-login')
         }
 
         axios.get(`${import.meta.env.VITE_BASE_URL}/captains/profile`, {
             headers: {
-                Authorization: `Bearer ${token}` // Include the token in the request headers for authentication.
+                Authorization: `Bearer ${token}`
             }
         }).then((response) => {
             if (response.status === 200) {
@@ -35,11 +35,11 @@ const CaptainProtectWrapper = ({
 
 
     if (isLoading) {
-        return <div>Loading...</div> // Show a loading message while the authentication status is being checked.
+        return <div>Loading...</div>
     }
     return (
         <>
-            {children} {/* Render the children components if the user is authenticated */}
+            {children}
         </>
     )
 }

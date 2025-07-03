@@ -33,7 +33,7 @@ const Riding = () => {
     const [isLoadingTripData, setIsLoadingTripData] = useState(true)
     const [trafficAlerts, setTrafficAlerts] = useState([])
     const [showTrafficDetails, setShowTrafficDetails] = useState(true)
-    const [lastUpdate, setLastUpdate] = useState(Date.now())    // Fetch initial trip data
+    const [lastUpdate, setLastUpdate] = useState(Date.now())
     useEffect(() => {
         const fetchTripData = async () => {
             if (ride?.pickup && ride?.destination) {
@@ -54,16 +54,15 @@ const Riding = () => {
                         originalDuration: durationInSeconds,
                         distanceInKm: distanceInKm,
                         averageSpeed: calculatedAvgSpeed,
-                        currentSpeed: parseFloat(calculatedAvgSpeed), // Initialize current speed
+                        currentSpeed: parseFloat(calculatedAvgSpeed),
                         trafficCondition: determineTrafficCondition(durationInSeconds, distanceInKm),
                         trafficIncidents: generateTrafficIncidents(determineTrafficCondition(durationInSeconds, distanceInKm)),
                         routeAlerts: generateRouteAlerts(determineTrafficCondition(durationInSeconds, distanceInKm)),
                         alternativeRoutes: Math.floor(Math.random() * 3) + 1
                     })
                 } catch (error) {
-                    // Fallback values - calculate dynamic average based on distance and duration
                     const fallbackDistance = 3.2
-                    const fallbackDuration = 720 // seconds
+                    const fallbackDuration = 720
                     const fallbackAvgSpeed = (fallbackDistance / (fallbackDuration / 3600)).toFixed(1)
 
                     setTripData({
@@ -73,7 +72,7 @@ const Riding = () => {
                         originalDuration: 720,
                         distanceInKm: 3.2,
                         averageSpeed: fallbackAvgSpeed,
-                        currentSpeed: parseFloat(fallbackAvgSpeed), // Initialize current speed
+                        currentSpeed: parseFloat(fallbackAvgSpeed),
                         trafficCondition: 'normal',
                         trafficIncidents: generateTrafficIncidents('normal'),
                         routeAlerts: generateRouteAlerts('normal'),
@@ -87,115 +86,98 @@ const Riding = () => {
         fetchTripData()
     }, [ride])
 
-    // Update time every second
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date())
         }, 1000)
 
         return () => clearInterval(timer)
-    }, [])    // Enhanced dynamic trip updates with comprehensive traffic simulation
+    }, [])
     useEffect(() => {
         const updateTripProgress = () => {
             if (tripData.originalDuration && !isRideCompleted) {
-                const elapsedTime = (currentTime - rideStartTime) / 1000 // seconds
+                const elapsedTime = (currentTime - rideStartTime) / 1000
                 const progressPercentage = Math.min(elapsedTime / tripData.originalDuration, 1)
 
-                // More realistic distance calculation with GPS simulation
                 const baseDistance = tripData.distanceInKm || 3.2
                 const remainingKm = Math.max(baseDistance * (1 - progressPercentage), 0.05)
 
-                // Advanced traffic simulation
                 const trafficMultiplier = simulateTrafficConditions()
 
-                // Dynamic base speed based on vehicle type and conditions
                 const vehicleType = ride?.captain?.vehicle?.vehicleType?.toLowerCase()
-                let baseSpeed = 25 // Default base speed
+                let baseSpeed = 25
 
                 switch (vehicleType) {
                     case 'motorcycle':
                     case 'moto':
-                        baseSpeed = 35 // Motorcycles are generally faster
+                        baseSpeed = 35
                         break
                     case 'car':
-                        baseSpeed = 30 // Cars have good speed
+                        baseSpeed = 30
                         break
                     case 'auto':
-                        baseSpeed = 20 // Auto-rickshaws are slower
+                        baseSpeed = 20
                         break
                 }
 
-                // Apply traffic conditions with enhanced multipliers
                 let adjustedSpeed = baseSpeed / trafficMultiplier
 
-                // Adventure/high-speed scenarios enhancement - increased frequency
-                const isAdventureMode = Math.random() < 0.25 // 25% chance for adventure (increased from 8%)
+                const isAdventureMode = Math.random() < 0.25
                 if (isAdventureMode && trafficMultiplier < 1.0) {
-                    // Highway/expressway scenario - significant speed boost
-                    const adventureBoost = 2.0 + Math.random() * 1.5 // 200-350% boost (increased)
+                    const adventureBoost = 2.0 + Math.random() * 1.5
                     adjustedSpeed *= adventureBoost
                 }
 
-                // Additional dynamic factors for realism
-                const roadConditionFactor = 0.8 + (Math.random() * 0.4) // 0.8 to 1.2
-                const driverBehaviorFactor = 0.9 + (Math.random() * 0.2) // 0.9 to 1.1
-                const weatherFactor = Math.random() > 0.85 ? 0.7 : 1.0 // 15% chance of weather impact
+                const roadConditionFactor = 0.8 + (Math.random() * 0.4)
+                const driverBehaviorFactor = 0.9 + (Math.random() * 0.2)
+                const weatherFactor = Math.random() > 0.85 ? 0.7 : 1.0
 
-                // Calculate current speed with all factors
                 let currentSpeed = adjustedSpeed * roadConditionFactor * driverBehaviorFactor * weatherFactor
 
-                // Apply vehicle speed limits - increased caps
-                let maxSpeedCap = 120 // Increased default
+                let maxSpeedCap = 120
                 switch (vehicleType) {
                     case 'motorcycle':
                     case 'moto':
-                        maxSpeedCap = 200 // Increased significantly
+                        maxSpeedCap = 200
                         break
                     case 'car':
-                        maxSpeedCap = 180 // Increased significantly  
+                        maxSpeedCap = 180
                         break
                     case 'auto':
-                        maxSpeedCap = 100 // Increased from 80
+                        maxSpeedCap = 100
                         break
                 }
 
                 currentSpeed = Math.max(Math.min(currentSpeed, maxSpeedCap), 5)
 
-                // Calculate dynamic ETA based on current speed and conditions
-                const timeToDestination = (remainingKm / currentSpeed) * 3600 // seconds
+                const timeToDestination = (remainingKm / currentSpeed) * 3600
 
-                // Enhanced traffic delay calculation
                 let trafficDelayBuffer = 0
                 if (trafficMultiplier > 1.2) {
-                    trafficDelayBuffer = (trafficMultiplier - 1) * 200 // Heavy traffic delays
+                    trafficDelayBuffer = (trafficMultiplier - 1) * 200
                 } else if (trafficMultiplier < 0.8) {
-                    trafficDelayBuffer = -60 // Light traffic time savings
+                    trafficDelayBuffer = -60
                 }
 
-                const randomBuffer = Math.random() * 90 + 30 // 30-120 seconds buffer
+                const randomBuffer = Math.random() * 90 + 30
                 const adjustedETA = Math.max(timeToDestination + trafficDelayBuffer + randomBuffer, 60)
 
-                // Determine traffic condition with enhanced granularity
                 let trafficCondition = 'normal'
                 if (currentSpeed < 8) trafficCondition = 'severe'
                 else if (currentSpeed < 15) trafficCondition = 'heavy'
                 else if (currentSpeed < 25) trafficCondition = 'moderate'
-                else if (currentSpeed > 60) trafficCondition = 'light' // Lowered threshold for light traffic
+                else if (currentSpeed > 60) trafficCondition = 'light'
 
-                // Calculate dynamic trip average speed
-                const tripElapsedTime = elapsedTime / 3600 // hours
+                const tripElapsedTime = elapsedTime / 3600
                 const distanceTraveled = baseDistance - remainingKm
                 let dynamicAvgSpeed = tripElapsedTime > 0 ? (distanceTraveled / tripElapsedTime) : currentSpeed
 
-                // Smooth the average speed changes to avoid jumps
                 const previousAvgSpeed = parseFloat(tripData.averageSpeed) || currentSpeed
-                dynamicAvgSpeed = (previousAvgSpeed * 0.7) + (dynamicAvgSpeed * 0.3) // 70-30 smoothing
+                dynamicAvgSpeed = (previousAvgSpeed * 0.7) + (dynamicAvgSpeed * 0.3)
 
-                // Calculate dynamic traffic delay
                 const expectedSpeed = baseSpeed * 1.2
                 const trafficDelay = Math.max(0, Math.round(((expectedSpeed - currentSpeed) / expectedSpeed) * 8))
 
-                // Determine speed trend
                 const speedTrend = tripData.currentSpeed ?
                     (currentSpeed > tripData.currentSpeed ? 'increasing' :
                         currentSpeed < tripData.currentSpeed ? 'decreasing' : 'stable') : 'stable'

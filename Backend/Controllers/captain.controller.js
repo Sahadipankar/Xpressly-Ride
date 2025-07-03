@@ -1,33 +1,30 @@
-const captainModel = require('../Models/captain.model'); // Import the captain model
-const captainService = require('../Services/captain.service'); // Import the captain service
-const { validationResult } = require('express-validator'); // Import express-validator for request validation
-const blackListTokenModel = require('../Models/blacklistToken.model'); // Import the blacklist token model
+const captainModel = require('../Models/captain.model');
+const captainService = require('../Services/captain.service');
+const { validationResult } = require('express-validator');
+const blackListTokenModel = require('../Models/blacklistToken.model');
 
+module.exports.registerCaptain = async (req, res, next) => {
+    const errors = validationResult(req);
 
-
-module.exports.registerCaptain = async (req, res, next) => { // Function to register a new captain
-
-    const errors = validationResult(req); // Validate the request body using express-validator
-
-    if (!errors.isEmpty()) { // Check if there are validation errors
-        return res.status(400).json({ // Return a 400 Bad Request response with the validation errors
-            errors: errors.array(), // Send the array of validation errors
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array(),
         });
     }
 
-    const { fullname, email, password, vehicle } = req.body; // Destructure the request body to get the captain's details
+    const { fullname, email, password, vehicle } = req.body;
 
-    const isCaptainAlreadyExist = await captainModel.findOne({ email }); // Check if a captain with the same email already exists
+    const isCaptainAlreadyExist = await captainModel.findOne({ email });
 
-    if (isCaptainAlreadyExist) { // If a captain with the same email exists
-        return res.status(400).json({ // Return a 400 Bad Request response
-            message: 'Captain already exists', // Send an error message
+    if (isCaptainAlreadyExist) {
+        return res.status(400).json({
+            message: 'Captain already exists',
         });
     }
 
-    const hashedPassword = await captainModel.hashPassword(password); // Hash the password using the hashPassword method from the captain model
+    const hashedPassword = await captainModel.hashPassword(password);
 
-    const captain = await captainService.createCaptain({ // Call the createCaptain function from the captain service to create a new captain
+    const captain = await captainService.createCaptain({
         firstname: fullname.firstname,
         lastname: fullname.lastname,
         email,
@@ -36,31 +33,28 @@ module.exports.registerCaptain = async (req, res, next) => { // Function to regi
         plate: vehicle.plate,
         capacity: vehicle.capacity,
         vehicleType: vehicle.vehicleType,
-    }); 
+    });
 
-    const token = captain.generateAuthToken(); // Generate a JWT token for the newly created captain
+    const token = captain.generateAuthToken();
 
-    res.status(201).json({ token, captain }); // Return a 201 Created response with the token and captain details
+    res.status(201).json({ token, captain });
 }
 
+module.exports.loginCaptain = async (req, res, next) => {
+    const errors = validationResult(req);
 
-
-module.exports.loginCaptain = async (req, res, next) => { // Function to log in a captain
-
-    const errors = validationResult(req); // Validate the request body using express-validator
-
-    if (!errors.isEmpty()) { // Check if there are validation errors
-        return res.status(400).json({ // Return a 400 Bad Request response with the validation errors
-            errors: errors.array(), // Send the array of validation errors
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array(),
         });
     }
 
-    const { email, password } = req.body; // Destructure the request body to get the email and password
+    const { email, password } = req.body;
 
-    const captain = await captainModel.findOne({ email }).select('+password'); // Find the captain by email and select the password field
+    const captain = await captainModel.findOne({ email }).select('+password');
 
-    if (!captain) { // If the captain is not found
-        return res.status(400).json({ // Return a 400 Bad Request response
+    if (!captain) {
+        return res.status(400).json({
             message: 'Invalid email or password', // Send an error message
         });
     }
@@ -97,7 +91,7 @@ module.exports.getCaptainProfile = async (req, res, next) => { // Function to ge
 module.exports.logoutCaptain = async (req, res, next) => { // Function to log out a captain
 
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1]; // Get the token from cookies or headers
-    
+
     await blackListTokenModel.create({ token: token }); // Add the token to the blacklist in the database
 
     res.clearCookie('token'); // Clear the token cookie from the response

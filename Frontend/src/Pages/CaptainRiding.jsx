@@ -10,16 +10,15 @@ const CaptainRiding = () => {
     const navigate = useNavigate()
     const [finishRidePanel, setFinishRidePanel] = useState(false)
     const [currentTime, setCurrentTime] = useState(new Date())
-    const [tripDuration, setTripDuration] = useState(0) // in seconds
+    const [tripDuration, setTripDuration] = useState(0)
     const [distanceRemaining, setDistanceRemaining] = useState('4 km')
     const [estimatedTime, setEstimatedTime] = useState('12 min')
-    const [rideStatus, setRideStatus] = useState('in-progress') // 'in-progress', 'near-destination'
+    const [rideStatus, setRideStatus] = useState('in-progress')
 
     const finishRidePanelRef = useRef(null)
     const location = useLocation()
     const rideData = location.state?.ride
 
-    // Update current time and trip duration
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date())
@@ -28,7 +27,6 @@ const CaptainRiding = () => {
         return () => clearInterval(timer)
     }, [])
 
-    // Format trip duration
     const formatDuration = (seconds) => {
         const mins = Math.floor(seconds / 60)
         const secs = seconds % 60

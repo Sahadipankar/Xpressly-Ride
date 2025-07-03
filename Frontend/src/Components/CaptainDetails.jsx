@@ -11,7 +11,6 @@ const CaptainDetails = ({ isOnline = true, setIsOnline, isConnected = true, loca
         { id: 2, type: 'info', message: 'Peak hours starting soon', time: '5 min ago', icon: 'ri-time-line' }
     ])
 
-    // Update clock every second
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date())
@@ -20,27 +19,26 @@ const CaptainDetails = ({ isOnline = true, setIsOnline, isConnected = true, loca
         return () => clearInterval(timer)
     }, [])
 
-    // Memoized stats generation for better performance
     const dynamicStats = useMemo(() => {
-        const baseEarnings = Math.floor(Math.random() * 500) + 600; // 600-1100
-        const hoursOnline = (Math.random() * 6 + 2).toFixed(1); // 2-8 hours
-        const totalRides = Math.floor(Math.random() * 15) + 8; // 8-23 rides
-        const rating = (Math.random() * 0.5 + 4.5).toFixed(1); // 4.5-5.0
-        const completionRate = Math.floor(Math.random() * 5) + 95; // 95-100%
+        const baseEarnings = Math.floor(Math.random() * 500) + 600;
+        const hoursOnline = (Math.random() * 6 + 2).toFixed(1);
+        const totalRides = Math.floor(Math.random() * 15) + 8;
+        const rating = (Math.random() * 0.5 + 4.5).toFixed(1);
+        const completionRate = Math.floor(Math.random() * 5) + 95;
 
         return {
             todayEarnings: baseEarnings,
             weeklyEarnings: baseEarnings * 6 + Math.floor(Math.random() * 1000),
             monthlyEarnings: baseEarnings * 25 + Math.floor(Math.random() * 5000),
             hoursOnline: parseFloat(hoursOnline),
-            totalDistance: Math.floor(Math.random() * 100) + 80, // 80-180 km
+            totalDistance: Math.floor(Math.random() * 100) + 80,
             totalRides: totalRides,
             rating: parseFloat(rating),
-            totalTrips: Math.floor(Math.random() * 200) + 150, // 150-350 total trips
+            totalTrips: Math.floor(Math.random() * 200) + 150,
             completionRate: completionRate,
             avgTripEarnings: Math.floor(baseEarnings / totalRides),
-            fuelSavings: Math.floor(Math.random() * 200) + 100, // 100-300
-            carbonOffset: (Math.random() * 15 + 10).toFixed(1) // 10-25 kg CO2
+            fuelSavings: Math.floor(Math.random() * 200) + 100,
+            carbonOffset: (Math.random() * 15 + 10).toFixed(1)
         }
     }, [])
 
