@@ -6,6 +6,7 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import ConfirmRidePopUp from '../Components/ConfirmRidePopUp'
 import LiveTracking from '../Components/LiveTracking'
+import XpresslyLogo from '../Components/XpresslyLogo'
 
 import { useEffect, useContext } from 'react'
 import { SocketContext } from '../Context/SocketContext'
@@ -141,14 +142,17 @@ const CaptainDashboard = () => {
                     {/* Logo and Brand */}
                     <div className="flex items-center gap-3">
                         <div className="relative">
-                            <img
-                                className='w-10 h-10 md:w-12 md:h-12 object-contain'
-                                src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png"
-                                alt="Xpressly Logo"
-                            />
+                            <XpresslyLogo className="w-10 h-10 md:w-12 md:h-12" />
                             <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
-                        </div>                        <div className="hidden md:block">
-                            <h1 className="text-lg font-bold text-gray-800">Captain Dashboard</h1>
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-green-500 bg-clip-text text-transparent">
+                                    Xpressly
+                                </h1>
+                                <span className="hidden sm:inline text-gray-400">•</span>
+                                <span className="hidden sm:inline text-sm font-medium text-gray-600">Captain</span>
+                            </div>
                         </div>
                     </div>                    {/* Captain Info (Mobile) */}
                     <div className="flex md:hidden items-center gap-2">
@@ -206,7 +210,7 @@ const CaptainDashboard = () => {
             <main className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
                 {/* Map Section */}
                 <div className="flex-1 relative">
-                    <div className="relative h-83 md:h-96 lg:h-full">
+                    <div className="relative h-79 md:h-96 lg:h-full">
                         <LiveTracking />
                     </div>
                 </div>

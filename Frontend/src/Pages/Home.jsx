@@ -7,6 +7,7 @@ import VehiclePanel from '../Components/VehiclePanel';
 import ConfirmRide from '../Components/ConfirmRide';
 import LookingForDriver from '../Components/LookingForDriver';
 import WaitingForDriver from '../Components/WaitingForDriver';
+import XpresslyLogo from '../Components/XpresslyLogo';
 import axios from 'axios';
 import { SocketContext } from '../Context/SocketContext';
 import { UserDataContext } from '../Context/UserContext';
@@ -334,8 +335,13 @@ const Home = () => {
             {/* Enhanced Header with Logo, User Greeting, Clock and Logout */}
             <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-3 sm:p-4 md:p-6 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100">
                 <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
-                    <img className='w-8 sm:w-10 md:w-12 flex-shrink-0' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="Xpressly Logo" />
+                    <XpresslyLogo className="w-8 sm:w-10 md:w-12 flex-shrink-0" />
                     <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                        <div>
+                            <h1 className="text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-green-500 bg-clip-text text-transparent">
+                                Xpressly
+                            </h1>
+                        </div>
                         <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full overflow-hidden shadow-md flex-shrink-0 border-2 border-gray-200">
                             <img
                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKAjn0EsJc3E-9hgTU6GxsMuCioyJbeeRK4A&s"
