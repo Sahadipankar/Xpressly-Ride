@@ -108,7 +108,7 @@ const Start = () => {
                         </div>
 
                         {/* Royal Stats Grid */}
-                        <div className="grid grid-cols-3 gap-3 md:gap-4 lg:gap-6 mb-8 md:mb-10 max-w-lg mx-auto">
+                        <div className="grid grid-cols-3 gap-3 md:gap-4 lg:gap-6 mb-10 md:mb-10 max-w-lg mx-auto">
                             <div className="text-center glassmorphism p-3 md:p-4 lg:p-6 rounded-xl lg:rounded-2xl transform hover:scale-105 transition-all duration-300 group border border-yellow-500/20">
                                 <div className="text-yellow-400 mb-2 group-hover:scale-110 transition-transform">
                                     <svg className="w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 mx-auto" fill="currentColor" viewBox="0 0 24 24">
@@ -142,7 +142,7 @@ const Start = () => {
                             </div>
                         </div>
 
-                        <div className="w-15 h-15 md:w-24 md:h-24 lg:w-28 lg:h-28 mx-auto bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl relative">
+                        <div className="w-14 h-14 mt-4 md:w-24 md:h-24 lg:w-28 lg:h-28 mx-auto bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl relative">
                             <div className="absolute inset-0 bg-gradient-to-br from-yellow-300 to-amber-600 rounded-full animate-ping opacity-20"></div>
                             <svg className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-black relative z-10" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path>
