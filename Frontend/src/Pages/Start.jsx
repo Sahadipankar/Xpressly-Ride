@@ -68,44 +68,41 @@ const Start = () => {
                 <div className="pt-6 md:pt-8 px-4 md:px-6">
                     <div className="flex justify-center md:justify-start">
                         <div className="transform hover:scale-105 transition-transform duration-300 relative">
-                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
-                            <div className="relative">
-                                <XpresslyLogo className="text-white drop-shadow-2xl" size="lg" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 rounded-full blur-xl opacity-40 animate-pulse"></div>
+                            <div className="relative flex items-center space-x-4">
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-500 to-green-400 rounded-full blur-md opacity-50 animate-ping"></div>
+                                    <XpresslyLogo className="w-15 h-15 md:w-24 md:h-24 lg:w-28 lg:h-28 text-white drop-shadow-2xl relative z-10" />
+                                </div>
+                                <div className="text-white">
+                                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 bg-clip-text text-transparent drop-shadow-lg">
+                                        Xpressly
+                                    </h1>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Royal Main Content */}
-                <div className="flex-1 flex flex-col justify-center px-4 md:px-6 py-8">
+                <div className="flex-1 flex flex-col justify-center mt-8 px-4 md:px-6 py-8">
                     <div className="max-w-4xl mx-auto w-full">
                         {/* Royal Hero Section */}
                         <div className="text-center mb-8 md:mb-12">
-                            {/* Premium Hero Icon */}
-                            <div className="mb-6 md:mb-8">
-                                <div className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 mx-auto bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl relative">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-300 to-amber-600 rounded-full animate-ping opacity-20"></div>
-                                    <svg className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-black relative z-10" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
-                                    </svg>
-                                </div>
-                            </div>
-
                             {/* Royal Headlines */}
                             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6 leading-tight">
                                 <span className="text-white">Welcome to the</span>
-                                <span className="block bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent">
-                                    Royal Mobility Experience
+                                <span className="block bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent font-semibold">
+                                    Premium Riding Experience
                                 </span>
                             </h1>
 
                             <div className="space-y-2 md:space-y-3 mb-8 md:mb-10">
-                                <p className="text-lg md:text-xl lg:text-2xl font-semibold bg-gradient-to-r from-yellow-300 via-amber-400 to-gold-500 bg-clip-text text-transparent">
+                                <p className="text-lg md:text-xl lg:text-2xl mt-6 font-semibold bg-gradient-to-r from-yellow-300 via-amber-400 to-gold-500 bg-clip-text text-transparent">
                                     "Ride Smart. On Time. Every Time."
                                 </p>
-                                <p className="text-base md:text-lg lg:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed px-4">
-                                    Experience luxury transportation with premium service,
-                                    unmatched elegance, and royal treatment.
+                                <p className="text-base mt-2 -mb-2 md:text-lg lg:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed px-4">
+                                    Experience luxury transportation with premium riding experiences.
                                 </p>
                             </div>
                         </div>
@@ -143,6 +140,13 @@ const Start = () => {
                                 <div className="text-xl md:text-2xl lg:text-3xl font-bold text-white">4.9</div>
                                 <div className="text-xs md:text-sm lg:text-base text-yellow-200">Royal Rating</div>
                             </div>
+                        </div>
+
+                        <div className="w-15 h-15 md:w-24 md:h-24 lg:w-28 lg:h-28 mx-auto bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl relative">
+                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-300 to-amber-600 rounded-full animate-ping opacity-20"></div>
+                            <svg className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-black relative z-10" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path>
+                            </svg>
                         </div>
 
                         {/* Premium Features - Desktop Only */}
