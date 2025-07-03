@@ -359,37 +359,8 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Clock and Action Buttons section */}
+                {/* Action Buttons section */}
                 <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                    {/* Digital Clock - Desktop */}
-                    <div className="hidden md:flex flex-col items-center justify-center bg-gray-50 px-3 py-2 rounded-lg border shadow-sm">
-                        <div className="text-lg md:text-xl font-bold text-gray-800 leading-tight">
-                            {currentTime.toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: true
-                            })}
-                        </div>
-                        <div className="text-xs text-gray-500 leading-tight mt-0.5">
-                            {currentTime.toLocaleDateString([], {
-                                month: 'short',
-                                day: 'numeric'
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Mobile Clock */}
-                    <div className="md:hidden flex items-center justify-center gap-1 sm:gap-2 bg-gray-50 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border shadow-sm">
-                        <i className="ri-time-line text-gray-600 text-xs sm:text-sm flex-shrink-0" style={{ lineHeight: '1' }}></i>
-                        <span className="text-xs sm:text-sm font-medium text-gray-800" style={{ lineHeight: '1' }}>
-                            {currentTime.toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: true
-                            })}
-                        </span>
-                    </div>
-
                     {/* Enhanced Refresh Button */}
                     <button
                         onClick={refreshSession}
@@ -512,10 +483,38 @@ const Home = () => {
 
                     {/* Recent Destinations */}
                     <div className="mb-4">
-                        <h5 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                            <i className="ri-time-line text-gray-500"></i>
-                            Recent Destinations
-                        </h5>
+                        <div className="flex items-center justify-between mb-2">
+                            <h5 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                                <i className="ri-time-line text-gray-500"></i>
+                                Recent Destinations
+                            </h5>
+
+                            {/* Time Display */}
+                            <div className="flex items-center">
+                                {/* Desktop Time */}
+                                <div className="hidden md:flex items-center bg-gray-50 px-2 py-1 rounded-lg border shadow-sm">
+                                    <div className="text-sm font-bold text-gray-800">
+                                        {currentTime.toLocaleTimeString([], {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: true
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Mobile Time */}
+                                <div className="md:hidden flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border shadow-sm">
+                                    <i className="ri-time-line text-gray-600 text-xs"></i>
+                                    <span className="text-xs font-medium text-gray-800">
+                                        {currentTime.toLocaleTimeString([], {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: true
+                                        })}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                             <button className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all whitespace-nowrap">
                                 <i className="ri-home-line text-blue-500 text-sm"></i>
@@ -524,6 +523,10 @@ const Home = () => {
                             <button className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all whitespace-nowrap">
                                 <i className="ri-building-line text-orange-500 text-sm"></i>
                                 <span className="text-xs font-medium text-gray-700">Work</span>
+                            </button>
+                            <button className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all whitespace-nowrap">
+                                <i className="ri-building-4-line text-purple-500 text-sm"></i>
+                                <span className="text-xs font-medium text-gray-700">Office</span>
                             </button>
                             <button className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all whitespace-nowrap">
                                 <i className="ri-shopping-cart-line text-green-500 text-sm"></i>
