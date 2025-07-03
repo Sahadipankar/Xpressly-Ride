@@ -132,7 +132,7 @@ const Start = () => {
                             </div>
                             <div className="text-center glassmorphism p-3 md:p-4 lg:p-6 rounded-xl lg:rounded-2xl transform hover:scale-105 transition-all duration-300 group border border-yellow-400/20">
                                 <div className="text-yellow-400 mb-2 group-hover:scale-110 transition-transform">
-                                    <div className="flex justify-center space-x-1">
+                                    <div className="flex justify-center space-x-1 mt-2">
                                         {[...Array(5)].map((_, i) => (
                                             <svg key={i} className="w-2 h-2 md:w-3 md:h-3 lg:w-4 lg:h-4" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z" />
@@ -174,11 +174,11 @@ const Start = () => {
                     <div className="text-center mb-4 md:mb-6">
                         <h2 className='text-xl md:text-2xl lg:text-3xl font-bold mb-2'>
                             <span className="bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent">
-                                Begin Your Royal Journey
+                                Begin Your Journey
                             </span>
                         </h2>
                         <p className="text-yellow-200/80 text-sm md:text-base lg:text-lg">
-                            Join the elite who choose luxury and excellence
+                            Join the premium riding experience with Xpressly.
                         </p>
                     </div>
 
@@ -214,7 +214,7 @@ const Start = () => {
                                         <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
                                     </svg>
                                 </div>
-                                <span>Become Premium Driver</span>
+                                <span>Continue as Premium Driver</span>
                             </div>
                             <div className="relative z-10">
                                 <svg className="w-5 h-5 md:w-6 md:h-6 transform group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24">
