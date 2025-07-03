@@ -5,7 +5,7 @@
 A sleek and modern ride-booking platform built with the power of the MERN stack. This comprehensive project demonstrates real-world application development with advanced features including real-time tracking, Socket.IO communication, Google Maps integration, secure authentication, and responsive design. Perfect for showcasing full-stack development expertise and understanding of complex system architecture.
 
 ## � **Live Demo & Links**
-- 🌐 **Frontend**: [Experience Xpressly Live](https://uberclone0406.netlify.app)
+- 🌐 **Frontend**: [Experience Xpressly Live](https://xpressly.netlify.app)
 - 📱 **Try the App**: Create an account as both rider and captain to experience the full workflow
 - 📊 **GitHub Repository**: Complete source code with detailed documentation
 
