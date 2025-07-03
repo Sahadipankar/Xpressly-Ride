@@ -11,9 +11,12 @@ const CaptainDetails = ({ isOnline = true, setIsOnline, isConnected = true, loca
         { id: 2, type: 'info', message: 'Peak hours starting soon', time: '5 min ago', icon: 'ri-time-line' }
     ])
 
-    // Update time every minute
+    // Update clock every second
     useEffect(() => {
-        const timer = setInterval(() => setCurrentTime(new Date()), 60000)
+        const timer = setInterval(() => {
+            setCurrentTime(new Date())
+        }, 1000)
+
         return () => clearInterval(timer)
     }, [])
 
@@ -114,8 +117,34 @@ const CaptainDetails = ({ isOnline = true, setIsOnline, isConnected = true, loca
                                 </span>
                             </div>
                             <p className="text-sm opacity-75 mt-1 address-text">
-                                {vehicleInfo} • {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                {vehicleInfo}
                             </p>
+
+                            {/* Time Display */}
+                            <div className="flex items-center mt-2">
+                                {/* Desktop Time */}
+                                <div className="hidden md:flex items-center bg-white/20 backdrop-blur-sm px-2 py-1 rounded-lg border border-white/30 shadow-sm">
+                                    <div className="text-sm font-bold text-white">
+                                        {currentTime.toLocaleTimeString([], {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: true
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Mobile Time */}
+                                <div className="md:hidden flex items-center gap-1 bg-white/20 backdrop-blur-sm px-2 py-1 rounded-lg border border-white/30 shadow-sm">
+                                    <i className="ri-time-line text-white text-xs"></i>
+                                    <span className="text-xs font-medium text-white">
+                                        {currentTime.toLocaleTimeString([], {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: true
+                                        })}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="text-right">

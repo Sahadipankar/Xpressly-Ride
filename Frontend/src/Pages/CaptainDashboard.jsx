@@ -28,9 +28,12 @@ const CaptainDashboard = () => {
     const { socket } = useContext(SocketContext)
     const { captain } = useContext(CaptainDataContext)
 
-    // Update current time every minute
+    // Update clock every second
     useEffect(() => {
-        const timer = setInterval(() => setCurrentTime(new Date()), 60000)
+        const timer = setInterval(() => {
+            setCurrentTime(new Date())
+        }, 1000)
+
         return () => clearInterval(timer)
     }, [])
 
@@ -144,22 +147,10 @@ const CaptainDashboard = () => {
                                 alt="Xpressly Logo"
                             />
                             <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
-                        </div>
-                        <div className="hidden md:block">
+                        </div>                        <div className="hidden md:block">
                             <h1 className="text-lg font-bold text-gray-800">Captain Dashboard</h1>
-                            <p className="text-xs text-gray-600">
-                                {currentTime.toLocaleDateString('en-US', {
-                                    weekday: 'short',
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                })}
-                            </p>
                         </div>
-                    </div>
-
-                    {/* Captain Info (Mobile) */}
+                    </div>                    {/* Captain Info (Mobile) */}
                     <div className="flex md:hidden items-center gap-2">
                         <div className="text-right">
                             <h3 className="text-sm font-semibold capitalize">

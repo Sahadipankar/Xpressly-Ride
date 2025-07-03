@@ -29,7 +29,7 @@ const LocationSearchPanel = ({ suggestions, setVehiclePanel, setPanelOpen, setPi
     }
 
     const addToRecentLocations = (location) => {
-        const updatedLocations = [location, ...recentLocations.filter(loc => loc !== location)].slice(0, 5)
+        const updatedLocations = [location, ...recentLocations.filter(loc => loc !== location)].slice(0, 2)
         setRecentLocations(updatedLocations)
         localStorage.setItem('recentLocations', JSON.stringify(updatedLocations))
     }
