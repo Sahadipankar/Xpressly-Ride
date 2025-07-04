@@ -69,7 +69,7 @@ const Start = () => {
             <div className={`min-h-screen flex flex-col relative z-10 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                 {/* Header with Royal Logo */}
                 <div className="pt-6 md:pt-8 px-4 md:px-6">
-                    <div className="flex justify-center md:justify-start">
+                    <div className="flex justify-center">
                         <div className="transform hover:scale-105 transition-transform duration-300 relative">
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 rounded-full blur-xl opacity-40 animate-pulse"></div>
                             <div className="relative flex items-center space-x-4">
