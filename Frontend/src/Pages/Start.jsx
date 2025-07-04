@@ -153,7 +153,7 @@ const Start = () => {
                         </div>
 
                         {/* Premium Features - Desktop Only */}
-                        <div className="hidden lg:flex justify-center space-x-8 mb-8">
+                        <div className="hidden mt-10 lg:flex justify-center space-x-8 mb-2">
                             <div className="flex items-center text-yellow-200/90 text-sm xl:text-base">
                                 <svg className="w-4 h-4 xl:w-5 xl:h-5 mr-2 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
