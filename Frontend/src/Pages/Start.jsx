@@ -191,7 +191,7 @@ const Start = () => {
 
                     <div className="space-y-3 md:space-y-4">
                         <Link
-                            className='group flex items-center justify-between w-full bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 hover:from-yellow-400 hover:via-amber-400 hover:to-yellow-500 text-black py-4 md:py-5 lg:py-6 px-6 md:px-8 rounded-xl lg:rounded-2xl font-bold text-base md:text-lg lg:text-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl shadow-lg relative overflow-hidden'
+                            className='group btn-click-effect pulse-on-click flex items-center justify-between w-full bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 hover:from-yellow-400 hover:via-amber-400 hover:to-yellow-500 text-black py-4 md:py-5 lg:py-6 px-6 md:px-8 rounded-xl lg:rounded-2xl font-bold text-base md:text-lg lg:text-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl shadow-lg relative overflow-hidden'
                             to="/login"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -211,7 +211,7 @@ const Start = () => {
                         </Link>
 
                         <Link
-                            className='group flex items-center justify-between w-full bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 hover:from-gray-700 hover:via-gray-600 hover:to-gray-700 text-yellow-400 border border-yellow-500/50 py-4 md:py-5 lg:py-6 px-6 md:px-8 rounded-xl lg:rounded-2xl font-bold text-base md:text-lg lg:text-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl shadow-lg relative overflow-hidden'
+                            className='group btn-click-effect pulse-on-click flex items-center justify-between w-full bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 hover:from-gray-700 hover:via-gray-600 hover:to-gray-700 text-yellow-400 border border-yellow-500/50 py-4 md:py-5 lg:py-6 px-6 md:px-8 rounded-xl lg:rounded-2xl font-bold text-base md:text-lg lg:text-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl shadow-lg relative overflow-hidden'
                             to="/captain-login"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

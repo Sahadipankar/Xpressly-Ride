@@ -22,6 +22,8 @@ const CaptainSignUp = () => {
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
+    // useState hook to manage password visibility toggle
 
     // Vehicle information state management
     const [vehicleColor, setVehicleColor] = useState('')
@@ -70,6 +72,7 @@ const CaptainSignUp = () => {
         setLastName('')
         setEmail('')
         setPassword('')
+        setShowPassword(false)
         setVehicleColor('')
         setVehiclePlate('')
         setVehicleCapacity('')
@@ -216,14 +219,23 @@ const CaptainSignUp = () => {
                                         <label className='block text-xs font-bold text-gray-700 mb-1'>
                                             <i className="ri-lock-line mr-1"></i>Password
                                         </label>
-                                        <input
-                                            className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm bg-white placeholder-gray-400'
-                                            required
-                                            type="password"
-                                            placeholder='Create a strong password'
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                        />
+                                        <div className='relative'>
+                                            <input
+                                                className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm bg-white placeholder-gray-400'
+                                                required
+                                                type={showPassword ? "text" : "password"}
+                                                placeholder='Create a strong password'
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                            />
+                                            <button
+                                                type="button"
+                                                className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'
+                                                onClick={() => setShowPassword(!showPassword)}
+                                            >
+                                                <i className={`ri-eye-${showPassword ? 'off' : 'line'} text-sm`}></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 

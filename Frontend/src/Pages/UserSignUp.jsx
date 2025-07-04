@@ -18,6 +18,8 @@ const UserSignUp = () => {
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
+    // useState hook to manage password visibility toggle
     const [userData, setUserData] = useState({})
 
     const navigate = useNavigate() // Navigation hook for programmatic routing
@@ -56,6 +58,7 @@ const UserSignUp = () => {
         setLastName('')
         setEmail('')
         setPassword('')
+        setShowPassword(false)
     }
 
 
@@ -199,13 +202,17 @@ const UserSignUp = () => {
                                         <input
                                             className='w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 text-base bg-gray-50/50 hover:bg-white hover:shadow-lg placeholder-gray-400'
                                             required
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             placeholder='Create a strong password'
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                         />
-                                        <button type="button" className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'>
-                                            <i className="ri-eye-line text-lg"></i>
+                                        <button
+                                            type="button"
+                                            className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            <i className={`ri-eye-${showPassword ? 'off' : 'line'} text-lg`}></i>
                                         </button>
                                     </div>
                                 </div>

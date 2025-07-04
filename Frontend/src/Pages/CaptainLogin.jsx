@@ -17,6 +17,8 @@ const CaptainLogin = () => {
     // Form state management for captain credentials
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
+    // useState hook to manage password visibility toggle
 
     const { captain, setCaptain } = React.useContext(CaptainDataContext) // Global captain state
     const navigate = useNavigate() // Navigation hook for route management
@@ -48,6 +50,7 @@ const CaptainLogin = () => {
         // Reset form fields after submission
         setEmail('')
         setPassword('')
+        setShowPassword(false)
     }
 
     return (
@@ -173,11 +176,15 @@ const CaptainLogin = () => {
                                             required
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             placeholder='Enter your secure password'
                                         />
-                                        <button type="button" className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'>
-                                            <i className="ri-eye-line text-lg"></i>
+                                        <button
+                                            type="button"
+                                            className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            <i className={`ri-eye-${showPassword ? 'off' : 'line'} text-lg`}></i>
                                         </button>
                                     </div>
                                 </div>
