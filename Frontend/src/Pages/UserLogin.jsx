@@ -247,6 +247,17 @@ const UserLogin = () => {
                             </Link>
                         </div>
                     </div>
+
+                    {/* Back to Start Button - Bottom positioned */}
+                    <div className='mt-8 text-center'>
+                        <Link
+                            to='/'
+                            className='inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-xl hover:bg-white/20 transition-all duration-300 group shadow-lg'
+                        >
+                            <i className="ri-arrow-left-line text-lg group-hover:-translate-x-1 transition-transform duration-300"></i>
+                            <span className='font-medium'>Back to Start</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
