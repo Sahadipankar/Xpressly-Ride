@@ -34,6 +34,7 @@ const CaptainSignUp = () => {
     const { captain, setCaptain } = React.useContext(CaptainDataContext) // Global captain state
     const [loading, setLoading] = useState(false)
     const [loadingSignin, setLoadingSignin] = useState(false)
+    const [error, setError] = useState('') // State for error message
 
     /**
      * Captain registration form submission handler
@@ -43,6 +44,7 @@ const CaptainSignUp = () => {
     const submitHandler = async (e) => {
         e.preventDefault()
         setLoading(true)
+        setError('') // Clear previous errors
         try {
             // Prepare comprehensive captain data object
             const captainData = {
@@ -66,6 +68,12 @@ const CaptainSignUp = () => {
                 setCaptain(data.captain) // Update global captain context
                 localStorage.setItem('token', data.token) // Store authentication token
                 navigate('/captain-dashboard') // Redirect to captain dashboard
+            }
+        } catch (err) {
+            if (err.response && (err.response.status === 400 || err.response.status === 409)) {
+                setError('Email is already registered. Please use a different email or sign in.')
+            } else {
+                setError('An unexpected error occurred. Please try again later.')
             }
         } finally {
             setLoading(false)
@@ -175,6 +183,13 @@ const CaptainSignUp = () => {
                             </div>
 
                             <form onSubmit={(e) => submitHandler(e)} className='space-y-5'>
+                                {/* Error Message Display */}
+                                {error && (
+                                    <div className="mb-4 text-center text-red-600 bg-red-100 border border-red-200 rounded-lg py-2 px-4 animate-pulse">
+                                        {error}
+                                    </div>
+                                )}
+
                                 {/* Personal Information */}
                                 <div className='bg-gray-50 rounded-2xl p-4 border-l-4 border-blue-500'>
                                     <h3 className='font-bold text-gray-800 mb-3 flex items-center gap-2'>
@@ -268,6 +283,8 @@ const CaptainSignUp = () => {
                                                 type="text"
                                                 placeholder='MH01AB1234'
                                                 value={vehiclePlate}
+                                                pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$"
+                                                title="Vehicle Plate must contain both letters and numbers."
                                                 onChange={(e) => setVehiclePlate(e.target.value.toUpperCase())}
                                             />
                                         </div>
@@ -280,12 +297,12 @@ const CaptainSignUp = () => {
                                                 required
                                                 type="number"
                                                 min="1"
-                                                max="8"
-                                                placeholder='4'
+                                                max="4"
+                                                placeholder='Max 4'
                                                 value={vehicleCapacity}
                                                 onChange={(e) => {
                                                     const value = e.target.value;
-                                                    if (value === '' || (Number(value) > 0 && Number(value) <= 8)) {
+                                                    if (value === '' || (Number(value) > 0 && Number(value) <= 4)) {
                                                         setVehicleCapacity(value);
                                                     }
                                                 }}

@@ -23,6 +23,7 @@ const UserSignUp = () => {
     const [userData, setUserData] = useState({})
     const [loading, setLoading] = useState(false) // Loading state for signup button
     const [loadingSignin, setLoadingSignin] = useState(false) // Loading state for sign in link
+    const [error, setError] = useState('') // State for error message
 
     const navigate = useNavigate() // Navigation hook for programmatic routing
     const { user, setUser } = useContext(UserDataContext) // Global user state management
@@ -35,6 +36,7 @@ const UserSignUp = () => {
     const submitHandler = async (e) => {
         e.preventDefault()
         setLoading(true)
+        setError('') // Clear previous errors
         try {
             // Prepare user data object for API request
             const newUser = {
@@ -52,6 +54,12 @@ const UserSignUp = () => {
                 setUser(data.user) // Update global user context
                 localStorage.setItem('token', data.token) // Store authentication token
                 navigate('/home') // Redirect to home page
+            }
+        } catch (err) {
+            if (err.response && (err.response.status === 400 || err.response.status === 409)) {
+                setError('Email is already registered. Please use a different email or sign in.')
+            } else {
+                setError('An unexpected error occurred. Please try again later.')
             }
         } finally {
             setLoading(false)
@@ -143,6 +151,13 @@ const UserSignUp = () => {
                             </div>
 
                             <form onSubmit={(e) => submitHandler(e)} className='space-y-5'>
+                                {/* Error Message Display */}
+                                {error && (
+                                    <div className="mb-4 text-center text-red-600 bg-red-100 border border-red-200 rounded-lg py-2 px-4 animate-pulse">
+                                        {error}
+                                    </div>
+                                )}
+
                                 {/* Name Fields - First and Last name inputs */}
                                 <div className='grid grid-cols-2 gap-4'>
                                     <div className='relative'>
