@@ -21,6 +21,7 @@ const UserSignUp = () => {
     const [showPassword, setShowPassword] = useState(false)
     // useState hook to manage password visibility toggle
     const [userData, setUserData] = useState({})
+    const [loading, setLoading] = useState(false) // Loading state for async actions
 
     const navigate = useNavigate() // Navigation hook for programmatic routing
     const { user, setUser } = useContext(UserDataContext) // Global user state management
@@ -31,34 +32,35 @@ const UserSignUp = () => {
      * @param {Event} e - Form submission event
      */
     const submitHandler = async (e) => {
-        e.preventDefault() // Prevent default form submission
-
-        // Prepare user data object for API request
-        const newUser = {
-            fullname: {
-                firstname: firstName,
-                lastname: lastName
-            },
-            email: email,
-            password: password
+        e.preventDefault()
+        setLoading(true)
+        try {
+            // Prepare user data object for API request
+            const newUser = {
+                fullname: {
+                    firstname: firstName,
+                    lastname: lastName
+                },
+                email: email,
+                password: password
+            }
+            // Send registration request to backend API
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser)
+            if (response.status === 201) {
+                const data = response.data
+                setUser(data.user) // Update global user context
+                localStorage.setItem('token', data.token) // Store authentication token
+                navigate('/home') // Redirect to home page
+            }
+        } finally {
+            setLoading(false)
+            // Reset form fields after successful submission
+            setFirstName('')
+            setLastName('')
+            setEmail('')
+            setPassword('')
+            setShowPassword(false)
         }
-
-        // Send registration request to backend API
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser)
-
-        if (response.status === 201) {
-            const data = response.data
-            setUser(data.user) // Update global user context
-            localStorage.setItem('token', data.token) // Store authentication token
-            navigate('/home') // Redirect to home page
-        }
-
-        // Reset form fields after successful submission
-        setFirstName('')
-        setLastName('')
-        setEmail('')
-        setPassword('')
-        setShowPassword(false)
     }
 
 
@@ -231,12 +233,14 @@ const UserSignUp = () => {
                                 {/* Submit Button - Account creation button */}
                                 <button
                                     type='submit'
-                                    className='relative w-full bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl group overflow-hidden'
+                                    className='relative w-full bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl group overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed'
+                                    disabled={loading}
                                 >
                                     <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700'></div>
                                     <div className='relative flex items-center justify-center gap-3'>
                                         <i className="ri-user-add-line text-xl"></i>
-                                        <span className='text-lg'>Create Account</span>
+                                        <span className='text-lg'>{loading ? 'Creating Account...' : 'Create Account'}</span>
+                                        {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                     </div>
                                 </button>
                             </form>
@@ -252,9 +256,15 @@ const UserSignUp = () => {
                                     </div>
                                 </div>
                                 <div className='mt-4'>
-                                    <Link to='/login' className='w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-400 hover:text-blue-600 transition-all duration-200 font-semibold group'>
+                                    <Link
+                                        to='/login'
+                                        className='w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-400 hover:text-blue-600 transition-all duration-200 font-semibold group relative'
+                                        onClick={e => { if (loading) e.preventDefault(); }}
+                                        style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+                                    >
                                         <i className="ri-login-circle-line text-lg group-hover:scale-110 transition-transform"></i>
-                                        Sign In Instead
+                                        <span>{loading ? 'Loading...' : 'Sign In Instead'}</span>
+                                        {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                     </Link>
                                 </div>
                             </div>

@@ -25,6 +25,7 @@ const UserLogin = () => {
     const [showPassword, setShowPassword] = useState(false)
     // useState hook to manage password visibility toggle
     const [userData, setUserData] = useState({})
+    const [loading, setLoading] = useState(false) // Loading state for async actions
 
 
     const { user, setUser } = useContext(UserDataContext) // Using the UserDataContext to get and set user data.
@@ -38,27 +39,30 @@ const UserLogin = () => {
      */
     const submitHandler = async (e) => { // This function handles the form submission.
         e.preventDefault() // Prevents the default form submission behavior.
+        setLoading(true)
+        try {
+            // Prepare login credentials for API request
+            const userData = {
+                email: email,
+                password: password
+            }
 
-        // Prepare login credentials for API request
-        const userData = {
-            email: email,
-            password: password
+            // Send authentication request to backend API
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData) // Sending a POST request to the server to log in the user.
+
+            if (response.status === 200) { // If the response is successful
+                const data = response.data // Extracting user data from the response.
+                setUser(data.user) // Updating the user context with the new user data.
+                localStorage.setItem('token', data.token) // Storing the token in local storage for authentication.
+                navigate('/home') // Navigating to the home page after successful login.
+            }
+        } finally {
+            setLoading(false)
+            // Resetting the input fields after submission
+            setEmail('')
+            setPassword('')
+            setShowPassword(false)
         }
-
-        // Send authentication request to backend API
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData) // Sending a POST request to the server to log in the user.
-
-        if (response.status === 200) { // If the response is successful
-            const data = response.data // Extracting user data from the response.
-            setUser(data.user) // Updating the user context with the new user data.
-            localStorage.setItem('token', data.token) // Storing the token in local storage for authentication.
-            navigate('/home') // Navigating to the home page after successful login.
-        }
-
-        // Resetting the input fields after submission
-        setEmail('')
-        setPassword('')
-        setShowPassword(false)
     }
     return (
         <div className='min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden'>
@@ -196,12 +200,14 @@ const UserLogin = () => {
                                 {/* Submit Button - Login action button */}
                                 <button
                                     type='submit'
-                                    className='relative w-full bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl group overflow-hidden'
+                                    className='relative w-full bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl group overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed'
+                                    disabled={loading}
                                 >
                                     <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700'></div>
                                     <div className='relative flex items-center justify-center gap-3'>
                                         <i className="ri-login-circle-line text-xl"></i>
-                                        <span className='text-lg'>Sign In</span>
+                                        <span className='text-lg'>{loading ? 'Signing In...' : 'Sign In'}</span>
+                                        {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                     </div>
                                 </button>
                             </form>
@@ -217,9 +223,15 @@ const UserLogin = () => {
                                     </div>
                                 </div>
                                 <div className='mt-6'>
-                                    <Link to='/signup' className='w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-400 hover:text-blue-600 transition-all duration-200 font-semibold group'>
+                                    <Link
+                                        to='/signup'
+                                        className='w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-400 hover:text-blue-600 transition-all duration-200 font-semibold group relative'
+                                        onClick={e => { if (loading) e.preventDefault(); }}
+                                        style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+                                    >
                                         <i className="ri-user-add-line text-lg group-hover:scale-110 transition-transform"></i>
-                                        Create New Account
+                                        <span>{loading ? 'Loading...' : 'Create New Account'}</span>
+                                        {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                     </Link>
                                 </div>
                             </div>
@@ -233,6 +245,8 @@ const UserLogin = () => {
                             <Link
                                 to='/captain-login'
                                 className='relative w-full flex items-center justify-center bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl group overflow-hidden'
+                                onClick={e => { if (loading) e.preventDefault(); }}
+                                style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
                             >
                                 <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700'></div>
                                 <div className='relative flex items-center gap-3'>
@@ -240,9 +254,10 @@ const UserLogin = () => {
                                         <i className="ri-steering-2-line text-xl"></i>
                                     </div>
                                     <div>
-                                        <span className='block text-lg font-bold'>Join as Captain</span>
+                                        <span className='block text-lg font-bold'>{loading ? 'Loading...' : 'Join as Captain'}</span>
                                         <span className='block text-sm text-green-100'>Start earning today</span>
                                     </div>
+                                    {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                 </div>
                             </Link>
                         </div>

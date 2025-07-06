@@ -18,6 +18,7 @@ const CaptainLogin = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
+    const [loading, setLoading] = useState(false)
     // useState hook to manage password visibility toggle
 
     const { captain, setCaptain } = React.useContext(CaptainDataContext) // Global captain state
@@ -29,28 +30,28 @@ const CaptainLogin = () => {
      * @param {Event} e - Form submission event
      */
     const submitHandler = async (e) => {
-        e.preventDefault() // Prevent default form submission
-
-        // Prepare captain login credentials
-        const captain = {
-            email: email,
-            password: password
+        e.preventDefault()
+        setLoading(true)
+        try {
+            // Prepare captain login credentials
+            const captain = {
+                email: email,
+                password: password
+            }
+            // Send captain authentication request to backend
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, captain)
+            if (response.status === 200) {
+                const data = response.data
+                setCaptain(data.captain) // Update global captain context
+                localStorage.setItem('token', data.token) // Store authentication token
+                navigate('/captain-dashboard') // Redirect to captain dashboard
+            }
+        } finally {
+            setLoading(false)
+            setEmail('')
+            setPassword('')
+            setShowPassword(false)
         }
-
-        // Send captain authentication request to backend
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, captain)
-
-        if (response.status === 200) {
-            const data = response.data
-            setCaptain(data.captain) // Update global captain context
-            localStorage.setItem('token', data.token) // Store authentication token
-            navigate('/captain-dashboard') // Redirect to captain dashboard
-        }
-
-        // Reset form fields after submission
-        setEmail('')
-        setPassword('')
-        setShowPassword(false)
     }
 
     return (
@@ -201,14 +202,16 @@ const CaptainLogin = () => {
 
                                 <button
                                     type='submit'
-                                    className='relative w-full bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 hover:from-green-700 hover:via-emerald-700 hover:to-green-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl group overflow-hidden'
+                                    className='relative w-full bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 hover:from-green-700 hover:via-emerald-700 hover:to-green-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl group overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed'
+                                    disabled={loading}
                                 >
                                     <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700'></div>
                                     <div className='relative flex items-center justify-center gap-3'>
                                         <div className='p-1 bg-white/20 rounded-lg'>
                                             <i className="ri-steering-2-line text-xl"></i>
                                         </div>
-                                        <span className='text-lg'>Access Captain Dashboard</span>
+                                        <span className='text-lg'>{loading ? 'Signing In...' : 'Access Captain Dashboard'}</span>
+                                        {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                     </div>
                                 </button>
                             </form>
@@ -223,9 +226,15 @@ const CaptainLogin = () => {
                                     </div>
                                 </div>
                                 <div className='mt-6'>
-                                    <Link to='/captain-signup' className='w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-green-400 hover:text-green-600 transition-all duration-200 font-semibold group'>
+                                    <Link
+                                        to='/captain-signup'
+                                        className='w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-green-400 hover:text-green-600 transition-all duration-200 font-semibold group relative'
+                                        onClick={e => { if (loading) e.preventDefault(); }}
+                                        style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+                                    >
                                         <i className="ri-user-add-line text-lg group-hover:scale-110 transition-transform"></i>
-                                        Join as Captain
+                                        <span>{loading ? 'Loading...' : 'Join as Captain'}</span>
+                                        {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                     </Link>
                                 </div>
                             </div>
