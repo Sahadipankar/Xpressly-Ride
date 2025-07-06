@@ -203,7 +203,7 @@ const CaptainSignUp = () => {
                                                 className='w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100 text-sm bg-white placeholder-gray-400'
                                                 required
                                                 type="text"
-                                                placeholder='John'
+                                                placeholder='First Name'
                                                 value={firstName}
                                                 onChange={(e) => setFirstName(e.target.value)}
                                             />
@@ -214,7 +214,7 @@ const CaptainSignUp = () => {
                                                 className='w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100 text-sm bg-white placeholder-gray-400'
                                                 required
                                                 type="text"
-                                                placeholder='Doe'
+                                                placeholder='Last Name'
                                                 value={lastName}
                                                 onChange={(e) => setLastName(e.target.value)}
                                             />
@@ -281,9 +281,9 @@ const CaptainSignUp = () => {
                                                 className='w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-100 text-sm bg-white placeholder-gray-400 uppercase'
                                                 required
                                                 type="text"
-                                                placeholder='MH01AB1234'
+                                                placeholder='WB07 A1234'
                                                 value={vehiclePlate}
-                                                pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$"
+                                                pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d ]+$" 
                                                 title="Vehicle Plate must contain both letters and numbers."
                                                 onChange={(e) => setVehiclePlate(e.target.value.toUpperCase())}
                                             />
