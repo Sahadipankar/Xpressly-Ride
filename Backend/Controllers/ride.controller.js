@@ -35,8 +35,8 @@ module.exports.createRide = async (req, res) => {
         // Get pickup location coordinates for captain search
         const pickupCoordinates = await mapService.getAddressCoordinate(pickup);
 
-        // Find captains within 5km radius of pickup location
-        const captainsInRadius = await mapService.getCaptainsInTheRadius(pickupCoordinates.ltd, pickupCoordinates.lng, 50000);
+        // Find captains within 20m radius of pickup location
+        const captainsInRadius = await mapService.getCaptainsInTheRadius(pickupCoordinates.ltd, pickupCoordinates.lng, 20);
 
         // Hide OTP from ride data sent to captains for security
         ride.otp = ""

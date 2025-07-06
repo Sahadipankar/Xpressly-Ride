@@ -28,6 +28,7 @@ const UserLogin = () => {
     const [loading, setLoading] = useState(false) // Loading state for login button
     const [loadingSignup, setLoadingSignup] = useState(false) // Loading state for signup link
     const [loadingCaptain, setLoadingCaptain] = useState(false) // Loading state for captain link
+    const [error, setError] = useState('') // State for error message
 
 
     const { user, setUser } = useContext(UserDataContext) // Using the UserDataContext to get and set user data.
@@ -42,6 +43,7 @@ const UserLogin = () => {
     const submitHandler = async (e) => { // This function handles the form submission.
         e.preventDefault() // Prevents the default form submission behavior.
         setLoading(true)
+        setError('') // Clear previous errors
         try {
             // Prepare login credentials for API request
             const userData = {
@@ -57,6 +59,12 @@ const UserLogin = () => {
                 setUser(data.user) // Updating the user context with the new user data.
                 localStorage.setItem('token', data.token) // Storing the token in local storage for authentication.
                 navigate('/home') // Navigating to the home page after successful login.
+            }
+        } catch (err) {
+            if (err.response && (err.response.status === 401 || err.response.status === 404)) {
+                setError('Invalid username or password. User not found. Please try again!')
+            } else {
+                setError('An unexpected error occurred. Please try again later.')
             }
         } finally {
             setLoading(false)
@@ -142,6 +150,13 @@ const UserLogin = () => {
                             </div>
 
                             <form onSubmit={(e) => submitHandler(e)} className='space-y-6'>
+                                {/* Error Message Display */}
+                                {error && (
+                                    <div className="mb-4 text-center text-red-600 bg-red-100 border border-red-200 rounded-lg py-2 px-4 animate-pulse">
+                                        {error}
+                                    </div>
+                                )}
+
                                 {/* Email Field - User email input with validation */}
                                 <div className='relative'>
                                     <label className='block text-sm font-bold text-gray-800 mb-3'>

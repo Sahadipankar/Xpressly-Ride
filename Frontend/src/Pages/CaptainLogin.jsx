@@ -20,6 +20,7 @@ const CaptainLogin = () => {
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const [loadingSignup, setLoadingSignup] = useState(false)
+    const [error, setError] = useState('') // State for error message
     // useState hook to manage password visibility toggle
 
     const { captain, setCaptain } = React.useContext(CaptainDataContext) // Global captain state
@@ -33,6 +34,7 @@ const CaptainLogin = () => {
     const submitHandler = async (e) => {
         e.preventDefault()
         setLoading(true)
+        setError('') // Clear previous errors
         try {
             // Prepare captain login credentials
             const captain = {
@@ -46,6 +48,12 @@ const CaptainLogin = () => {
                 setCaptain(data.captain) // Update global captain context
                 localStorage.setItem('token', data.token) // Store authentication token
                 navigate('/captain-dashboard') // Redirect to captain dashboard
+            }
+        } catch (err) {
+            if (err.response && (err.response.status === 401 || err.response.status === 404 || err.response.status === 400)) {
+                setError('Invalid username or password. Captain not found. Please try again!')
+            } else {
+                setError('An unexpected error occurred. Please try again later.')
             }
         } finally {
             setLoading(false)
@@ -147,6 +155,13 @@ const CaptainLogin = () => {
                             </div>
 
                             <form onSubmit={(e) => submitHandler(e)} className='space-y-6'>
+                                {/* Error Message Display */}
+                                {error && (
+                                    <div className="mb-4 text-center text-red-600 bg-red-100 border border-red-200 rounded-lg py-2 px-4 animate-pulse">
+                                        {error}
+                                    </div>
+                                )}
+
                                 <div className='relative'>
                                     <label className='block text-sm font-bold text-gray-800 mb-3'>
                                         <i className="ri-mail-line mr-2 text-green-600"></i>
