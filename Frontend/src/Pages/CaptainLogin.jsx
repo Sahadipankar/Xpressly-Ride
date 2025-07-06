@@ -19,6 +19,7 @@ const CaptainLogin = () => {
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [loadingSignup, setLoadingSignup] = useState(false)
     // useState hook to manage password visibility toggle
 
     const { captain, setCaptain } = React.useContext(CaptainDataContext) // Global captain state
@@ -229,12 +230,15 @@ const CaptainLogin = () => {
                                     <Link
                                         to='/captain-signup'
                                         className='w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-green-400 hover:text-green-600 transition-all duration-200 font-semibold group relative'
-                                        onClick={e => { if (loading) e.preventDefault(); }}
-                                        style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+                                        onClick={e => {
+                                            if (loadingSignup) { e.preventDefault(); return; }
+                                            setLoadingSignup(true);
+                                        }}
+                                        style={loadingSignup ? { pointerEvents: 'none', opacity: 0.6 } : {}}
                                     >
                                         <i className="ri-user-add-line text-lg group-hover:scale-110 transition-transform"></i>
-                                        <span>{loading ? 'Loading...' : 'Join as Captain'}</span>
-                                        {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
+                                        <span>{loadingSignup ? 'Loading...' : 'Join as Captain'}</span>
+                                        {loadingSignup && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                     </Link>
                                 </div>
                             </div>

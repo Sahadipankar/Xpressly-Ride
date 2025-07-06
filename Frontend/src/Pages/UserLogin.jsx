@@ -25,7 +25,9 @@ const UserLogin = () => {
     const [showPassword, setShowPassword] = useState(false)
     // useState hook to manage password visibility toggle
     const [userData, setUserData] = useState({})
-    const [loading, setLoading] = useState(false) // Loading state for async actions
+    const [loading, setLoading] = useState(false) // Loading state for login button
+    const [loadingSignup, setLoadingSignup] = useState(false) // Loading state for signup link
+    const [loadingCaptain, setLoadingCaptain] = useState(false) // Loading state for captain link
 
 
     const { user, setUser } = useContext(UserDataContext) // Using the UserDataContext to get and set user data.
@@ -226,12 +228,15 @@ const UserLogin = () => {
                                     <Link
                                         to='/signup'
                                         className='w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-400 hover:text-blue-600 transition-all duration-200 font-semibold group relative'
-                                        onClick={e => { if (loading) e.preventDefault(); }}
-                                        style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+                                        onClick={e => {
+                                            if (loadingSignup) { e.preventDefault(); return; }
+                                            setLoadingSignup(true);
+                                        }}
+                                        style={loadingSignup ? { pointerEvents: 'none', opacity: 0.6 } : {}}
                                     >
                                         <i className="ri-user-add-line text-lg group-hover:scale-110 transition-transform"></i>
-                                        <span>{loading ? 'Loading...' : 'Create New Account'}</span>
-                                        {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
+                                        <span>{loadingSignup ? 'Loading...' : 'Create New Account'}</span>
+                                        {loadingSignup && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                     </Link>
                                 </div>
                             </div>
@@ -245,8 +250,11 @@ const UserLogin = () => {
                             <Link
                                 to='/captain-login'
                                 className='relative w-full flex items-center justify-center bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl group overflow-hidden'
-                                onClick={e => { if (loading) e.preventDefault(); }}
-                                style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+                                onClick={e => {
+                                    if (loadingCaptain) { e.preventDefault(); return; }
+                                    setLoadingCaptain(true);
+                                }}
+                                style={loadingCaptain ? { pointerEvents: 'none', opacity: 0.6 } : {}}
                             >
                                 <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700'></div>
                                 <div className='relative flex items-center gap-3'>
@@ -254,10 +262,10 @@ const UserLogin = () => {
                                         <i className="ri-steering-2-line text-xl"></i>
                                     </div>
                                     <div>
-                                        <span className='block text-lg font-bold'>{loading ? 'Loading...' : 'Join as Captain'}</span>
+                                        <span className='block text-lg font-bold'>{loadingCaptain ? 'Loading...' : 'Join as Captain'}</span>
                                         <span className='block text-sm text-green-100'>Start earning today</span>
                                     </div>
-                                    {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
+                                    {loadingCaptain && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                 </div>
                             </Link>
                         </div>

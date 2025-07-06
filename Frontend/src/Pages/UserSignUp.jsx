@@ -21,7 +21,8 @@ const UserSignUp = () => {
     const [showPassword, setShowPassword] = useState(false)
     // useState hook to manage password visibility toggle
     const [userData, setUserData] = useState({})
-    const [loading, setLoading] = useState(false) // Loading state for async actions
+    const [loading, setLoading] = useState(false) // Loading state for signup button
+    const [loadingSignin, setLoadingSignin] = useState(false) // Loading state for sign in link
 
     const navigate = useNavigate() // Navigation hook for programmatic routing
     const { user, setUser } = useContext(UserDataContext) // Global user state management
@@ -259,12 +260,15 @@ const UserSignUp = () => {
                                     <Link
                                         to='/login'
                                         className='w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-400 hover:text-blue-600 transition-all duration-200 font-semibold group relative'
-                                        onClick={e => { if (loading) e.preventDefault(); }}
-                                        style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+                                        onClick={e => {
+                                            if (loadingSignin) { e.preventDefault(); return; }
+                                            setLoadingSignin(true);
+                                        }}
+                                        style={loadingSignin ? { pointerEvents: 'none', opacity: 0.6 } : {}}
                                     >
                                         <i className="ri-login-circle-line text-lg group-hover:scale-110 transition-transform"></i>
-                                        <span>{loading ? 'Loading...' : 'Sign In Instead'}</span>
-                                        {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
+                                        <span>{loadingSignin ? 'Loading...' : 'Sign In Instead'}</span>
+                                        {loadingSignin && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                     </Link>
                                 </div>
                             </div>

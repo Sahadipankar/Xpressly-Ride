@@ -33,6 +33,7 @@ const CaptainSignUp = () => {
 
     const { captain, setCaptain } = React.useContext(CaptainDataContext) // Global captain state
     const [loading, setLoading] = useState(false)
+    const [loadingSignin, setLoadingSignin] = useState(false)
 
     /**
      * Captain registration form submission handler
@@ -345,12 +346,15 @@ const CaptainSignUp = () => {
                                     <Link
                                         to='/captain-login'
                                         className='w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-green-400 hover:text-green-600 transition-all duration-200 font-semibold group relative'
-                                        onClick={e => { if (loading) e.preventDefault(); }}
-                                        style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+                                        onClick={e => {
+                                            if (loadingSignin) { e.preventDefault(); return; }
+                                            setLoadingSignin(true);
+                                        }}
+                                        style={loadingSignin ? { pointerEvents: 'none', opacity: 0.6 } : {}}
                                     >
                                         <i className="ri-login-circle-line text-lg group-hover:scale-110 transition-transform"></i>
-                                        <span>{loading ? 'Loading...' : 'Sign In Instead'}</span>
-                                        {loading && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
+                                        <span>{loadingSignin ? 'Loading...' : 'Sign In Instead'}</span>
+                                        {loadingSignin && <span className="ml-2 animate-spin ri-loader-4-line text-xl"></span>}
                                     </Link>
                                 </div>
                             </div>
