@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
  * Uses connection string from environment variables for security
  */
 function connectToDB() {
-    mongoose.connect(process.env.DB_CONNECT).then(() => {
+    mongoose.connect(process.env.DB_CONNECT, {dbName: "Xpressly",}).then(() => {
         // Connection successful - no logging in production
         console.log('Connected to MongoDB');
     })
